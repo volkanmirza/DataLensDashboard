@@ -17,7 +17,21 @@ namespace DataLens.Models
         [StringLength(500)]
         public string? Description { get; set; }
 
+        [StringLength(50)]
+        public string Type { get; set; } = "Standard"; // Standard, Department, Project, Custom
+
+        public string? ParentGroupId { get; set; }
+
+        public int? MaxMembers { get; set; }
+
+        public bool AllowSelfJoin { get; set; } = false;
+
+        [StringLength(200)]
+        public string? Tags { get; set; }
+
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+
+        public DateTime? UpdatedDate { get; set; }
 
         public bool IsActive { get; set; } = true;
 

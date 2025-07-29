@@ -1,0 +1,742 @@
+@model DataLens.Models.User
+
+@{
+    ViewData["Title"] = "Profilim";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles {
+    <!-- Select2 -->
+    <link rel="stylesheet" href="~/lib/admin-lte/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="~/lib/admin-lte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+    <!-- iCheck for checkboxes and radio inputs -->
+    <link rel="stylesheet" href="~/lib/admin-lte/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+    <!-- Tempusdominus Bootstrap 4 -->
+    <link rel="stylesheet" href="~/lib/admin-lte/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
+}
+
+@section Breadcrumbs {
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">Profilim</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Ana Sayfa</a></li>
+                        <li class="breadcrumb-item active">Profil</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-3">
+                <!-- Profile Image -->
+                <div class="card card-primary card-outline">
+                    <div class="card-body box-profile">
+                        <div class="text-center">
+                            <img class="profile-user-img img-fluid img-circle"
+                                 src="~/lib/admin-lte/img/user4-128x128.jpg"
+                                 alt="User profile picture"
+                                 id="profileImage">
+                        </div>
+
+                        <h3 class="profile-username text-center" id="displayName">@ViewBag.FullName</h3>
+
+                        <p class="text-muted text-center">
+                            @switch (Model.Role)
+                            {
+                                case "Admin":
+                                    <span class="badge badge-danger">@Model.Role</span>
+                                    break;
+                                case "Designer":
+                                    <span class="badge badge-warning">@Model.Role</span>
+                                    break;
+                                case "Viewer":
+                                    <span class="badge badge-info">@Model.Role</span>
+                                    break;
+                                default:
+                                    <span class="badge badge-secondary">@Model.Role</span>
+                                    break;
+                            }
+                        </p>
+
+                        <ul class="list-group list-group-unbordered mb-3">
+                            <li class="list-group-item">
+                                <b>Dashboard Sayısı</b> <a class="float-right" id="dashboardCount">0</a>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Toplam Görüntüleme</b> <a class="float-right" id="totalViews">0</a>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Aktif Gün</b> <a class="float-right" id="activeDays">0</a>
+                            </li>
+                        </ul>
+
+                        <div class="row">
+                            <div class="col-12">
+                                <button class="btn btn-primary btn-block" data-toggle="modal" data-target="#changeProfileImageModal">
+                                    <i class="fas fa-camera"></i> Profil Fotoğrafı Değiştir
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Account Status -->
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Hesap Bilgileri</h3>
+                    </div>
+                    <div class="card-body">
+                        <strong><i class="fas fa-user-check mr-1"></i> Durum</strong>
+                        <p class="text-muted">
+                            @if (Model.IsActive)
+                            {
+                                <span class="badge badge-success">Aktif</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-secondary">Pasif</span>
+                            }
+                        </p>
+                        <hr>
+
+                        <strong><i class="fas fa-calendar mr-1"></i> Üyelik Tarihi</strong>
+                        <p class="text-muted">@Model.CreatedDate.ToString("dd MMMM yyyy")</p>
+                        <hr>
+
+                        <strong><i class="fas fa-clock mr-1"></i> Son Giriş</strong>
+                        <p class="text-muted" id="lastLoginDate">Yükleniyor...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-9">
+                <div class="card">
+                    <div class="card-header p-2">
+                        <ul class="nav nav-pills">
+                            <li class="nav-item"><a class="nav-link active" href="#settings" data-toggle="tab">Profil Bilgileri</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#security" data-toggle="tab">Güvenlik</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#preferences" data-toggle="tab">Tercihler</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#activity" data-toggle="tab">Aktiviteler</a></li>
+                        </ul>
+                    </div>
+                    <div class="card-body">
+                        <div class="tab-content">
+                            <!-- Profile Settings Tab -->
+                            <div class="active tab-pane" id="settings">
+                                <form asp-action="UpdateProfile" method="post" id="profileForm" class="form-horizontal">
+                                    <input asp-for="Id" type="hidden" />
+                                    <input asp-for="CreatedDate" type="hidden" />
+                                    <input asp-for="PasswordHash" type="hidden" />
+                                    <input asp-for="Role" type="hidden" />
+                                    <input asp-for="IsActive" type="hidden" />
+
+                                    <div class="form-group row">
+                                        <label asp-for="Username" class="col-sm-2 col-form-label">Kullanıcı Adı</label>
+                                        <div class="col-sm-10">
+                                            <input asp-for="Username" class="form-control" readonly />
+                                            <small class="form-text text-muted">Kullanıcı adı değiştirilemez.</small>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label asp-for="Email" class="col-sm-2 col-form-label">E-posta <span class="text-danger">*</span></label>
+                                        <div class="col-sm-10">
+                                            <input asp-for="Email" type="email" class="form-control" />
+                                            <span asp-validation-for="Email" class="text-danger"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label for="FirstName" class="col-sm-2 col-form-label">Ad</label>
+                                        <div class="col-sm-10">
+                                            <input type="text" id="FirstName" name="FirstName" value="@ViewBag.FirstName" class="form-control" />
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label for="LastName" class="col-sm-2 col-form-label">Soyad</label>
+                                        <div class="col-sm-10">
+                                            <input type="text" id="LastName" name="LastName" value="@ViewBag.LastName" class="form-control" />
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label for="Phone" class="col-sm-2 col-form-label">Telefon</label>
+                                        <div class="col-sm-10">
+                                            <input type="tel" id="Phone" name="Phone" value="@ViewBag.Phone" class="form-control" />
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label for="Department" class="col-sm-2 col-form-label">Departman</label>
+                                        <div class="col-sm-10">
+                                            <input type="text" id="Department" name="Department" value="@ViewBag.Department" class="form-control" />
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label for="Bio" class="col-sm-2 col-form-label">Hakkımda</label>
+                                        <div class="col-sm-10">
+                                            <textarea id="Bio" name="Bio" class="form-control" rows="3" placeholder="Kendiniz hakkında kısa bilgi yazınız">@ViewBag.Bio</textarea>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <div class="offset-sm-2 col-sm-10">
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fas fa-save"></i> Profili Güncelle
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- Security Tab -->
+                            <div class="tab-pane" id="security">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card card-warning">
+                                            <div class="card-header">
+                                                <h3 class="card-title">Şifre Değiştir</h3>
+                                            </div>
+                                            <form id="changePasswordForm">
+                                                <div class="card-body">
+                                                    <div class="form-group">
+                                                        <label for="currentPassword">Mevcut Şifre <span class="text-danger">*</span></label>
+                                                        <div class="input-group">
+                                                            <input type="password" id="currentPassword" name="currentPassword" class="form-control" />
+                                                            <div class="input-group-append">
+                                                                <button type="button" class="btn btn-outline-secondary" id="toggleCurrentPassword">
+                                                                    <i class="fas fa-eye"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label for="newPassword">Yeni Şifre <span class="text-danger">*</span></label>
+                                                        <div class="input-group">
+                                                            <input type="password" id="newPassword" name="newPassword" class="form-control" />
+                                                            <div class="input-group-append">
+                                                                <button type="button" class="btn btn-outline-secondary" id="toggleNewPassword">
+                                                                    <i class="fas fa-eye"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label for="confirmPassword">Yeni Şifre Tekrar <span class="text-danger">*</span></label>
+                                                        <div class="input-group">
+                                                            <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" />
+                                                            <div class="input-group-append">
+                                                                <button type="button" class="btn btn-outline-secondary" id="toggleConfirmPassword">
+                                                                    <i class="fas fa-eye"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="progress mb-2">
+                                                        <div class="progress-bar" id="passwordStrength" role="progressbar" style="width: 0%"></div>
+                                                    </div>
+                                                    <small id="passwordStrengthText" class="text-muted">Şifre gücü: Zayıf</small>
+                                                </div>
+                                                <div class="card-footer">
+                                                    <button type="submit" class="btn btn-warning">
+                                                        <i class="fas fa-key"></i> Şifreyi Değiştir
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card card-info">
+                                            <div class="card-header">
+                                                <h3 class="card-title">Güvenlik Bilgileri</h3>
+                                            </div>
+                                            <div class="card-body">
+                                                <dl class="row">
+                                                    <dt class="col-sm-6">Son Şifre Değişikliği:</dt>
+                                                    <dd class="col-sm-6" id="lastPasswordChange">Yükleniyor...</dd>
+                                                    <dt class="col-sm-6">Son Giriş IP:</dt>
+                                                    <dd class="col-sm-6" id="lastLoginIP">Yükleniyor...</dd>
+                                                    <dt class="col-sm-6">Başarısız Giriş:</dt>
+                                                    <dd class="col-sm-6" id="failedLoginCount">0</dd>
+                                                </dl>
+
+                                                <h6><i class="fas fa-shield-alt"></i> Güvenlik Önerileri</h6>
+                                                <ul class="list-unstyled">
+                                                    <li>• Şifrenizi düzenli olarak değiştirin</li>
+                                                    <li>• Güçlü şifre kullanın</li>
+                                                    <li>• Şifrenizi kimseyle paylaşmayın</li>
+                                                    <li>• Şüpheli aktivite durumunda bildirin</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Preferences Tab -->
+                            <div class="tab-pane" id="preferences">
+                                <form id="preferencesForm">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="card card-success">
+                                                <div class="card-header">
+                                                    <h3 class="card-title">Genel Tercihler</h3>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="form-group">
+                                                        <label for="language">Dil</label>
+                                                        <select id="language" name="language" class="form-control select2">
+                                                            <option value="tr">Türkçe</option>
+                                                            <option value="en">English</option>
+                                                        </select>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label for="timezone">Saat Dilimi</label>
+                                                        <select id="timezone" name="timezone" class="form-control select2">
+                                                            <option value="Europe/Istanbul">İstanbul (UTC+3)</option>
+                                                            <option value="UTC">UTC</option>
+                                                        </select>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label for="dateFormat">Tarih Formatı</label>
+                                                        <select id="dateFormat" name="dateFormat" class="form-control select2">
+                                                            <option value="dd.MM.yyyy">DD.MM.YYYY</option>
+                                                            <option value="MM/dd/yyyy">MM/DD/YYYY</option>
+                                                            <option value="yyyy-MM-dd">YYYY-MM-DD</option>
+                                                        </select>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <div class="icheck-primary">
+                                                            <input type="checkbox" id="darkMode" name="darkMode" />
+                                                            <label for="darkMode">Karanlık Tema</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="card card-info">
+                                                <div class="card-header">
+                                                    <h3 class="card-title">Bildirim Tercihleri</h3>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="form-group">
+                                                        <div class="icheck-primary">
+                                                            <input type="checkbox" id="emailNotifications" name="emailNotifications" checked />
+                                                            <label for="emailNotifications">E-posta Bildirimleri</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <div class="icheck-primary">
+                                                            <input type="checkbox" id="dashboardNotifications" name="dashboardNotifications" checked />
+                                                            <label for="dashboardNotifications">Dashboard Bildirimleri</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <div class="icheck-primary">
+                                                            <input type="checkbox" id="systemNotifications" name="systemNotifications" checked />
+                                                            <label for="systemNotifications">Sistem Bildirimleri</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <div class="icheck-primary">
+                                                            <input type="checkbox" id="weeklyReports" name="weeklyReports" />
+                                                            <label for="weeklyReports">Haftalık Raporlar</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <button type="submit" class="btn btn-success">
+                                                <i class="fas fa-save"></i> Tercihleri Kaydet
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- Activity Tab -->
+                            <div class="tab-pane" id="activity">
+                                <div class="timeline timeline-inverse" id="activityTimeline">
+                                    <!-- Timeline will be loaded via AJAX -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Change Profile Image Modal -->
+<div class="modal fade" id="changeProfileImageModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Profil Fotoğrafı Değiştir</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center">
+                    <img id="imagePreview" src="~/lib/admin-lte/img/user4-128x128.jpg" class="img-circle" style="width: 150px; height: 150px;" />
+                </div>
+                <div class="form-group mt-3">
+                    <label for="profileImageFile">Fotoğraf Seç</label>
+                    <input type="file" id="profileImageFile" class="form-control-file" accept="image/*" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="uploadImage">Fotoğrafı Yükle</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- Select2 -->
+    <script src="~/lib/admin-lte/plugins/select2/js/select2.full.min.js"></script>
+    <!-- jquery-validation -->
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+    <script>
+        $(function () {
+            // Initialize Select2
+            $('.select2').select2({
+                theme: 'bootstrap4'
+            });
+
+            // Load user data
+            loadUserStatistics();
+            loadSecurityInfo();
+            loadUserPreferences();
+            loadActivityTimeline();
+
+            // Password visibility toggles
+            $('#toggleCurrentPassword, #toggleNewPassword, #toggleConfirmPassword').click(function () {
+                var targetId = $(this).attr('id').replace('toggle', '').toLowerCase();
+                var targetField = $('#' + targetId);
+                var icon = $(this).find('i');
+                
+                if (targetField.attr('type') === 'password') {
+                    targetField.attr('type', 'text');
+                    icon.removeClass('fa-eye').addClass('fa-eye-slash');
+                } else {
+                    targetField.attr('type', 'password');
+                    icon.removeClass('fa-eye-slash').addClass('fa-eye');
+                }
+            });
+
+            // Password strength checker
+            $('#newPassword').on('input', function () {
+                var password = $(this).val();
+                var strength = checkPasswordStrength(password);
+                updatePasswordStrengthUI(strength);
+            });
+
+            // Profile image preview
+            $('#profileImageFile').change(function () {
+                var file = this.files[0];
+                if (file) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        $('#imagePreview').attr('src', e.target.result);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Form validations
+            setupFormValidations();
+        });
+
+        function loadUserStatistics() {
+            $.ajax({
+                url: '@Url.Action("GetMyStatistics", "Account")',
+                type: 'GET',
+                success: function (data) {
+                    $('#dashboardCount').text(data.dashboardCount);
+                    $('#totalViews').text(data.totalViews);
+                    $('#activeDays').text(data.activeDays);
+                },
+                error: function () {
+                    console.log('İstatistikler yüklenirken hata oluştu.');
+                }
+            });
+        }
+
+        function loadSecurityInfo() {
+            $.ajax({
+                url: '@Url.Action("GetSecurityInfo", "Account")',
+                type: 'GET',
+                success: function (data) {
+                    $('#lastPasswordChange').text(data.lastPasswordChange ? new Date(data.lastPasswordChange).toLocaleDateString('tr-TR') : 'Hiç değiştirilmemiş');
+                    $('#lastLoginIP').text(data.lastLoginIP || 'Bilinmiyor');
+                    $('#failedLoginCount').text(data.failedLoginCount || 0);
+                    $('#lastLoginDate').text(data.lastLoginDate ? new Date(data.lastLoginDate).toLocaleString('tr-TR') : 'Hiç giriş yapmamış');
+                },
+                error: function () {
+                    console.log('Güvenlik bilgileri yüklenirken hata oluştu.');
+                }
+            });
+        }
+
+        function loadUserPreferences() {
+            $.ajax({
+                url: '@Url.Action("GetPreferences", "Account")',
+                type: 'GET',
+                success: function (data) {
+                    $('#language').val(data.language || 'tr').trigger('change');
+                    $('#timezone').val(data.timezone || 'Europe/Istanbul').trigger('change');
+                    $('#dateFormat').val(data.dateFormat || 'dd.MM.yyyy').trigger('change');
+                    $('#darkMode').prop('checked', data.darkMode || false);
+                    $('#emailNotifications').prop('checked', data.emailNotifications !== false);
+                    $('#dashboardNotifications').prop('checked', data.dashboardNotifications !== false);
+                    $('#systemNotifications').prop('checked', data.systemNotifications !== false);
+                    $('#weeklyReports').prop('checked', data.weeklyReports || false);
+                },
+                error: function () {
+                    console.log('Tercihler yüklenirken hata oluştu.');
+                }
+            });
+        }
+
+        function loadActivityTimeline() {
+            $.ajax({
+                url: '@Url.Action("GetMyActivities", "Account")',
+                type: 'GET',
+                success: function (data) {
+                    var html = '';
+                    if (data.length > 0) {
+                        data.forEach(function (item) {
+                            html += '<div class="time-label"><span class="bg-info">' + new Date(item.date).toLocaleDateString('tr-TR') + '</span></div>';
+                            html += '<div><i class="fas fa-' + item.icon + ' bg-blue"></i>';
+                            html += '<div class="timeline-item"><span class="time"><i class="fas fa-clock"></i> ' + new Date(item.date).toLocaleTimeString('tr-TR') + '</span>';
+                            html += '<h3 class="timeline-header">' + item.title + '</h3>';
+                            html += '<div class="timeline-body">' + item.description + '</div></div></div>';
+                        });
+                        html += '<div><i class="far fa-clock bg-gray"></i></div>';
+                    } else {
+                        html = '<p class="text-muted">Henüz aktivite bulunmuyor.</p>';
+                    }
+                    $('#activityTimeline').html(html);
+                },
+                error: function () {
+                    $('#activityTimeline').html('<p class="text-danger">Aktiviteler yüklenirken hata oluştu.</p>');
+                }
+            });
+        }
+
+        function setupFormValidations() {
+            $('#profileForm').validate({
+                rules: {
+                    Email: {
+                        required: true,
+                        email: true
+                    }
+                },
+                messages: {
+                    Email: {
+                        required: "E-posta adresi gereklidir",
+                        email: "Geçerli bir e-posta adresi giriniz"
+                    }
+                }
+            });
+
+            $('#changePasswordForm').validate({
+                rules: {
+                    currentPassword: {
+                        required: true
+                    },
+                    newPassword: {
+                        required: true,
+                        minlength: 8
+                    },
+                    confirmPassword: {
+                        required: true,
+                        equalTo: "#newPassword"
+                    }
+                },
+                messages: {
+                    currentPassword: {
+                        required: "Mevcut şifre gereklidir"
+                    },
+                    newPassword: {
+                        required: "Yeni şifre gereklidir",
+                        minlength: "Şifre en az 8 karakter olmalıdır"
+                    },
+                    confirmPassword: {
+                        required: "Şifre tekrarı gereklidir",
+                        equalTo: "Şifreler eşleşmiyor"
+                    }
+                },
+                submitHandler: function (form) {
+                    changePassword();
+                    return false;
+                }
+            });
+
+            $('#preferencesForm').submit(function (e) {
+                e.preventDefault();
+                savePreferences();
+            });
+        }
+
+        function checkPasswordStrength(password) {
+            var strength = 0;
+            var checks = {
+                length: password.length >= 8,
+                lowercase: /[a-z]/.test(password),
+                uppercase: /[A-Z]/.test(password),
+                number: /[0-9]/.test(password),
+                special: /[^A-Za-z0-9]/.test(password)
+            };
+
+            for (var check in checks) {
+                if (checks[check]) strength += 20;
+            }
+
+            return { score: strength, checks: checks };
+        }
+
+        function updatePasswordStrengthUI(strength) {
+            var progressBar = $('#passwordStrength');
+            var strengthText = $('#passwordStrengthText');
+            var score = strength.score;
+
+            progressBar.css('width', score + '%').attr('aria-valuenow', score);
+
+            if (score < 40) {
+                progressBar.removeClass().addClass('progress-bar bg-danger');
+                strengthText.text('Şifre gücü: Çok Zayıf');
+            } else if (score < 60) {
+                progressBar.removeClass().addClass('progress-bar bg-warning');
+                strengthText.text('Şifre gücü: Zayıf');
+            } else if (score < 80) {
+                progressBar.removeClass().addClass('progress-bar bg-info');
+                strengthText.text('Şifre gücü: Orta');
+            } else if (score < 100) {
+                progressBar.removeClass().addClass('progress-bar bg-primary');
+                strengthText.text('Şifre gücü: Güçlü');
+            } else {
+                progressBar.removeClass().addClass('progress-bar bg-success');
+                strengthText.text('Şifre gücü: Çok Güçlü');
+            }
+        }
+
+        function changePassword() {
+            var currentPassword = $('#currentPassword').val();
+            var newPassword = $('#newPassword').val();
+            var confirmPassword = $('#confirmPassword').val();
+
+            $.ajax({
+                url: '@Url.Action("ChangePassword", "Account")',
+                type: 'POST',
+                data: {
+                    currentPassword: currentPassword,
+                    newPassword: newPassword,
+                    confirmPassword: confirmPassword
+                },
+                success: function (result) {
+                    if (result.success) {
+                        $('#changePasswordForm')[0].reset();
+                        toastr.success('Şifre başarıyla değiştirildi.');
+                        loadSecurityInfo();
+                    } else {
+                        toastr.error(result.message || 'Şifre değiştirilirken hata oluştu.');
+                    }
+                },
+                error: function () {
+                    toastr.error('Şifre değiştirilirken hata oluştu.');
+                }
+            });
+        }
+
+        function savePreferences() {
+            var preferences = {
+                language: $('#language').val(),
+                timezone: $('#timezone').val(),
+                dateFormat: $('#dateFormat').val(),
+                darkMode: $('#darkMode').is(':checked'),
+                emailNotifications: $('#emailNotifications').is(':checked'),
+                dashboardNotifications: $('#dashboardNotifications').is(':checked'),
+                systemNotifications: $('#systemNotifications').is(':checked'),
+                weeklyReports: $('#weeklyReports').is(':checked')
+            };
+
+            $.ajax({
+                url: '@Url.Action("SavePreferences", "Account")',
+                type: 'POST',
+                data: preferences,
+                success: function (result) {
+                    if (result.success) {
+                        toastr.success('Tercihler başarıyla kaydedildi.');
+                    } else {
+                        toastr.error(result.message || 'Tercihler kaydedilirken hata oluştu.');
+                    }
+                },
+                error: function () {
+                    toastr.error('Tercihler kaydedilirken hata oluştu.');
+                }
+            });
+        }
+
+        $('#uploadImage').click(function () {
+            var fileInput = $('#profileImageFile')[0];
+            if (fileInput.files.length === 0) {
+                toastr.warning('Lütfen bir fotoğraf seçiniz.');
+                return;
+            }
+
+            var formData = new FormData();
+            formData.append('profileImage', fileInput.files[0]);
+
+            $.ajax({
+                url: '@Url.Action("UploadProfileImage", "Account")',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (result) {
+                    if (result.success) {
+                        $('#changeProfileImageModal').modal('hide');
+                        $('#profileImage').attr('src', result.imageUrl);
+                        toastr.success('Profil fotoğrafı başarıyla güncellendi.');
+                    } else {
+                        toastr.error(result.message || 'Fotoğraf yüklenirken hata oluştu.');
+                    }
+                },
+                error: function () {
+                    toastr.error('Fotoğraf yüklenirken hata oluştu.');
+                }
+            });
+        });
+    </script>
+}

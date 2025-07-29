@@ -2,6 +2,7 @@ using DataLens.Data;
 using DataLens.Data.Interfaces;
 using DataLens.Data.SqlServer;
 using DataLens.Data.MongoDB;
+using MongoDB.Driver;
 using DataLens.Services;
 using DataLens.Services.Interfaces;
 using DataLens.Middleware;
@@ -27,7 +28,6 @@ builder.Services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>();
 
 // Unit of Work Factory Registration
 builder.Services.AddScoped<IUnitOfWorkFactory, UnitOfWorkFactory>();
-builder.Services.AddScoped<IUnitOfWork>(provider => provider.GetRequiredService<IUnitOfWorkFactory>().CreateUnitOfWork());
 
 // Repository Registration based on Database Type
 var databaseType = builder.Configuration["DatabaseSettings:DatabaseType"] ?? "SqlServer";
@@ -50,10 +50,21 @@ switch (databaseType)
         });
         break;
     case "MongoDB":
+        builder.Services.AddSingleton<IMongoDatabase>(provider =>
+        {
+            var connectionFactory = provider.GetRequiredService<IDbConnectionFactory>();
+            return connectionFactory.CreateMongoDatabase();
+        });
         builder.Services.AddScoped<IUserRepository, MongoUserRepository>();
+        builder.Services.AddScoped<IUserGroupRepository, MongoUserGroupRepository>();
+        builder.Services.AddScoped<IUserGroupMemberRepository, MongoUserGroupMemberRepository>();
         builder.Services.AddScoped<IUserGroupMembershipRepository, MongoUserGroupMembershipRepository>();
-        builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
-        builder.Services.AddScoped<IDashboardPermissionRepository, DashboardPermissionRepository>();
+        builder.Services.AddScoped<IDashboardRepository, MongoDashboardRepository>();
+        builder.Services.AddScoped<IDashboardPermissionRepository, MongoDashboardPermissionRepository>();
+        builder.Services.AddScoped<INotificationRepository, MongoNotificationRepository>();
+        builder.Services.AddScoped<IUserSettingsRepository, MongoUserSettingsRepository>();
+        builder.Services.AddScoped<IUnitOfWork, MongoUnitOfWork>();
+        builder.Services.AddScoped<IMongoDbInitializer, MongoDbInitializer>();
         break;
     default:
         throw new NotSupportedException($"Database type '{databaseType}' is not supported");
@@ -130,5 +141,19 @@ app.MapControllerRoute(
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+// MongoDB Database Initialization
+if (databaseType == "MongoDB")
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var mongoInitializer = scope.ServiceProvider.GetRequiredService<IMongoDbInitializer>();
+        if (!await mongoInitializer.IsDatabaseInitializedAsync())
+        {
+            await mongoInitializer.InitializeAsync();
+            await mongoInitializer.SeedDataAsync();
+        }
+    }
+}
 
 app.Run();

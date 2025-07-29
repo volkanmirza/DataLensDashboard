@@ -1,0 +1,195 @@
+<!-- Main Sidebar Container -->
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <!-- Brand Logo -->
+    <a href="@Url.Action("Index", "Home")" class="brand-link">
+        <img src="~/lib/admin-lte/img/AdminLTELogo.png" alt="DataLens Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+        <span class="brand-text font-weight-light">DataLens</span>
+    </a>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <!-- Sidebar user panel (optional) -->
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+            <div class="image">
+                <img src="~/lib/admin-lte/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
+            </div>
+            <div class="info">
+                <a href="@Url.Action("Index", "Profile", new { area = "Profile" })" class="d-block">Kullanıcı Adı</a>
+            </div>
+        </div>
+
+        <!-- SidebarSearch Form -->
+        <div class="form-inline">
+            <div class="input-group" data-widget="sidebar-search">
+                <input class="form-control form-control-sidebar" type="search" placeholder="Ara..." aria-label="Search">
+                <div class="input-group-append">
+                    <button class="btn btn-sidebar">
+                        <i class="fa fa-search fa-fw"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Menu -->
+        <nav class="mt-2">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                <!-- Add icons to the links using the .nav-icon class with font-awesome or any other icon font library -->
+                
+                <!-- Dashboard -->
+                <li class="nav-item">
+                    <a href="@Url.Action("Index", "Home")" class="nav-link">
+                        <i class="nav-icon fa fa-tachometer"></i>
+                        <p>Ana Sayfa</p>
+                    </a>
+                </li>
+                
+                <!-- Dashboard Management -->
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fa fa-dashboard"></i>
+                        <p>
+                            Dashboard'lar
+                            <i class="right fa fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="@Url.Action("Index", "Dashboard", new { area = "Dashboard" })" class="nav-link">
+                                <i class="fa fa-circle-o nav-icon"></i>
+                                <p>Dashboard Listesi</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="@Url.Action("Create", "Dashboard", new { area = "Dashboard" })" class="nav-link">
+                                <i class="fa fa-circle-o nav-icon"></i>
+                                <p>Yeni Dashboard</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="@Url.Action("Designer", "Dashboard", new { area = "Dashboard" })" class="nav-link">
+                                <i class="fa fa-circle-o nav-icon"></i>
+                                <p>Dashboard Tasarımcısı</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                
+                <!-- Admin Section (Only for Admin users) -->
+                <li class="nav-header">YÖNETİM</li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fa fa-users"></i>
+                        <p>
+                            Kullanıcı Yönetimi
+                            <i class="right fa fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="@Url.Action("Index", "User", new { area = "Admin" })" class="nav-link">
+                                <i class="fa fa-circle-o nav-icon"></i>
+                                <p>Kullanıcılar</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="@Url.Action("Index", "UserGroup", new { area = "Admin" })" class="nav-link">
+                                <i class="fa fa-circle-o nav-icon"></i>
+                                <p>Kullanıcı Grupları</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                
+                <!-- Dashboard Permissions -->
+                <li class="nav-item">
+                    <a href="@Url.Action("Manage", "DashboardPermission", new { area = "Dashboard" })" class="nav-link">
+                        <i class="nav-icon fa fa-lock"></i>
+                        <p>Dashboard İzinleri</p>
+                    </a>
+                </li>
+                
+                <!-- Profile Section -->
+                <li class="nav-header">PROFİL</li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fa fa-user"></i>
+                        <p>
+                            Hesabım
+                            <i class="right fa fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="@Url.Action("Index", "Profile", new { area = "Profile" })" class="nav-link">
+                                <i class="fa fa-circle-o nav-icon"></i>
+                                <p>Profil Bilgileri</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="@Url.Action("Index", "Settings", new { area = "Profile" })" class="nav-link">
+                                <i class="fa fa-circle-o nav-icon"></i>
+                                <p>Ayarlar</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="@Url.Action("Index", "Notification", new { area = "Profile" })" class="nav-link">
+                                <i class="fa fa-circle-o nav-icon"></i>
+                                <p>Bildirimler</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                
+                <!-- Reports -->
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fa fa-file-text-o"></i>
+                        <p>
+                            Raporlar
+                            <i class="right fa fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fa fa-circle-o nav-icon"></i>
+                                <p>Kullanım Raporları</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fa fa-circle-o nav-icon"></i>
+                                <p>Performans Raporları</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                
+                <!-- System -->
+                <li class="nav-header">SİSTEM</li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fa fa-cog"></i>
+                        <p>Sistem Ayarları</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fa fa-info-circle"></i>
+                        <p>Hakkında</p>
+                    </a>
+                </li>
+                
+                <!-- Logout -->
+                <li class="nav-item">
+                    <a href="@Url.Action("Logout", "Account")" class="nav-link">
+                        <i class="nav-icon fa fa-sign-out"></i>
+                        <p>Çıkış Yap</p>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <!-- /.sidebar-menu -->
+    </div>
+    <!-- /.sidebar -->
+</aside>

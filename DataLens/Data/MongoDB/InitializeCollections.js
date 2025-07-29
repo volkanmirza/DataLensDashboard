@@ -1,8 +1,8 @@
 // MongoDB Collection Initialization Script
 // Run this script in MongoDB shell or MongoDB Compass
 
-// Switch to DataLensDb database
-use('DataLensDb');
+// Switch to datalens database
+use('datalens');
 
 // Create Users collection with validation schema
 db.createCollection('Users', {

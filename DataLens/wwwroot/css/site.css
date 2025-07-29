@@ -1,5 +1,10 @@
+/* DataLens Dashboard Custom Styles */
+
+/* Base HTML and Body Styles */
 html {
   font-size: 14px;
+  position: relative;
+  min-height: 100%;
 }
 
 @media (min-width: 768px) {
@@ -8,19 +13,20 @@ html {
   }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
-}
-
 body {
-  margin-bottom: 60px;
+  font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+  font-weight: 400;
+  line-height: 1.6;
+  color: #212529;
+  background-color: #f4f6f9;
 }
 
+/* Focus Styles */
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #007bff;
+}
+
+/* Form Styles */
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
   color: var(--bs-secondary-color);
   text-align: end;
@@ -28,4 +34,289 @@ body {
 
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
+}
+
+/* AdminLTE Custom Overrides */
+.main-header {
+  border-bottom: 1px solid #dee2e6;
+}
+
+.main-sidebar {
+  box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+}
+
+.content-wrapper {
+  background-color: #f4f6f9;
+}
+
+/* Card Enhancements */
+.card {
+  box-shadow: 0 0 1px rgba(0,0,0,.125), 0 1px 3px rgba(0,0,0,.2);
+  margin-bottom: 1rem;
+  border: 0;
+}
+
+.card-header {
+  background-color: transparent;
+  border-bottom: 1px solid rgba(0,0,0,.125);
+  padding: .75rem 1.25rem;
+  position: relative;
+  border-top-left-radius: .25rem;
+  border-top-right-radius: .25rem;
+}
+
+.card-title {
+  float: left;
+  font-size: 1.1rem;
+  font-weight: 400;
+  margin: 0;
+}
+
+/* Small Box Enhancements */
+.small-box {
+  border-radius: .25rem;
+  box-shadow: 0 0 1px rgba(0,0,0,.125), 0 1px 3px rgba(0,0,0,.2);
+  display: block;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.small-box > .inner {
+  padding: 10px;
+}
+
+.small-box > .small-box-footer {
+  background-color: rgba(0,0,0,.1);
+  color: rgba(255,255,255,.8);
+  display: block;
+  padding: 3px 0;
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+  z-index: 10;
+}
+
+.small-box > .small-box-footer:hover {
+  color: #fff;
+  background-color: rgba(0,0,0,.15);
+}
+
+.small-box h3 {
+  font-size: 2.2rem;
+  font-weight: bold;
+  margin: 0 0 10px 0;
+  white-space: nowrap;
+  padding: 0;
+}
+
+.small-box p {
+  font-size: 1rem;
+}
+
+.small-box .icon {
+  color: rgba(0,0,0,.15);
+  z-index: 0;
+}
+
+.small-box .icon > i {
+  font-size: 90px;
+  position: absolute;
+  right: 15px;
+  top: 15px;
+  transition: transform .3s linear;
+}
+
+.small-box:hover .icon > i {
+  transform: scale(1.1);
+}
+
+/* Breadcrumb Styles */
+.content-header {
+  padding: 15px .5rem;
+}
+
+.breadcrumb {
+  background-color: transparent;
+  margin-bottom: 0;
+  padding: 0;
+}
+
+/* Navigation Enhancements */
+.nav-sidebar .nav-link {
+  border-radius: .25rem;
+  margin-bottom: .25rem;
+}
+
+.nav-sidebar .nav-link.active {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.nav-sidebar .nav-link:hover {
+  background-color: rgba(255,255,255,.1);
+}
+
+/* Button Enhancements */
+.btn {
+  border-radius: .25rem;
+  font-weight: 400;
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  border: 1px solid transparent;
+  padding: .375rem .75rem;
+  font-size: .875rem;
+  line-height: 1.5;
+  transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
+/* Table Enhancements */
+.table {
+  margin-bottom: 0;
+}
+
+.table th {
+  border-top: 0;
+  font-weight: 600;
+}
+
+/* Login Page Styles */
+.login-page {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+}
+
+.login-box {
+  width: 360px;
+  margin: 7% auto;
+}
+
+.login-logo {
+  font-size: 2.1rem;
+  font-weight: 300;
+  margin-bottom: 0.9rem;
+  text-align: center;
+}
+
+.login-logo a {
+  color: #495057;
+  text-decoration: none;
+}
+
+.login-card-body {
+  background-color: #fff;
+  border-radius: .25rem;
+  box-shadow: 0 0 1px rgba(0,0,0,.125), 0 1px 3px rgba(0,0,0,.2);
+  color: #666;
+  padding: 20px;
+}
+
+.login-box-msg {
+  margin: 0;
+  text-align: center;
+  padding: 0 20px 20px 20px;
+}
+
+/* Dashboard Specific Styles */
+.dashboard-stats {
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  transition: transform 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+}
+
+/* Chart Container */
+.chart-container {
+  position: relative;
+  height: 300px;
+  width: 100%;
+}
+
+/* DevExpress Dashboard Integration */
+.dx-dashboard {
+  height: 600px;
+  width: 100%;
+}
+
+.dx-dashboard-container {
+  border: 1px solid #dee2e6;
+  border-radius: .25rem;
+  overflow: hidden;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 767.98px) {
+  .small-box h3 {
+    font-size: 1.8rem;
+  }
+  
+  .small-box .icon > i {
+    font-size: 60px;
+  }
+  
+  .login-box {
+    width: 90%;
+    margin: 5% auto;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .card {
+    background-color: #343a40;
+    color: #fff;
+  }
+  
+  .card-header {
+    border-bottom-color: #495057;
+  }
+}
+
+/* Animation Classes */
+.fade-in {
+  animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.slide-in {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Utility Classes */
+.text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.shadow-sm {
+  box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);
+}
+
+.shadow {
+  box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
+}
+
+.shadow-lg {
+  box-shadow: 0 1rem 3rem rgba(0,0,0,.175);
 }

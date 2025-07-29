@@ -1,0 +1,580 @@
+@model DataLens.Models.User
+
+@{
+    ViewData["Title"] = "Kullanıcı Detayları";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@section Styles {
+    <!-- Chart.js -->
+    <link rel="stylesheet" href="~/lib/admin-lte/plugins/chart.js/Chart.min.css">
+}
+
+@section Breadcrumbs {
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">Kullanıcı Detayları</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home", new { area = "" })">Ana Sayfa</a></li>
+                        <li class="breadcrumb-item"><a href="#">Admin</a></li>
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Users", new { area = "Admin" })">Kullanıcılar</a></li>
+                        <li class="breadcrumb-item active">Detaylar</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-3">
+                <!-- Profile Image -->
+                <div class="card card-primary card-outline">
+                    <div class="card-body box-profile">
+                        <div class="text-center">
+                            <img class="profile-user-img img-fluid img-circle"
+                                 src="~/lib/admin-lte/img/user4-128x128.jpg"
+                                 alt="User profile picture">
+                        </div>
+
+                        <h3 class="profile-username text-center">@ViewBag.FullName</h3>
+
+                        <p class="text-muted text-center">
+                            @switch (Model.Role)
+                            {
+                                case "Admin":
+                                    <span class="badge badge-danger">@Model.Role</span>
+                                    break;
+                                case "Designer":
+                                    <span class="badge badge-warning">@Model.Role</span>
+                                    break;
+                                case "Viewer":
+                                    <span class="badge badge-info">@Model.Role</span>
+                                    break;
+                                default:
+                                    <span class="badge badge-secondary">@Model.Role</span>
+                                    break;
+                            }
+                        </p>
+
+                        <ul class="list-group list-group-unbordered mb-3">
+                            <li class="list-group-item">
+                                <b>Dashboard Sayısı</b> <a class="float-right" id="dashboardCount">0</a>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Toplam Görüntüleme</b> <a class="float-right" id="totalViews">0</a>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Aktif Gün</b> <a class="float-right" id="activeDays">0</a>
+                            </li>
+                        </ul>
+
+                        <div class="row">
+                            <div class="col-6">
+                                <a href="@Url.Action("Edit", "Users", new { area = "Admin", id = Model.Id })" class="btn btn-warning btn-block">
+                                    <i class="fas fa-edit"></i> Düzenle
+                                </a>
+                            </div>
+                            <div class="col-6">
+                                <button class="btn btn-primary btn-block" data-toggle="modal" data-target="#sendMessageModal">
+                                    <i class="fas fa-envelope"></i> Mesaj Gönder
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Account Status -->
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Hesap Durumu</h3>
+                    </div>
+                    <div class="card-body">
+                        <strong><i class="fas fa-user-check mr-1"></i> Durum</strong>
+                        <p class="text-muted">
+                            @if (Model.IsActive)
+                            {
+                                <span class="badge badge-success">Aktif</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-secondary">Pasif</span>
+                            }
+                        </p>
+                        <hr>
+
+                        <strong><i class="fas fa-calendar mr-1"></i> Oluşturma Tarihi</strong>
+                        <p class="text-muted">@Model.CreatedDate.ToString("dd MMMM yyyy, HH:mm")</p>
+                        <hr>
+
+                        <strong><i class="fas fa-clock mr-1"></i> Son Giriş</strong>
+                        <p class="text-muted" id="lastLoginDate">Yükleniyor...</p>
+                        <hr>
+
+                        <strong><i class="fas fa-map-marker-alt mr-1"></i> Departman</strong>
+                        <p class="text-muted">@ViewBag.Department</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-9">
+                <div class="card">
+                    <div class="card-header p-2">
+                        <ul class="nav nav-pills">
+                            <li class="nav-item"><a class="nav-link active" href="#activity" data-toggle="tab">Aktiviteler</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#timeline" data-toggle="tab">Zaman Çizelgesi</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#settings" data-toggle="tab">Bilgiler</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#dashboards" data-toggle="tab">Dashboard'lar</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#groups" data-toggle="tab">Gruplar</a></li>
+                        </ul>
+                    </div>
+                    <div class="card-body">
+                        <div class="tab-content">
+                            <!-- Activity Tab -->
+                            <div class="active tab-pane" id="activity">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h3 class="card-title">Aylık Aktivite</h3>
+                                            </div>
+                                            <div class="card-body">
+                                                <canvas id="monthlyActivityChart" style="height: 300px;"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h3 class="card-title">Dashboard Kullanımı</h3>
+                                            </div>
+                                            <div class="card-body">
+                                                <canvas id="dashboardUsageChart" style="height: 300px;"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Recent Activities -->
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Son Aktiviteler</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="recentActivitiesList">
+                                            <!-- Activities will be loaded via AJAX -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Timeline Tab -->
+                            <div class="tab-pane" id="timeline">
+                                <div class="timeline timeline-inverse" id="userTimeline">
+                                    <!-- Timeline will be loaded via AJAX -->
+                                </div>
+                            </div>
+
+                            <!-- Settings Tab -->
+                            <div class="tab-pane" id="settings">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h3 class="card-title">Kişisel Bilgiler</h3>
+                                            </div>
+                                            <div class="card-body">
+                                                <dl class="row">
+                                                    <dt class="col-sm-4">Kullanıcı Adı:</dt>
+                                                    <dd class="col-sm-8">@Model.Username</dd>
+                                                    <dt class="col-sm-4">E-posta:</dt>
+                                                    <dd class="col-sm-8">@Model.Email</dd>
+                                                    <dt class="col-sm-4">Ad:</dt>
+                                                    <dd class="col-sm-8">@ViewBag.FirstName</dd>
+                                                    <dt class="col-sm-4">Soyad:</dt>
+                                                    <dd class="col-sm-8">@ViewBag.LastName</dd>
+                                                    <dt class="col-sm-4">Telefon:</dt>
+                                                    <dd class="col-sm-8">@ViewBag.Phone</dd>
+                                                    <dt class="col-sm-4">Departman:</dt>
+                                                    <dd class="col-sm-8">@ViewBag.Department</dd>
+                                                </dl>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h3 class="card-title">Sistem Bilgileri</h3>
+                                            </div>
+                                            <div class="card-body">
+                                                <dl class="row">
+                                                    <dt class="col-sm-4">Kullanıcı ID:</dt>
+                                                    <dd class="col-sm-8">@Model.Id</dd>
+                                                    <dt class="col-sm-4">Rol:</dt>
+                                                    <dd class="col-sm-8">@Model.Role</dd>
+                                                    <dt class="col-sm-4">Durum:</dt>
+                                                    <dd class="col-sm-8">
+                                                        @if (Model.IsActive)
+                                                        {
+                                                            <span class="badge badge-success">Aktif</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="badge badge-secondary">Pasif</span>
+                                                        }
+                                                    </dd>
+                                                    <dt class="col-sm-4">Oluşturma:</dt>
+                                                    <dd class="col-sm-8">@Model.CreatedDate.ToString("dd.MM.yyyy HH:mm")</dd>
+                                                    <dt class="col-sm-4">Son Giriş:</dt>
+                                                    <dd class="col-sm-8" id="lastLoginInfo">Yükleniyor...</dd>
+                                                    <dt class="col-sm-4">IP Adresi:</dt>
+                                                    <dd class="col-sm-8" id="lastIpAddress">Yükleniyor...</dd>
+                                                </dl>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Dashboards Tab -->
+                            <div class="tab-pane" id="dashboards">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Kullanıcının Dashboard'ları</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row" id="userDashboards">
+                                            <!-- Dashboards will be loaded via AJAX -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Groups Tab -->
+                            <div class="tab-pane" id="groups">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Kullanıcı Grupları</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="userGroupsList">
+                                            <!-- Groups will be loaded via AJAX -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Send Message Modal -->
+<div class="modal fade" id="sendMessageModal" tabindex="-1" role="dialog" aria-labelledby="sendMessageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="sendMessageModalLabel">@ViewBag.FullName'e Mesaj Gönder</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="sendMessageForm">
+                <div class="modal-body">
+                    <input type="hidden" id="recipientId" value="@Model.Id" />
+                    
+                    <div class="form-group">
+                        <label for="messageSubject" class="form-label">Konu <span class="text-danger">*</span></label>
+                        <input type="text" id="messageSubject" name="messageSubject" class="form-control" placeholder="Mesaj konusunu giriniz" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="messageContent" class="form-label">Mesaj <span class="text-danger">*</span></label>
+                        <textarea id="messageContent" name="messageContent" class="form-control" rows="5" placeholder="Mesajınızı yazınız"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="icheck-primary">
+                            <input type="checkbox" id="sendEmail" name="sendEmail" checked />
+                            <label for="sendEmail">E-posta olarak da gönder</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-primary">Mesaj Gönder</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- Chart.js -->
+    <script src="~/lib/admin-lte/plugins/chart.js/Chart.min.js"></script>
+    <!-- jquery-validation -->
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+    <script>
+        $(function () {
+            // Load user data
+            loadUserStatistics();
+            loadUserInfo();
+            loadRecentActivities();
+            loadUserTimeline();
+            loadUserDashboards();
+            loadUserGroups();
+            
+            // Initialize charts
+            initializeCharts();
+
+            // Form validation
+            $('#sendMessageForm').validate({
+                rules: {
+                    messageSubject: {
+                        required: true,
+                        maxlength: 200
+                    },
+                    messageContent: {
+                        required: true,
+                        maxlength: 1000
+                    }
+                },
+                messages: {
+                    messageSubject: {
+                        required: "Konu gereklidir",
+                        maxlength: "Konu en fazla 200 karakter olabilir"
+                    },
+                    messageContent: {
+                        required: "Mesaj içeriği gereklidir",
+                        maxlength: "Mesaj en fazla 1000 karakter olabilir"
+                    }
+                },
+                submitHandler: function (form) {
+                    sendMessage();
+                    return false;
+                }
+            });
+        });
+
+        function loadUserStatistics() {
+            $.ajax({
+                url: '@Url.Action("GetUserStatistics", "Users", new { area = "Admin" })/' + @Model.Id,
+                type: 'GET',
+                success: function (data) {
+                    $('#dashboardCount').text(data.dashboardCount);
+                    $('#totalViews').text(data.totalViews);
+                    $('#activeDays').text(data.activeDays);
+                },
+                error: function () {
+                    console.log('İstatistikler yüklenirken hata oluştu.');
+                }
+            });
+        }
+
+        function loadUserInfo() {
+            $.ajax({
+                url: '@Url.Action("GetUserInfo", "Users", new { area = "Admin" })/' + @Model.Id,
+                type: 'GET',
+                success: function (data) {
+                    $('#lastLoginDate').text(data.lastLoginDate ? new Date(data.lastLoginDate).toLocaleString('tr-TR') : 'Hiç giriş yapmamış');
+                    $('#lastLoginInfo').text(data.lastLoginDate ? new Date(data.lastLoginDate).toLocaleString('tr-TR') : 'Hiç giriş yapmamış');
+                    $('#lastIpAddress').text(data.lastIpAddress || 'Bilinmiyor');
+                },
+                error: function () {
+                    $('#lastLoginDate').text('Yüklenemedi');
+                    $('#lastLoginInfo').text('Yüklenemedi');
+                    $('#lastIpAddress').text('Yüklenemedi');
+                }
+            });
+        }
+
+        function loadRecentActivities() {
+            $.ajax({
+                url: '@Url.Action("GetUserActivities", "Users", new { area = "Admin" })/' + @Model.Id,
+                type: 'GET',
+                success: function (data) {
+                    var html = '';
+                    if (data.length > 0) {
+                        data.forEach(function (activity) {
+                            html += '<div class="post">';
+                            html += '<div class="user-block">';
+                            html += '<img class="img-circle img-bordered-sm" src="~/lib/admin-lte/img/user1-128x128.jpg" alt="user image">';
+                            html += '<span class="username"><a href="#">' + activity.title + '</a></span>';
+                            html += '<span class="description">' + new Date(activity.date).toLocaleString('tr-TR') + '</span>';
+                            html += '</div>';
+                            html += '<p>' + activity.description + '</p>';
+                            html += '</div>';
+                        });
+                    } else {
+                        html = '<p class="text-muted">Henüz aktivite bulunmuyor.</p>';
+                    }
+                    $('#recentActivitiesList').html(html);
+                },
+                error: function () {
+                    $('#recentActivitiesList').html('<p class="text-danger">Aktiviteler yüklenirken hata oluştu.</p>');
+                }
+            });
+        }
+
+        function loadUserTimeline() {
+            $.ajax({
+                url: '@Url.Action("GetUserTimeline", "Users", new { area = "Admin" })/' + @Model.Id,
+                type: 'GET',
+                success: function (data) {
+                    var html = '';
+                    if (data.length > 0) {
+                        data.forEach(function (item) {
+                            html += '<div class="time-label"><span class="bg-info">' + new Date(item.date).toLocaleDateString('tr-TR') + '</span></div>';
+                            html += '<div><i class="fas fa-' + item.icon + ' bg-blue"></i>';
+                            html += '<div class="timeline-item"><span class="time"><i class="fas fa-clock"></i> ' + new Date(item.date).toLocaleTimeString('tr-TR') + '</span>';
+                            html += '<h3 class="timeline-header">' + item.title + '</h3>';
+                            html += '<div class="timeline-body">' + item.description + '</div></div></div>';
+                        });
+                        html += '<div><i class="far fa-clock bg-gray"></i></div>';
+                    } else {
+                        html = '<p class="text-muted">Henüz zaman çizelgesi verisi bulunmuyor.</p>';
+                    }
+                    $('#userTimeline').html(html);
+                },
+                error: function () {
+                    $('#userTimeline').html('<p class="text-danger">Zaman çizelgesi yüklenirken hata oluştu.</p>');
+                }
+            });
+        }
+
+        function loadUserDashboards() {
+            $.ajax({
+                url: '@Url.Action("GetUserDashboards", "Users", new { area = "Admin" })/' + @Model.Id,
+                type: 'GET',
+                success: function (data) {
+                    var html = '';
+                    if (data.length > 0) {
+                        data.forEach(function (dashboard) {
+                            html += '<div class="col-md-4">';
+                            html += '<div class="card card-outline card-primary">';
+                            html += '<div class="card-header"><h3 class="card-title">' + dashboard.name + '</h3></div>';
+                            html += '<div class="card-body">';
+                            html += '<p>' + (dashboard.description || 'Açıklama bulunmuyor') + '</p>';
+                            html += '<small class="text-muted">Oluşturma: ' + new Date(dashboard.createdDate).toLocaleDateString('tr-TR') + '</small>';
+                            html += '</div>';
+                            html += '<div class="card-footer">';
+                            html += '<a href="#" class="btn btn-primary btn-sm">Görüntüle</a>';
+                            html += '</div>';
+                            html += '</div></div>';
+                        });
+                    } else {
+                        html = '<div class="col-12"><p class="text-muted">Henüz dashboard bulunmuyor.</p></div>';
+                    }
+                    $('#userDashboards').html(html);
+                },
+                error: function () {
+                    $('#userDashboards').html('<div class="col-12"><p class="text-danger">Dashboard'lar yüklenirken hata oluştu.</p></div>');
+                }
+            });
+        }
+
+        function loadUserGroups() {
+            $.ajax({
+                url: '@Url.Action("GetUserGroups", "Users", new { area = "Admin" })/' + @Model.Id,
+                type: 'GET',
+                success: function (data) {
+                    var html = '';
+                    if (data.length > 0) {
+                        data.forEach(function (group) {
+                            html += '<div class="card card-outline card-info mb-3">';
+                            html += '<div class="card-header"><h3 class="card-title">' + group.groupName + '</h3></div>';
+                            html += '<div class="card-body">';
+                            html += '<p>' + (group.description || 'Açıklama bulunmuyor') + '</p>';
+                            html += '<small class="text-muted">Katılma: ' + new Date(group.joinDate).toLocaleDateString('tr-TR') + '</small>';
+                            html += '</div></div>';
+                        });
+                    } else {
+                        html = '<p class="text-muted">Henüz hiçbir gruba dahil değil.</p>';
+                    }
+                    $('#userGroupsList').html(html);
+                },
+                error: function () {
+                    $('#userGroupsList').html('<p class="text-danger">Gruplar yüklenirken hata oluştu.</p>');
+                }
+            });
+        }
+
+        function initializeCharts() {
+            // Monthly Activity Chart
+            var monthlyCtx = document.getElementById('monthlyActivityChart').getContext('2d');
+            var monthlyChart = new Chart(monthlyCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran'],
+                    datasets: [{
+                        label: 'Aktivite',
+                        data: [12, 19, 3, 5, 2, 3],
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+
+            // Dashboard Usage Chart
+            var usageCtx = document.getElementById('dashboardUsageChart').getContext('2d');
+            var usageChart = new Chart(usageCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Görüntüleme', 'Düzenleme', 'Paylaşım'],
+                    datasets: [{
+                        data: [300, 50, 100],
+                        backgroundColor: ['#f56954', '#00a65a', '#f39c12']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        function sendMessage() {
+            var recipientId = $('#recipientId').val();
+            var subject = $('#messageSubject').val();
+            var content = $('#messageContent').val();
+            var sendEmail = $('#sendEmail').is(':checked');
+
+            $.ajax({
+                url: '@Url.Action("SendMessage", "Users", new { area = "Admin" })',
+                type: 'POST',
+                data: {
+                    recipientId: recipientId,
+                    subject: subject,
+                    content: content,
+                    sendEmail: sendEmail
+                },
+                success: function (result) {
+                    if (result.success) {
+                        $('#sendMessageModal').modal('hide');
+                        $('#sendMessageForm')[0].reset();
+                        toastr.success('Mesaj başarıyla gönderildi.');
+                    } else {
+                        toastr.error(result.message || 'Mesaj gönderilirken hata oluştu.');
+                    }
+                },
+                error: function () {
+                    toastr.error('Mesaj gönderilirken hata oluştu.');
+                }
+            });
+        }
+    </script>
+}

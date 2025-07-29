@@ -1,0 +1,1110 @@
+@model DataLens.Models.UserGroup
+
+@{
+    ViewData["Title"] = "Kullanıcı Grubu Detayları";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+@section Styles {
+    <!-- Select2 -->
+    <link rel="stylesheet" href="~/lib/admin-lte/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="~/lib/admin-lte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+    <!-- DataTables -->
+    <link rel="stylesheet" href="~/lib/admin-lte/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="~/lib/admin-lte/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+    <!-- Chart.js -->
+    <link rel="stylesheet" href="~/lib/admin-lte/plugins/chart.js/Chart.min.css">
+}
+
+@section Breadcrumbs {
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">Kullanıcı Grubu Detayları</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home", new { area = "Admin" })">Ana Sayfa</a></li>
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "UserGroups", new { area = "Admin" })">Kullanıcı Grupları</a></li>
+                        <li class="breadcrumb-item active">@Model.GroupName</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-3">
+                <!-- Group Profile Box -->
+                <div class="card card-primary card-outline">
+                    <div class="card-body box-profile">
+                        <div class="text-center">
+                            <div class="profile-user-img img-fluid img-circle bg-primary d-inline-flex align-items-center justify-content-center" style="width: 128px; height: 128px; font-size: 48px; color: white;">
+                                <i class="fas fa-users"></i>
+                            </div>
+                        </div>
+
+                        <h3 class="profile-username text-center">@Model.GroupName</h3>
+
+                        <p class="text-muted text-center">
+                            <span class="badge badge-info">@Model.Type</span>
+                        </p>
+
+                        <ul class="list-group list-group-unbordered mb-3">
+                            <li class="list-group-item">
+                                <b>Toplam Üye</b> <a class="float-right" id="totalMembersCount">0</a>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Aktif Üye</b> <a class="float-right" id="activeMembersCount">0</a>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Oluşturulma</b> <a class="float-right">@Model.CreatedDate.ToString("dd.MM.yyyy")</a>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Durum</b> 
+                                <span class="float-right">
+                                    @if (Model.IsActive)
+                                    {
+                                        <span class="badge badge-success">Aktif</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-danger">Pasif</span>
+                                    }
+                                </span>
+                            </li>
+                        </ul>
+
+                        <div class="row">
+                            <div class="col-6">
+                                <a href="@Url.Action("Edit", "UserGroups", new { area = "Admin", id = Model.Id })" class="btn btn-primary btn-block">
+                                    <b>Düzenle</b>
+                                </a>
+                            </div>
+                            <div class="col-6">
+                                <button type="button" class="btn btn-success btn-block" id="sendMessageBtn">
+                                    <b>Mesaj Gönder</b>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Group Information -->
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Grup Bilgileri</h3>
+                    </div>
+                    <div class="card-body">
+                        <strong><i class="fas fa-info-circle mr-1"></i> Açıklama</strong>
+                        <p class="text-muted" id="groupDescription">
+                            @(string.IsNullOrEmpty(Model.Description) ? "Açıklama bulunmuyor." : Model.Description)
+                        </p>
+                        <hr>
+
+                        <strong><i class="fas fa-sitemap mr-1"></i> Üst Grup</strong>
+                        <p class="text-muted" id="parentGroupInfo">
+                            Yükleniyor...
+                        </p>
+                        <hr>
+
+                        <strong><i class="fas fa-users mr-1"></i> Maksimum Üye</strong>
+                        <p class="text-muted" id="maxMembersInfo">
+                            Yükleniyor...
+                        </p>
+                        <hr>
+
+                        <strong><i class="fas fa-tags mr-1"></i> Etiketler</strong>
+                        <p class="text-muted" id="groupTags">
+                            Yükleniyor...
+                        </p>
+                        <hr>
+
+                        <strong><i class="fas fa-cog mr-1"></i> Ayarlar</strong>
+                        <p class="text-muted">
+                            <span id="selfJoinStatus">Yükleniyor...</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-9">
+                <div class="card">
+                    <div class="card-header p-2">
+                        <ul class="nav nav-pills">
+                            <li class="nav-item"><a class="nav-link active" href="#activity" data-toggle="tab">Aktivite</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#members" data-toggle="tab">Üyeler</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#statistics" data-toggle="tab">İstatistikler</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#subgroups" data-toggle="tab">Alt Gruplar</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#permissions" data-toggle="tab">İzinler</a></li>
+                        </ul>
+                    </div>
+                    <div class="card-body">
+                        <div class="tab-content">
+                            <!-- Activity Tab -->
+                            <div class="active tab-pane" id="activity">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card card-info">
+                                            <div class="card-header">
+                                                <h3 class="card-title">Aylık Aktivite</h3>
+                                                <div class="card-tools">
+                                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                                        <i class="fas fa-minus"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="card-body">
+                                                <canvas id="monthlyActivityChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card card-success">
+                                            <div class="card-header">
+                                                <h3 class="card-title">Üye Dağılımı</h3>
+                                                <div class="card-tools">
+                                                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                                        <i class="fas fa-minus"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="card-body">
+                                                <canvas id="memberDistributionChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Timeline -->
+                                <div class="card card-warning">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Son Aktiviteler</h3>
+                                        <div class="card-tools">
+                                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                                <i class="fas fa-minus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="timeline timeline-inverse" id="activityTimeline">
+                                            <!-- Timeline will be loaded via AJAX -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Members Tab -->
+                            <div class="tab-pane" id="members">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <h5>Grup Üyeleri</h5>
+                                    </div>
+                                    <div class="col-md-6 text-right">
+                                        <button type="button" class="btn btn-primary btn-sm" id="addMemberBtn">
+                                            <i class="fas fa-user-plus"></i> Üye Ekle
+                                        </button>
+                                        <button type="button" class="btn btn-info btn-sm" id="exportMembersBtn">
+                                            <i class="fas fa-download"></i> Dışa Aktar
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <table id="membersTable" class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Kullanıcı</th>
+                                            <th>E-posta</th>
+                                            <th>Rol</th>
+                                            <th>Katılma Tarihi</th>
+                                            <th>Son Aktivite</th>
+                                            <th>Durum</th>
+                                            <th>İşlemler</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Data will be loaded via AJAX -->
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Statistics Tab -->
+                            <div class="tab-pane" id="statistics">
+                                <div class="row">
+                                    <div class="col-lg-3 col-6">
+                                        <div class="small-box bg-info">
+                                            <div class="inner">
+                                                <h3 id="statTotalMembers">0</h3>
+                                                <p>Toplam Üye</p>
+                                            </div>
+                                            <div class="icon">
+                                                <i class="fas fa-users"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-6">
+                                        <div class="small-box bg-success">
+                                            <div class="inner">
+                                                <h3 id="statActiveMembers">0</h3>
+                                                <p>Aktif Üye</p>
+                                            </div>
+                                            <div class="icon">
+                                                <i class="fas fa-user-check"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-6">
+                                        <div class="small-box bg-warning">
+                                            <div class="inner">
+                                                <h3 id="statAdminMembers">0</h3>
+                                                <p>Yönetici</p>
+                                            </div>
+                                            <div class="icon">
+                                                <i class="fas fa-user-shield"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-6">
+                                        <div class="small-box bg-danger">
+                                            <div class="inner">
+                                                <h3 id="statSubGroups">0</h3>
+                                                <p>Alt Grup</p>
+                                            </div>
+                                            <div class="icon">
+                                                <i class="fas fa-sitemap"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card card-primary">
+                                            <div class="card-header">
+                                                <h3 class="card-title">Üye Katılım Trendi</h3>
+                                            </div>
+                                            <div class="card-body">
+                                                <canvas id="memberJoinTrendChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card card-info">
+                                            <div class="card-header">
+                                                <h3 class="card-title">Rol Dağılımı</h3>
+                                            </div>
+                                            <div class="card-body">
+                                                <canvas id="roleDistributionChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card card-secondary">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Detaylı İstatistikler</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <dl class="row">
+                                                    <dt class="col-sm-6">Ortalama Günlük Aktivite:</dt>
+                                                    <dd class="col-sm-6" id="avgDailyActivity">Yükleniyor...</dd>
+                                                    <dt class="col-sm-6">En Aktif Üye:</dt>
+                                                    <dd class="col-sm-6" id="mostActiveMember">Yükleniyor...</dd>
+                                                    <dt class="col-sm-6">Son Katılan Üye:</dt>
+                                                    <dd class="col-sm-6" id="lastJoinedMember">Yükleniyor...</dd>
+                                                    <dt class="col-sm-6">Üye Değişim Oranı:</dt>
+                                                    <dd class="col-sm-6" id="memberTurnoverRate">Yükleniyor...</dd>
+                                                </dl>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <dl class="row">
+                                                    <dt class="col-sm-6">Haftalık Büyüme:</dt>
+                                                    <dd class="col-sm-6" id="weeklyGrowth">Yükleniyor...</dd>
+                                                    <dt class="col-sm-6">Aylık Büyüme:</dt>
+                                                    <dd class="col-sm-6" id="monthlyGrowth">Yükleniyor...</dd>
+                                                    <dt class="col-sm-6">Aktivite Skoru:</dt>
+                                                    <dd class="col-sm-6" id="activityScore">Yükleniyor...</dd>
+                                                    <dt class="col-sm-6">Sağlık Durumu:</dt>
+                                                    <dd class="col-sm-6" id="groupHealth">Yükleniyor...</dd>
+                                                </dl>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sub Groups Tab -->
+                            <div class="tab-pane" id="subgroups">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <h5>Alt Gruplar</h5>
+                                    </div>
+                                    <div class="col-md-6 text-right">
+                                        <a href="@Url.Action("Create", "UserGroups", new { area = "Admin" })" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-plus"></i> Yeni Alt Grup
+                                        </a>
+                                    </div>
+                                </div>
+                                
+                                <div id="subGroupsList">
+                                    <!-- Sub groups will be loaded via AJAX -->
+                                </div>
+                            </div>
+
+                            <!-- Permissions Tab -->
+                            <div class="tab-pane" id="permissions">
+                                <div class="card card-info">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Grup İzinleri</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <h6>Dashboard İzinleri</h6>
+                                                <div id="dashboardPermissions">
+                                                    <!-- Permissions will be loaded via AJAX -->
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h6>Sistem İzinleri</h6>
+                                                <div id="systemPermissions">
+                                                    <!-- Permissions will be loaded via AJAX -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card card-warning">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Özel İzinler</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="customPermissions">
+                                            <!-- Custom permissions will be loaded via AJAX -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Send Message Modal -->
+<div class="modal fade" id="sendMessageModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Gruba Mesaj Gönder</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <form id="sendMessageForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="messageSubject">Konu <span class="text-danger">*</span></label>
+                        <input type="text" id="messageSubject" name="subject" class="form-control" placeholder="Mesaj konusu" />
+                    </div>
+                    <div class="form-group">
+                        <label for="messageContent">Mesaj <span class="text-danger">*</span></label>
+                        <textarea id="messageContent" name="content" class="form-control" rows="5" placeholder="Mesaj içeriği"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <div class="icheck-primary">
+                            <input type="checkbox" id="sendEmail" name="sendEmail" checked />
+                            <label for="sendEmail">E-posta olarak da gönder</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="messageRecipients">Alıcılar</label>
+                        <select id="messageRecipients" name="recipients" class="form-control select2" multiple="multiple" style="width: 100%;">
+                            <option value="all" selected>Tüm Üyeler</option>
+                            <option value="admins">Sadece Yöneticiler</option>
+                            <option value="active">Sadece Aktif Üyeler</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane"></i> Mesajı Gönder
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add Member Modal -->
+<div class="modal fade" id="addMemberModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Gruba Üye Ekle</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <form id="addMemberForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="userSelect">Kullanıcı Seç <span class="text-danger">*</span></label>
+                        <select id="userSelect" name="userId" class="form-control select2" style="width: 100%;">
+                            <option value="">Kullanıcı seçiniz...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="memberRole">Grup İçi Rol</label>
+                        <select id="memberRole" name="role" class="form-control select2">
+                            <option value="Member">Üye</option>
+                            <option value="Admin">Yönetici</option>
+                            <option value="Moderator">Moderatör</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="memberNotes">Notlar</label>
+                        <textarea id="memberNotes" name="notes" class="form-control" rows="3" placeholder="Üye hakkında notlar (isteğe bağlı)"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-user-plus"></i> Üye Ekle
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- Select2 -->
+    <script src="~/lib/admin-lte/plugins/select2/js/select2.full.min.js"></script>
+    <!-- DataTables & Plugins -->
+    <script src="~/lib/admin-lte/plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="~/lib/admin-lte/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="~/lib/admin-lte/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/lib/admin-lte/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+    <!-- Chart.js -->
+    <script src="~/lib/admin-lte/plugins/chart.js/Chart.min.js"></script>
+
+    <script>
+        var membersTable;
+        var groupId = @Model.Id;
+        var monthlyActivityChart, memberDistributionChart, memberJoinTrendChart, roleDistributionChart;
+
+        $(function () {
+            // Initialize Select2
+            $('.select2').select2({
+                theme: 'bootstrap4'
+            });
+
+            // Load initial data
+            loadGroupDetails();
+            loadGroupStatistics();
+            loadGroupActivity();
+            loadSubGroups();
+            loadPermissions();
+            
+            // Initialize members table
+            initializeMembersTable();
+
+            // Initialize charts
+            initializeCharts();
+
+            // Setup event handlers
+            setupEventHandlers();
+        });
+
+        function setupEventHandlers() {
+            // Send message button
+            $('#sendMessageBtn').click(function () {
+                loadGroupMembers();
+                $('#sendMessageModal').modal('show');
+            });
+
+            // Add member button
+            $('#addMemberBtn').click(function () {
+                loadAvailableUsers();
+                $('#addMemberModal').modal('show');
+            });
+
+            // Export members
+            $('#exportMembersBtn').click(function () {
+                exportMembers();
+            });
+
+            // Form submissions
+            $('#sendMessageForm').submit(function (e) {
+                e.preventDefault();
+                sendMessage();
+            });
+
+            $('#addMemberForm').submit(function (e) {
+                e.preventDefault();
+                addMember();
+            });
+
+            // Tab change events
+            $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+                var target = $(e.target).attr("href");
+                if (target === '#statistics') {
+                    // Refresh charts when statistics tab is shown
+                    setTimeout(function() {
+                        if (memberJoinTrendChart) memberJoinTrendChart.resize();
+                        if (roleDistributionChart) roleDistributionChart.resize();
+                    }, 100);
+                }
+            });
+        }
+
+        function initializeMembersTable() {
+            membersTable = $('#membersTable').DataTable({
+                "responsive": true,
+                "lengthChange": false,
+                "autoWidth": false,
+                "processing": true,
+                "serverSide": true,
+                "ajax": {
+                    "url": "@Url.Action("GetGroupMembers", "UserGroups", new { area = "Admin" })",
+                    "type": "POST",
+                    "data": { groupId: groupId }
+                },
+                "columns": [
+                    { "data": "userName", "width": "15%" },
+                    { "data": "email", "width": "20%" },
+                    {
+                        "data": "role",
+                        "width": "10%",
+                        "render": function (data, type, row) {
+                            var badgeClass = '';
+                            switch (data) {
+                                case 'Admin': badgeClass = 'badge-danger'; break;
+                                case 'Moderator': badgeClass = 'badge-warning'; break;
+                                case 'Member': badgeClass = 'badge-info'; break;
+                                default: badgeClass = 'badge-secondary';
+                            }
+                            return '<span class="badge ' + badgeClass + '">' + data + '</span>';
+                        }
+                    },
+                    {
+                        "data": "joinedDate",
+                        "width": "12%",
+                        "render": function (data, type, row) {
+                            return new Date(data).toLocaleDateString('tr-TR');
+                        }
+                    },
+                    {
+                        "data": "lastActivity",
+                        "width": "12%",
+                        "render": function (data, type, row) {
+                            return data ? new Date(data).toLocaleDateString('tr-TR') : 'Hiç';
+                        }
+                    },
+                    {
+                        "data": "isActive",
+                        "width": "8%",
+                        "render": function (data, type, row) {
+                            return data ? '<span class="badge badge-success">Aktif</span>' : '<span class="badge badge-danger">Pasif</span>';
+                        }
+                    },
+                    {
+                        "data": null,
+                        "width": "13%",
+                        "orderable": false,
+                        "render": function (data, type, row) {
+                            return '<div class="btn-group" role="group">' +
+                                '<a href="@Url.Action("Details", "Users", new { area = "Admin" })/' + row.userId + '" class="btn btn-info btn-sm" title="Detaylar">' +
+                                '<i class="fas fa-eye"></i>' +
+                                '</a>' +
+                                '<button type="button" class="btn btn-warning btn-sm" onclick="editMember(' + row.userId + ')" title="Düzenle">' +
+                                '<i class="fas fa-edit"></i>' +
+                                '</button>' +
+                                '<button type="button" class="btn btn-danger btn-sm" onclick="removeMember(' + row.userId + ', \'' + row.userName + '\')" title="Çıkar">' +
+                                '<i class="fas fa-user-times"></i>' +
+                                '</button>' +
+                                '</div>';
+                        }
+                    }
+                ],
+                "pageLength": 10,
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Turkish.json"
+                }
+            });
+        }
+
+        function initializeCharts() {
+            // Monthly Activity Chart
+            var monthlyActivityCtx = document.getElementById('monthlyActivityChart').getContext('2d');
+            monthlyActivityChart = new Chart(monthlyActivityCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Aktivite',
+                        data: [],
+                        borderColor: 'rgb(75, 192, 192)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Member Distribution Chart
+            var memberDistributionCtx = document.getElementById('memberDistributionChart').getContext('2d');
+            memberDistributionChart = new Chart(memberDistributionCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Aktif', 'Pasif'],
+                    datasets: [{
+                        data: [0, 0],
+                        backgroundColor: ['#28a745', '#dc3545']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // Member Join Trend Chart
+            var memberJoinTrendCtx = document.getElementById('memberJoinTrendChart').getContext('2d');
+            memberJoinTrendChart = new Chart(memberJoinTrendCtx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Yeni Üyeler',
+                        data: [],
+                        backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Role Distribution Chart
+            var roleDistributionCtx = document.getElementById('roleDistributionChart').getContext('2d');
+            roleDistributionChart = new Chart(roleDistributionCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['Üye', 'Yönetici', 'Moderatör'],
+                    datasets: [{
+                        data: [0, 0, 0],
+                        backgroundColor: ['#17a2b8', '#dc3545', '#ffc107']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // Load chart data
+            loadChartData();
+        }
+
+        function loadGroupDetails() {
+            $.ajax({
+                url: '@Url.Action("GetGroupDetails", "UserGroups", new { area = "Admin" })',
+                type: 'GET',
+                data: { id: groupId },
+                success: function (data) {
+                    $('#parentGroupInfo').text(data.parentGroupName || 'Üst grup yok');
+                    $('#maxMembersInfo').text(data.maxMembers ? data.maxMembers + ' kişi' : 'Sınırsız');
+                    $('#groupTags').text(data.tags || 'Etiket yok');
+                    $('#selfJoinStatus').html(data.allowSelfJoin ? 
+                        '<span class="badge badge-success">Kendiliğinden katılıma açık</span>' : 
+                        '<span class="badge badge-secondary">Sadece davet ile</span>');
+                },
+                error: function () {
+                    console.log('Grup detayları yüklenirken hata oluştu.');
+                }
+            });
+        }
+
+        function loadGroupStatistics() {
+            $.ajax({
+                url: '@Url.Action("GetGroupStatistics", "UserGroups", new { area = "Admin" })',
+                type: 'GET',
+                data: { groupId: groupId },
+                success: function (data) {
+                    $('#totalMembersCount').text(data.totalMembers);
+                    $('#activeMembersCount').text(data.activeMembers);
+                    
+                    // Update statistics tab
+                    $('#statTotalMembers').text(data.totalMembers);
+                    $('#statActiveMembers').text(data.activeMembers);
+                    $('#statAdminMembers').text(data.adminMembers);
+                    $('#statSubGroups').text(data.subGroupCount);
+                    
+                    // Update detailed statistics
+                    $('#avgDailyActivity').text(data.avgDailyActivity || '0');
+                    $('#mostActiveMember').text(data.mostActiveMember || 'Yok');
+                    $('#lastJoinedMember').text(data.lastJoinedMember || 'Yok');
+                    $('#memberTurnoverRate').text((data.memberTurnoverRate || 0) + '%');
+                    $('#weeklyGrowth').text((data.weeklyGrowth || 0) + '%');
+                    $('#monthlyGrowth').text((data.monthlyGrowth || 0) + '%');
+                    $('#activityScore').text(data.activityScore || '0');
+                    
+                    var healthBadge = '';
+                    switch (data.groupHealth) {
+                        case 'Excellent': healthBadge = '<span class="badge badge-success">Mükemmel</span>'; break;
+                        case 'Good': healthBadge = '<span class="badge badge-info">İyi</span>'; break;
+                        case 'Average': healthBadge = '<span class="badge badge-warning">Orta</span>'; break;
+                        case 'Poor': healthBadge = '<span class="badge badge-danger">Zayıf</span>'; break;
+                        default: healthBadge = '<span class="badge badge-secondary">Bilinmiyor</span>';
+                    }
+                    $('#groupHealth').html(healthBadge);
+                },
+                error: function () {
+                    console.log('Grup istatistikleri yüklenirken hata oluştu.');
+                }
+            });
+        }
+
+        function loadGroupActivity() {
+            $.ajax({
+                url: '@Url.Action("GetGroupActivity", "UserGroups", new { area = "Admin" })',
+                type: 'GET',
+                data: { groupId: groupId },
+                success: function (data) {
+                    var html = '';
+                    if (data.length > 0) {
+                        data.forEach(function (item) {
+                            html += '<div class="time-label"><span class="bg-info">' + new Date(item.date).toLocaleDateString('tr-TR') + '</span></div>';
+                            html += '<div><i class="fas fa-' + item.icon + ' bg-blue"></i>';
+                            html += '<div class="timeline-item"><span class="time"><i class="fas fa-clock"></i> ' + new Date(item.date).toLocaleTimeString('tr-TR') + '</span>';
+                            html += '<h3 class="timeline-header">' + item.title + '</h3>';
+                            html += '<div class="timeline-body">' + item.description + '</div></div></div>';
+                        });
+                        html += '<div><i class="far fa-clock bg-gray"></i></div>';
+                    } else {
+                        html = '<p class="text-muted">Henüz aktivite bulunmuyor.</p>';
+                    }
+                    $('#activityTimeline').html(html);
+                },
+                error: function () {
+                    $('#activityTimeline').html('<p class="text-danger">Aktiviteler yüklenirken hata oluştu.</p>');
+                }
+            });
+        }
+
+        function loadSubGroups() {
+            $.ajax({
+                url: '@Url.Action("GetSubGroups", "UserGroups", new { area = "Admin" })',
+                type: 'GET',
+                data: { parentId: groupId },
+                success: function (data) {
+                    var html = '';
+                    if (data.length > 0) {
+                        data.forEach(function (group) {
+                            html += '<div class="card card-outline card-info">';
+                            html += '<div class="card-header">';
+                            html += '<h3 class="card-title">' + group.name + '</h3>';
+                            html += '<div class="card-tools">';
+                            html += '<span class="badge badge-info">' + group.type + '</span>';
+                            html += '</div></div>';
+                            html += '<div class="card-body">';
+                            html += '<p>' + (group.description || 'Açıklama yok') + '</p>';
+                            html += '<div class="row">';
+                            html += '<div class="col-sm-6"><strong>Üye Sayısı:</strong> ' + group.memberCount + '</div>';
+                            html += '<div class="col-sm-6"><strong>Durum:</strong> ' + (group.isActive ? '<span class="badge badge-success">Aktif</span>' : '<span class="badge badge-danger">Pasif</span>') + '</div>';
+                            html += '</div></div>';
+                            html += '<div class="card-footer">';
+                            html += '<a href="@Url.Action("Details", "UserGroups", new { area = "Admin" })/' + group.id + '" class="btn btn-info btn-sm">Detaylar</a> ';
+                            html += '<a href="@Url.Action("Edit", "UserGroups", new { area = "Admin" })/' + group.id + '" class="btn btn-warning btn-sm">Düzenle</a>';
+                            html += '</div></div><br>';
+                        });
+                    } else {
+                        html = '<div class="alert alert-info">Bu grubun alt grubu bulunmuyor.</div>';
+                    }
+                    $('#subGroupsList').html(html);
+                },
+                error: function () {
+                    $('#subGroupsList').html('<div class="alert alert-danger">Alt gruplar yüklenirken hata oluştu.</div>');
+                }
+            });
+        }
+
+        function loadPermissions() {
+            $.ajax({
+                url: '@Url.Action("GetGroupPermissions", "UserGroups", new { area = "Admin" })',
+                type: 'GET',
+                data: { groupId: groupId },
+                success: function (data) {
+                    // Dashboard permissions
+                    var dashboardHtml = '';
+                    if (data.dashboardPermissions && data.dashboardPermissions.length > 0) {
+                        data.dashboardPermissions.forEach(function (perm) {
+                            dashboardHtml += '<div class="form-check">';
+                            dashboardHtml += '<input class="form-check-input" type="checkbox" ' + (perm.granted ? 'checked' : '') + ' disabled>';
+                            dashboardHtml += '<label class="form-check-label">' + perm.name + '</label>';
+                            dashboardHtml += '</div>';
+                        });
+                    } else {
+                        dashboardHtml = '<p class="text-muted">Dashboard izni bulunmuyor.</p>';
+                    }
+                    $('#dashboardPermissions').html(dashboardHtml);
+                    
+                    // System permissions
+                    var systemHtml = '';
+                    if (data.systemPermissions && data.systemPermissions.length > 0) {
+                        data.systemPermissions.forEach(function (perm) {
+                            systemHtml += '<div class="form-check">';
+                            systemHtml += '<input class="form-check-input" type="checkbox" ' + (perm.granted ? 'checked' : '') + ' disabled>';
+                            systemHtml += '<label class="form-check-label">' + perm.name + '</label>';
+                            systemHtml += '</div>';
+                        });
+                    } else {
+                        systemHtml = '<p class="text-muted">Sistem izni bulunmuyor.</p>';
+                    }
+                    $('#systemPermissions').html(systemHtml);
+                    
+                    // Custom permissions
+                    var customHtml = '';
+                    if (data.customPermissions && data.customPermissions.length > 0) {
+                        data.customPermissions.forEach(function (perm) {
+                            customHtml += '<div class="form-check">';
+                            customHtml += '<input class="form-check-input" type="checkbox" ' + (perm.granted ? 'checked' : '') + ' disabled>';
+                            customHtml += '<label class="form-check-label">' + perm.name + '</label>';
+                            customHtml += '</div>';
+                        });
+                    } else {
+                        customHtml = '<p class="text-muted">Özel izin bulunmuyor.</p>';
+                    }
+                    $('#customPermissions').html(customHtml);
+                },
+                error: function () {
+                    $('#dashboardPermissions').html('<p class="text-danger">İzinler yüklenirken hata oluştu.</p>');
+                    $('#systemPermissions').html('<p class="text-danger">İzinler yüklenirken hata oluştu.</p>');
+                    $('#customPermissions').html('<p class="text-danger">İzinler yüklenirken hata oluştu.</p>');
+                }
+            });
+        }
+
+        function loadChartData() {
+            $.ajax({
+                url: '@Url.Action("GetGroupChartData", "UserGroups", new { area = "Admin" })',
+                type: 'GET',
+                data: { groupId: groupId },
+                success: function (data) {
+                    // Update monthly activity chart
+                    monthlyActivityChart.data.labels = data.monthlyActivity.labels;
+                    monthlyActivityChart.data.datasets[0].data = data.monthlyActivity.data;
+                    monthlyActivityChart.update();
+                    
+                    // Update member distribution chart
+                    memberDistributionChart.data.datasets[0].data = [data.memberDistribution.active, data.memberDistribution.inactive];
+                    memberDistributionChart.update();
+                    
+                    // Update member join trend chart
+                    memberJoinTrendChart.data.labels = data.memberJoinTrend.labels;
+                    memberJoinTrendChart.data.datasets[0].data = data.memberJoinTrend.data;
+                    memberJoinTrendChart.update();
+                    
+                    // Update role distribution chart
+                    roleDistributionChart.data.datasets[0].data = [data.roleDistribution.member, data.roleDistribution.admin, data.roleDistribution.moderator];
+                    roleDistributionChart.update();
+                },
+                error: function () {
+                    console.log('Grafik verileri yüklenirken hata oluştu.');
+                }
+            });
+        }
+
+        function loadGroupMembers() {
+            $.ajax({
+                url: '@Url.Action("GetGroupMembersForMessage", "UserGroups", new { area = "Admin" })',
+                type: 'GET',
+                data: { groupId: groupId },
+                success: function (data) {
+                    var select = $('#messageRecipients');
+                    select.empty();
+                    select.append('<option value="all" selected>Tüm Üyeler (' + data.totalCount + ')</option>');
+                    select.append('<option value="admins">Sadece Yöneticiler (' + data.adminCount + ')</option>');
+                    select.append('<option value="active">Sadece Aktif Üyeler (' + data.activeCount + ')</option>');
+                    
+                    data.members.forEach(function (member) {
+                        select.append('<option value="' + member.id + '">' + member.userName + ' (' + member.email + ')</option>');
+                    });
+                    
+                    select.trigger('change');
+                },
+                error: function () {
+                    toastr.error('Üyeler yüklenirken hata oluştu.');
+                }
+            });
+        }
+
+        function loadAvailableUsers() {
+            $.ajax({
+                url: '@Url.Action("GetAvailableUsers", "UserGroups", new { area = "Admin" })',
+                type: 'GET',
+                data: { groupId: groupId },
+                success: function (data) {
+                    var select = $('#userSelect');
+                    select.empty().append('<option value="">Kullanıcı seçiniz...</option>');
+                    
+                    data.forEach(function (user) {
+                        select.append('<option value="' + user.id + '">' + user.userName + ' (' + user.email + ')</option>');
+                    });
+                    
+                    select.trigger('change');
+                },
+                error: function () {
+                    toastr.error('Kullanıcılar yüklenirken hata oluştu.');
+                }
+            });
+        }
+
+        function sendMessage() {
+            var formData = {
+                groupId: groupId,
+                subject: $('#messageSubject').val(),
+                content: $('#messageContent').val(),
+                recipients: $('#messageRecipients').val(),
+                sendEmail: $('#sendEmail').is(':checked')
+            };
+
+            if (!formData.subject || !formData.content) {
+                toastr.warning('Lütfen konu ve mesaj alanlarını doldurunuz.');
+                return;
+            }
+
+            $.ajax({
+                url: '@Url.Action("SendGroupMessage", "UserGroups", new { area = "Admin" })',
+                type: 'POST',
+                data: formData,
+                success: function (result) {
+                    if (result.success) {
+                        $('#sendMessageModal').modal('hide');
+                        $('#sendMessageForm')[0].reset();
+                        toastr.success('Mesaj başarıyla gönderildi.');
+                    } else {
+                        toastr.error(result.message || 'Mesaj gönderilirken hata oluştu.');
+                    }
+                },
+                error: function () {
+                    toastr.error('Mesaj gönderilirken hata oluştu.');
+                }
+            });
+        }
+
+        function addMember() {
+            var formData = {
+                groupId: groupId,
+                userId: $('#userSelect').val(),
+                role: $('#memberRole').val(),
+                notes: $('#memberNotes').val()
+            };
+
+            if (!formData.userId) {
+                toastr.warning('Lütfen bir kullanıcı seçiniz.');
+                return;
+            }
+
+            $.ajax({
+                url: '@Url.Action("AddMemberToGroup", "UserGroups", new { area = "Admin" })',
+                type: 'POST',
+                data: formData,
+                success: function (result) {
+                    if (result.success) {
+                        $('#addMemberModal').modal('hide');
+                        $('#addMemberForm')[0].reset();
+                        membersTable.ajax.reload();
+                        loadGroupStatistics();
+                        loadChartData();
+                        toastr.success('Üye başarıyla gruba eklendi.');
+                    } else {
+                        toastr.error(result.message || 'Üye eklenirken hata oluştu.');
+                    }
+                },
+                error: function () {
+                    toastr.error('Üye eklenirken hata oluştu.');
+                }
+            });
+        }
+
+        function editMember(userId) {
+            window.location.href = '@Url.Action("Edit", "Users", new { area = "Admin" })' + '/' + userId;
+        }
+
+        function removeMember(userId, userName) {
+            if (confirm('"' + userName + '" kullanıcısını gruptan çıkarmak istediğinizden emin misiniz?')) {
+                $.ajax({
+                    url: '@Url.Action("RemoveMemberFromGroup", "UserGroups", new { area = "Admin" })',
+                    type: 'POST',
+                    data: { groupId: groupId, userId: userId },
+                    success: function (result) {
+                        if (result.success) {
+                            membersTable.ajax.reload();
+                            loadGroupStatistics();
+                            loadChartData();
+                            toastr.success('Üye başarıyla gruptan çıkarıldı.');
+                        } else {
+                            toastr.error(result.message || 'Üye çıkarılırken hata oluştu.');
+                        }
+                    },
+                    error: function () {
+                        toastr.error('Üye çıkarılırken hata oluştu.');
+                    }
+                });
+            }
+        }
+
+        function exportMembers() {
+            window.location.href = '@Url.Action("ExportMembers", "UserGroups", new { area = "Admin" })' + '?groupId=' + groupId;
+        }
+    </script>
+}

@@ -1,0 +1,935 @@
+@model DataLens.Models.UserGroup
+
+@{
+    ViewData["Title"] = "Kullanıcı Grubu Düzenle";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+@section Styles {
+    <!-- Select2 -->
+    <link rel="stylesheet" href="~/lib/admin-lte/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="~/lib/admin-lte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+    <!-- iCheck for checkboxes and radio inputs -->
+    <link rel="stylesheet" href="~/lib/admin-lte/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+    <!-- DataTables -->
+    <link rel="stylesheet" href="~/lib/admin-lte/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="~/lib/admin-lte/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+}
+
+@section Breadcrumbs {
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">Kullanıcı Grubu Düzenle</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home", new { area = "Admin" })">Ana Sayfa</a></li>
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "UserGroups", new { area = "Admin" })">Kullanıcı Grupları</a></li>
+                        <li class="breadcrumb-item active">Düzenle</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-8">
+                <!-- Group Information -->
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Grup Bilgileri</h3>
+                    </div>
+                    <form asp-action="Edit" method="post" id="editGroupForm">
+                        <input asp-for="Id" type="hidden" />
+                        <input asp-for="CreatedDate" type="hidden" />
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="Name">Grup Adı <span class="text-danger">*</span></label>
+                                        <input asp-for="Name" class="form-control" placeholder="Grup adını giriniz" />
+                                        <span asp-validation-for="Name" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="Type">Grup Tipi <span class="text-danger">*</span></label>
+                                        <select asp-for="Type" class="form-control select2" style="width: 100%;">
+                                            <option value="Department">Departman</option>
+                                            <option value="Project">Proje</option>
+                                            <option value="Role">Rol</option>
+                                            <option value="Custom">Özel</option>
+                                        </select>
+                                        <span asp-validation-for="Type" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="Description">Açıklama</label>
+                                <textarea asp-for="Description" class="form-control" rows="3" placeholder="Grup hakkında açıklama yazınız"></textarea>
+                                <span asp-validation-for="Description" class="text-danger"></span>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="ParentGroupId">Üst Grup</label>
+                                        <select id="ParentGroupId" name="ParentGroupId" class="form-control select2" style="width: 100%;">
+                                            <option value="">Üst grup seçiniz (isteğe bağlı)</option>
+                                        </select>
+                                        <small class="form-text text-muted">Bu grup başka bir grubun alt grubu olacaksa seçiniz.</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="MaxMembers">Maksimum Üye Sayısı</label>
+                                        <input type="number" id="MaxMembers" name="MaxMembers" class="form-control" min="1" max="1000" placeholder="Sınırsız" />
+                                        <small class="form-text text-muted">Boş bırakılırsa sınırsız olur.</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <div class="icheck-primary">
+                                            <input asp-for="IsActive" type="checkbox" id="IsActive" />
+                                            <label for="IsActive">Aktif</label>
+                                        </div>
+                                        <small class="form-text text-muted">Grup aktif olarak işaretlenirse kullanıcılar eklenebilir.</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <div class="icheck-primary">
+                                            <input type="checkbox" id="AllowSelfJoin" name="AllowSelfJoin" />
+                                            <label for="AllowSelfJoin">Kendiliğinden Katılıma İzin Ver</label>
+                                        </div>
+                                        <small class="form-text text-muted">Kullanıcılar bu gruba kendileri katılabilir.</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="Tags">Etiketler</label>
+                                <input type="text" id="Tags" name="Tags" class="form-control" placeholder="Etiketleri virgülle ayırarak yazınız" />
+                                <small class="form-text text-muted">Örnek: IT, Yazılım, Geliştirme</small>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Değişiklikleri Kaydet
+                            </button>
+                            <a href="@Url.Action("Index", "UserGroups", new { area = "Admin" })" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> İptal
+                            </a>
+                            <button type="button" class="btn btn-danger float-right" id="deleteGroupBtn">
+                                <i class="fas fa-trash"></i> Grubu Sil
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Group Members -->
+                <div class="card card-info">
+                    <div class="card-header">
+                        <h3 class="card-title">Grup Üyeleri</h3>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-primary btn-sm" id="addMemberBtn">
+                                <i class="fas fa-user-plus"></i> Üye Ekle
+                            </button>
+                            <button type="button" class="btn btn-info btn-sm" id="refreshMembersBtn">
+                                <i class="fas fa-sync-alt"></i> Yenile
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <table id="membersTable" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Kullanıcı</th>
+                                    <th>E-posta</th>
+                                    <th>Rol</th>
+                                    <th>Katılma Tarihi</th>
+                                    <th>Son Aktivite</th>
+                                    <th>İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Data will be loaded via AJAX -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <!-- Group Statistics -->
+                <div class="card card-success">
+                    <div class="card-header">
+                        <h3 class="card-title">Grup İstatistikleri</h3>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <dl class="row">
+                            <dt class="col-sm-6">Toplam Üye:</dt>
+                            <dd class="col-sm-6" id="totalMembers">0</dd>
+                            <dt class="col-sm-6">Aktif Üye:</dt>
+                            <dd class="col-sm-6" id="activeMembers">0</dd>
+                            <dt class="col-sm-6">Yönetici:</dt>
+                            <dd class="col-sm-6" id="adminMembers">0</dd>
+                            <dt class="col-sm-6">Oluşturulma:</dt>
+                            <dd class="col-sm-6" id="createdDate">@Model.CreatedDate.ToString("dd.MM.yyyy")</dd>
+                            <dt class="col-sm-6">Son Güncelleme:</dt>
+                            <dd class="col-sm-6" id="lastUpdated">Yükleniyor...</dd>
+                        </dl>
+                        
+                        <div class="progress-group">
+                            Üye Doluluk Oranı
+                            <span class="float-right"><b id="membershipPercentage">0</b>/100%</span>
+                            <div class="progress progress-sm">
+                                <div class="progress-bar bg-primary" id="membershipProgress" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Group Activity -->
+                <div class="card card-warning">
+                    <div class="card-header">
+                        <h3 class="card-title">Son Aktiviteler</h3>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="timeline timeline-inverse" id="activityTimeline">
+                            <!-- Timeline will be loaded via AJAX -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sub Groups -->
+                <div class="card card-info">
+                    <div class="card-header">
+                        <h3 class="card-title">Alt Gruplar</h3>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-primary btn-sm" id="createSubGroupBtn">
+                                <i class="fas fa-plus"></i> Alt Grup Oluştur
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="subGroupsList">
+                            <!-- Sub groups will be loaded via AJAX -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="card card-secondary">
+                    <div class="card-header">
+                        <h3 class="card-title">Hızlı İşlemler</h3>
+                    </div>
+                    <div class="card-body">
+                        <button type="button" class="btn btn-outline-primary btn-block" id="exportMembersBtn">
+                            <i class="fas fa-download"></i> Üyeleri Dışa Aktar
+                        </button>
+                        <button type="button" class="btn btn-outline-info btn-block" id="importMembersBtn">
+                            <i class="fas fa-upload"></i> Üyeleri İçe Aktar
+                        </button>
+                        <button type="button" class="btn btn-outline-warning btn-block" id="duplicateGroupBtn">
+                            <i class="fas fa-copy"></i> Grubu Kopyala
+                        </button>
+                        <button type="button" class="btn btn-outline-success btn-block" id="sendMessageBtn">
+                            <i class="fas fa-envelope"></i> Gruba Mesaj Gönder
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Member Modal -->
+<div class="modal fade" id="addMemberModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Gruba Üye Ekle</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <form id="addMemberForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="userSelect">Kullanıcı Seç <span class="text-danger">*</span></label>
+                        <select id="userSelect" name="userId" class="form-control select2" style="width: 100%;">
+                            <option value="">Kullanıcı seçiniz...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="memberRole">Grup İçi Rol</label>
+                        <select id="memberRole" name="role" class="form-control select2">
+                            <option value="Member">Üye</option>
+                            <option value="Admin">Yönetici</option>
+                            <option value="Moderator">Moderatör</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="memberNotes">Notlar</label>
+                        <textarea id="memberNotes" name="notes" class="form-control" rows="3" placeholder="Üye hakkında notlar (isteğe bağlı)"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-user-plus"></i> Üye Ekle
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Member Modal -->
+<div class="modal fade" id="editMemberModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Üye Bilgilerini Düzenle</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <form id="editMemberForm">
+                <div class="modal-body">
+                    <input type="hidden" id="editUserId" name="userId" />
+                    <div class="form-group">
+                        <label for="editMemberName">Kullanıcı</label>
+                        <input type="text" id="editMemberName" class="form-control" readonly />
+                    </div>
+                    <div class="form-group">
+                        <label for="editMemberRole">Grup İçi Rol</label>
+                        <select id="editMemberRole" name="role" class="form-control select2">
+                            <option value="Member">Üye</option>
+                            <option value="Admin">Yönetici</option>
+                            <option value="Moderator">Moderatör</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editMemberNotes">Notlar</label>
+                        <textarea id="editMemberNotes" name="notes" class="form-control" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Değişiklikleri Kaydet
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Send Message Modal -->
+<div class="modal fade" id="sendMessageModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Gruba Mesaj Gönder</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <form id="sendMessageForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="messageSubject">Konu <span class="text-danger">*</span></label>
+                        <input type="text" id="messageSubject" name="subject" class="form-control" placeholder="Mesaj konusu" />
+                    </div>
+                    <div class="form-group">
+                        <label for="messageContent">Mesaj <span class="text-danger">*</span></label>
+                        <textarea id="messageContent" name="content" class="form-control" rows="5" placeholder="Mesaj içeriği"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <div class="icheck-primary">
+                            <input type="checkbox" id="sendEmail" name="sendEmail" checked />
+                            <label for="sendEmail">E-posta olarak da gönder</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane"></i> Mesajı Gönder
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Grup Silme Onayı</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Bu grubu silmek istediğinizden emin misiniz?</p>
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Uyarı:</strong> Bu işlem geri alınamaz. Grup silindiğinde:
+                    <ul>
+                        <li>Tüm üyelik bilgileri silinecektir</li>
+                        <li>Alt gruplar varsa onlar da silinecektir</li>
+                        <li>Grup ile ilgili tüm aktivite geçmişi silinecektir</li>
+                    </ul>
+                </div>
+                <p><strong>Grup:</strong> @Model.GroupName</p>
+                <p><strong>Üye Sayısı:</strong> <span id="deleteGroupMemberCount">Yükleniyor...</span></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-danger" id="confirmDelete">
+                    <i class="fas fa-trash"></i> Evet, Sil
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- Select2 -->
+    <script src="~/lib/admin-lte/plugins/select2/js/select2.full.min.js"></script>
+    <!-- DataTables & Plugins -->
+    <script src="~/lib/admin-lte/plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="~/lib/admin-lte/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="~/lib/admin-lte/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/lib/admin-lte/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+    <!-- jquery-validation -->
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+    <script>
+        var membersTable;
+        var groupId = @Model.Id;
+
+        $(function () {
+            // Initialize Select2
+            $('.select2').select2({
+                theme: 'bootstrap4'
+            });
+
+            // Load initial data
+            loadParentGroups();
+            loadGroupData();
+            loadGroupStatistics();
+            loadGroupActivity();
+            loadSubGroups();
+            
+            // Initialize members table
+            initializeMembersTable();
+
+            // Setup form validation
+            setupFormValidation();
+
+            // Setup event handlers
+            setupEventHandlers();
+        });
+
+        function setupEventHandlers() {
+            // Add member button
+            $('#addMemberBtn').click(function () {
+                loadAvailableUsers();
+                $('#addMemberModal').modal('show');
+            });
+
+            // Refresh members
+            $('#refreshMembersBtn').click(function () {
+                membersTable.ajax.reload();
+                loadGroupStatistics();
+            });
+
+            // Delete group
+            $('#deleteGroupBtn').click(function () {
+                $('#deleteModal').modal('show');
+            });
+
+            // Confirm delete
+            $('#confirmDelete').click(function () {
+                deleteGroup();
+            });
+
+            // Quick actions
+            $('#exportMembersBtn').click(function () {
+                exportMembers();
+            });
+
+            $('#importMembersBtn').click(function () {
+                // Implement import functionality
+                toastr.info('İçe aktarma özelliği yakında eklenecek.');
+            });
+
+            $('#duplicateGroupBtn').click(function () {
+                duplicateGroup();
+            });
+
+            $('#sendMessageBtn').click(function () {
+                $('#sendMessageModal').modal('show');
+            });
+
+            $('#createSubGroupBtn').click(function () {
+                createSubGroup();
+            });
+
+            // Form submissions
+            $('#addMemberForm').submit(function (e) {
+                e.preventDefault();
+                addMember();
+            });
+
+            $('#editMemberForm').submit(function (e) {
+                e.preventDefault();
+                updateMember();
+            });
+
+            $('#sendMessageForm').submit(function (e) {
+                e.preventDefault();
+                sendMessage();
+            });
+        }
+
+        function setupFormValidation() {
+            $('#editGroupForm').validate({
+                rules: {
+                    Name: {
+                        required: true,
+                        minlength: 2,
+                        maxlength: 100
+                    },
+                    Type: {
+                        required: true
+                    },
+                    Description: {
+                        maxlength: 500
+                    },
+                    MaxMembers: {
+                        min: 1,
+                        max: 1000
+                    }
+                },
+                messages: {
+                    Name: {
+                        required: "Grup adı gereklidir",
+                        minlength: "Grup adı en az 2 karakter olmalıdır",
+                        maxlength: "Grup adı en fazla 100 karakter olabilir"
+                    },
+                    Type: {
+                        required: "Grup tipi seçilmelidir"
+                    },
+                    Description: {
+                        maxlength: "Açıklama en fazla 500 karakter olabilir"
+                    },
+                    MaxMembers: {
+                        min: "Maksimum üye sayısı en az 1 olmalıdır",
+                        max: "Maksimum üye sayısı en fazla 1000 olabilir"
+                    }
+                }
+            });
+        }
+
+        function initializeMembersTable() {
+            membersTable = $('#membersTable').DataTable({
+                "responsive": true,
+                "lengthChange": false,
+                "autoWidth": false,
+                "processing": true,
+                "serverSide": true,
+                "ajax": {
+                    "url": "@Url.Action("GetGroupMembers", "UserGroups", new { area = "Admin" })",
+                    "type": "POST",
+                    "data": { groupId: groupId }
+                },
+                "columns": [
+                    { "data": "userName", "width": "20%" },
+                    { "data": "email", "width": "25%" },
+                    {
+                        "data": "role",
+                        "width": "15%",
+                        "render": function (data, type, row) {
+                            var badgeClass = '';
+                            switch (data) {
+                                case 'Admin': badgeClass = 'badge-danger'; break;
+                                case 'Moderator': badgeClass = 'badge-warning'; break;
+                                case 'Member': badgeClass = 'badge-info'; break;
+                                default: badgeClass = 'badge-secondary';
+                            }
+                            return '<span class="badge ' + badgeClass + '">' + data + '</span>';
+                        }
+                    },
+                    {
+                        "data": "joinedDate",
+                        "width": "15%",
+                        "render": function (data, type, row) {
+                            return new Date(data).toLocaleDateString('tr-TR');
+                        }
+                    },
+                    {
+                        "data": "lastActivity",
+                        "width": "15%",
+                        "render": function (data, type, row) {
+                            return data ? new Date(data).toLocaleDateString('tr-TR') : 'Hiç';
+                        }
+                    },
+                    {
+                        "data": null,
+                        "width": "10%",
+                        "orderable": false,
+                        "render": function (data, type, row) {
+                            return '<div class="btn-group" role="group">' +
+                                '<button type="button" class="btn btn-warning btn-sm" onclick="editMember(' + row.userId + ', \'' + row.userName + '\', \'' + row.role + '\', \'' + (row.notes || '') + '\')" title="Düzenle">' +
+                                '<i class="fas fa-edit"></i>' +
+                                '</button>' +
+                                '<button type="button" class="btn btn-danger btn-sm" onclick="removeMember(' + row.userId + ', \'' + row.userName + '\')" title="Çıkar">' +
+                                '<i class="fas fa-user-times"></i>' +
+                                '</button>' +
+                                '</div>';
+                        }
+                    }
+                ],
+                "pageLength": 10,
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Turkish.json"
+                }
+            });
+        }
+
+        function loadParentGroups() {
+            $.ajax({
+                url: '@Url.Action("GetParentGroups", "UserGroups", new { area = "Admin" })',
+                type: 'GET',
+                data: { excludeId: groupId },
+                success: function (data) {
+                    var select = $('#ParentGroupId');
+                    select.empty().append('<option value="">Üst grup seçiniz (isteğe bağlı)</option>');
+                    
+                    data.forEach(function (group) {
+                        select.append('<option value="' + group.id + '">' + group.name + ' (' + group.type + ')</option>');
+                    });
+                    
+                    select.trigger('change');
+                },
+                error: function () {
+                    console.log('Üst gruplar yüklenirken hata oluştu.');
+                }
+            });
+        }
+
+        function loadGroupData() {
+            $.ajax({
+                url: '@Url.Action("GetGroupDetails", "UserGroups", new { area = "Admin" })',
+                type: 'GET',
+                data: { id: groupId },
+                success: function (data) {
+                    $('#ParentGroupId').val(data.parentGroupId).trigger('change');
+                    $('#MaxMembers').val(data.maxMembers);
+                    $('#AllowSelfJoin').prop('checked', data.allowSelfJoin);
+                    $('#Tags').val(data.tags);
+                },
+                error: function () {
+                    console.log('Grup verileri yüklenirken hata oluştu.');
+                }
+            });
+        }
+
+        function loadGroupStatistics() {
+            $.ajax({
+                url: '@Url.Action("GetGroupStatistics", "UserGroups", new { area = "Admin" })',
+                type: 'GET',
+                data: { groupId: groupId },
+                success: function (data) {
+                    $('#totalMembers').text(data.totalMembers);
+                    $('#activeMembers').text(data.activeMembers);
+                    $('#adminMembers').text(data.adminMembers);
+                    $('#lastUpdated').text(data.lastUpdated ? new Date(data.lastUpdated).toLocaleDateString('tr-TR') : 'Hiç');
+                    
+                    var percentage = data.maxMembers ? Math.round((data.totalMembers / data.maxMembers) * 100) : 0;
+                    $('#membershipPercentage').text(percentage);
+                    $('#membershipProgress').css('width', percentage + '%');
+                    
+                    $('#deleteGroupMemberCount').text(data.totalMembers);
+                },
+                error: function () {
+                    console.log('Grup istatistikleri yüklenirken hata oluştu.');
+                }
+            });
+        }
+
+        function loadGroupActivity() {
+            $.ajax({
+                url: '@Url.Action("GetGroupActivity", "UserGroups", new { area = "Admin" })',
+                type: 'GET',
+                data: { groupId: groupId },
+                success: function (data) {
+                    var html = '';
+                    if (data.length > 0) {
+                        data.forEach(function (item) {
+                            html += '<div class="time-label"><span class="bg-info">' + new Date(item.date).toLocaleDateString('tr-TR') + '</span></div>';
+                            html += '<div><i class="fas fa-' + item.icon + ' bg-blue"></i>';
+                            html += '<div class="timeline-item"><span class="time"><i class="fas fa-clock"></i> ' + new Date(item.date).toLocaleTimeString('tr-TR') + '</span>';
+                            html += '<h3 class="timeline-header">' + item.title + '</h3>';
+                            html += '<div class="timeline-body">' + item.description + '</div></div></div>';
+                        });
+                        html += '<div><i class="far fa-clock bg-gray"></i></div>';
+                    } else {
+                        html = '<p class="text-muted">Henüz aktivite bulunmuyor.</p>';
+                    }
+                    $('#activityTimeline').html(html);
+                },
+                error: function () {
+                    $('#activityTimeline').html('<p class="text-danger">Aktiviteler yüklenirken hata oluştu.</p>');
+                }
+            });
+        }
+
+        function loadSubGroups() {
+            $.ajax({
+                url: '@Url.Action("GetSubGroups", "UserGroups", new { area = "Admin" })',
+                type: 'GET',
+                data: { parentId: groupId },
+                success: function (data) {
+                    var html = '';
+                    if (data.length > 0) {
+                        data.forEach(function (group) {
+                            html += '<div class="d-flex justify-content-between align-items-center border-bottom py-2">';
+                            html += '<div><strong>' + group.name + '</strong><br><small class="text-muted">' + group.memberCount + ' üye</small></div>';
+                            html += '<div><a href="@Url.Action("Edit", "UserGroups", new { area = "Admin" })/' + group.id + '" class="btn btn-sm btn-outline-primary">Düzenle</a></div>';
+                            html += '</div>';
+                        });
+                    } else {
+                        html = '<p class="text-muted">Alt grup bulunmuyor.</p>';
+                    }
+                    $('#subGroupsList').html(html);
+                },
+                error: function () {
+                    $('#subGroupsList').html('<p class="text-danger">Alt gruplar yüklenirken hata oluştu.</p>');
+                }
+            });
+        }
+
+        function loadAvailableUsers() {
+            $.ajax({
+                url: '@Url.Action("GetAvailableUsers", "UserGroups", new { area = "Admin" })',
+                type: 'GET',
+                data: { groupId: groupId },
+                success: function (data) {
+                    var select = $('#userSelect');
+                    select.empty().append('<option value="">Kullanıcı seçiniz...</option>');
+                    
+                    data.forEach(function (user) {
+                        select.append('<option value="' + user.id + '">' + user.userName + ' (' + user.email + ')</option>');
+                    });
+                    
+                    select.trigger('change');
+                },
+                error: function () {
+                    toastr.error('Kullanıcılar yüklenirken hata oluştu.');
+                }
+            });
+        }
+
+        function addMember() {
+            var formData = {
+                groupId: groupId,
+                userId: $('#userSelect').val(),
+                role: $('#memberRole').val(),
+                notes: $('#memberNotes').val()
+            };
+
+            if (!formData.userId) {
+                toastr.warning('Lütfen bir kullanıcı seçiniz.');
+                return;
+            }
+
+            $.ajax({
+                url: '@Url.Action("AddMemberToGroup", "UserGroups", new { area = "Admin" })',
+                type: 'POST',
+                data: formData,
+                success: function (result) {
+                    if (result.success) {
+                        $('#addMemberModal').modal('hide');
+                        $('#addMemberForm')[0].reset();
+                        membersTable.ajax.reload();
+                        loadGroupStatistics();
+                        loadGroupActivity();
+                        toastr.success('Üye başarıyla gruba eklendi.');
+                    } else {
+                        toastr.error(result.message || 'Üye eklenirken hata oluştu.');
+                    }
+                },
+                error: function () {
+                    toastr.error('Üye eklenirken hata oluştu.');
+                }
+            });
+        }
+
+        function editMember(userId, userName, role, notes) {
+            $('#editUserId').val(userId);
+            $('#editMemberName').val(userName);
+            $('#editMemberRole').val(role).trigger('change');
+            $('#editMemberNotes').val(notes);
+            $('#editMemberModal').modal('show');
+        }
+
+        function updateMember() {
+            var formData = {
+                groupId: groupId,
+                userId: $('#editUserId').val(),
+                role: $('#editMemberRole').val(),
+                notes: $('#editMemberNotes').val()
+            };
+
+            $.ajax({
+                url: '@Url.Action("UpdateGroupMember", "UserGroups", new { area = "Admin" })',
+                type: 'POST',
+                data: formData,
+                success: function (result) {
+                    if (result.success) {
+                        $('#editMemberModal').modal('hide');
+                        membersTable.ajax.reload();
+                        loadGroupActivity();
+                        toastr.success('Üye bilgileri güncellendi.');
+                    } else {
+                        toastr.error(result.message || 'Üye güncellenirken hata oluştu.');
+                    }
+                },
+                error: function () {
+                    toastr.error('Üye güncellenirken hata oluştu.');
+                }
+            });
+        }
+
+        function removeMember(userId, userName) {
+            if (confirm('"' + userName + '" kullanıcısını gruptan çıkarmak istediğinizden emin misiniz?')) {
+                $.ajax({
+                    url: '@Url.Action("RemoveMemberFromGroup", "UserGroups", new { area = "Admin" })',
+                    type: 'POST',
+                    data: { groupId: groupId, userId: userId },
+                    success: function (result) {
+                        if (result.success) {
+                            membersTable.ajax.reload();
+                            loadGroupStatistics();
+                            loadGroupActivity();
+                            toastr.success('Üye başarıyla gruptan çıkarıldı.');
+                        } else {
+                            toastr.error(result.message || 'Üye çıkarılırken hata oluştu.');
+                        }
+                    },
+                    error: function () {
+                        toastr.error('Üye çıkarılırken hata oluştu.');
+                    }
+                });
+            }
+        }
+
+        function deleteGroup() {
+            $.ajax({
+                url: '@Url.Action("Delete", "UserGroups", new { area = "Admin" })',
+                type: 'POST',
+                data: { id: groupId },
+                success: function (result) {
+                    if (result.success) {
+                        toastr.success('Grup başarıyla silindi.');
+                        window.location.href = '@Url.Action("Index", "UserGroups", new { area = "Admin" })';
+                    } else {
+                        toastr.error(result.message || 'Grup silinirken hata oluştu.');
+                    }
+                },
+                error: function () {
+                    toastr.error('Grup silinirken hata oluştu.');
+                }
+            });
+        }
+
+        function exportMembers() {
+            window.location.href = '@Url.Action("ExportMembers", "UserGroups", new { area = "Admin" })' + '?groupId=' + groupId;
+        }
+
+        function duplicateGroup() {
+            if (confirm('Bu grubu kopyalamak istediğinizden emin misiniz?')) {
+                $.ajax({
+                    url: '@Url.Action("DuplicateGroup", "UserGroups", new { area = "Admin" })',
+                    type: 'POST',
+                    data: { id: groupId },
+                    success: function (result) {
+                        if (result.success) {
+                            toastr.success('Grup başarıyla kopyalandı.');
+                            window.location.href = '@Url.Action("Edit", "UserGroups", new { area = "Admin" })' + '/' + result.newGroupId;
+                        } else {
+                            toastr.error(result.message || 'Grup kopyalanırken hata oluştu.');
+                        }
+                    },
+                    error: function () {
+                        toastr.error('Grup kopyalanırken hata oluştu.');
+                    }
+                });
+            }
+        }
+
+        function createSubGroup() {
+            window.location.href = '@Url.Action("Create", "UserGroups", new { area = "Admin" })' + '?parentId=' + groupId;
+        }
+
+        function sendMessage() {
+            var formData = {
+                groupId: groupId,
+                subject: $('#messageSubject').val(),
+                content: $('#messageContent').val(),
+                sendEmail: $('#sendEmail').is(':checked')
+            };
+
+            if (!formData.subject || !formData.content) {
+                toastr.warning('Lütfen konu ve mesaj alanlarını doldurunuz.');
+                return;
+            }
+
+            $.ajax({
+                url: '@Url.Action("SendGroupMessage", "UserGroups", new { area = "Admin" })',
+                type: 'POST',
+                data: formData,
+                success: function (result) {
+                    if (result.success) {
+                        $('#sendMessageModal').modal('hide');
+                        $('#sendMessageForm')[0].reset();
+                        toastr.success('Mesaj başarıyla gönderildi.');
+                    } else {
+                        toastr.error(result.message || 'Mesaj gönderilirken hata oluştu.');
+                    }
+                },
+                error: function () {
+                    toastr.error('Mesaj gönderilirken hata oluştu.');
+                }
+            });
+        }
+    </script>
+}

@@ -2,8 +2,8 @@
 // Run this script after InitializeCollections.js
 // This script populates the database with initial data
 
-// Switch to DataLensDb database
-use('DataLensDb');
+// Switch to datalens database
+use('datalens');
 
 // Helper function to generate ObjectId
 function generateObjectId() {

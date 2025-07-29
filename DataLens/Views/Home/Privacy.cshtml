@@ -1,6 +1,120 @@
-﻿@{
-    ViewData["Title"] = "Privacy Policy";
+@{
+    ViewData["Title"] = "Gizlilik Politikası";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+@section Breadcrumb {
+    <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">Ana Sayfa</a></li>
+    <li class="breadcrumb-item active">Gizlilik Politikası</li>
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fa fa-shield mr-2"></i>
+                    Gizlilik Politikası
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h4>1. Bilgi Toplama ve Kullanım</h4>
+                        <p class="text-muted">
+                            DataLens Dashboard uygulaması, kullanıcı deneyimini iyileştirmek ve hizmetlerimizi sunmak için 
+                            belirli kişisel bilgileri toplar ve işler. Bu bilgiler arasında kullanıcı adı, e-posta adresi 
+                            ve dashboard kullanım verileri yer alır.
+                        </p>
+
+                        <h4>2. Veri Güvenliği</h4>
+                        <p class="text-muted">
+                            Tüm kullanıcı verileri endüstri standardı güvenlik protokolleri ile korunmaktadır. 
+                            Verileriniz şifrelenerek saklanır ve yetkisiz erişime karşı korunur.
+                        </p>
+
+                        <h4>3. Çerezler (Cookies)</h4>
+                        <p class="text-muted">
+                            Uygulamamız, kullanıcı deneyimini kişiselleştirmek ve sistem performansını izlemek için 
+                            çerezler kullanır. Bu çerezler oturum yönetimi ve kullanıcı tercihlerinin saklanması için gereklidir.
+                        </p>
+
+                        <h4>4. Üçüncü Taraf Paylaşımı</h4>
+                        <p class="text-muted">
+                            Kişisel bilgileriniz, yasal zorunluluklar dışında üçüncü taraflarla paylaşılmaz. 
+                            Dashboard verileri yalnızca yetkili kullanıcılar tarafından erişilebilir.
+                        </p>
+
+                        <h4>5. Kullanıcı Hakları</h4>
+                        <p class="text-muted">
+                            Kullanıcılar, kişisel verilerini görüntüleme, düzeltme ve silme hakkına sahiptir. 
+                            Bu talepleriniz için sistem yöneticisi ile iletişime geçebilirsiniz.
+                        </p>
+
+                        <h4>6. İletişim</h4>
+                        <p class="text-muted">
+                            Gizlilik politikası ile ilgili sorularınız için 
+                            <a href="mailto:privacy@datalens.com">privacy@datalens.com</a> adresinden bizimle iletişime geçebilirsiniz.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <small class="text-muted">
+                            <i class="fa fa-calendar mr-1"></i>
+                            Son güncelleme: @DateTime.Now.ToString("dd.MM.yyyy")
+                        </small>
+                    </div>
+                    <div class="col-sm-6 text-right">
+                        <small class="text-muted">
+                            <i class="fa fa-info-circle mr-1"></i>
+                            DataLens Dashboard v1.0
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card card-outline card-info">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fa fa-lock mr-2"></i>
+                    Veri Güvenliği
+                </h3>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li><i class="fa fa-check text-success mr-2"></i> SSL/TLS Şifreleme</li>
+                    <li><i class="fa fa-check text-success mr-2"></i> Güvenli Veritabanı</li>
+                    <li><i class="fa fa-check text-success mr-2"></i> Düzenli Güvenlik Güncellemeleri</li>
+                    <li><i class="fa fa-check text-success mr-2"></i> Erişim Kontrolü</li>
+                    <li><i class="fa fa-check text-success mr-2"></i> Veri Yedekleme</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card card-outline card-warning">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fa fa-user-shield mr-2"></i>
+                    Kullanıcı Hakları
+                </h3>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li><i class="fa fa-eye text-info mr-2"></i> Veri Görüntüleme Hakkı</li>
+                    <li><i class="fa fa-edit text-warning mr-2"></i> Veri Düzeltme Hakkı</li>
+                    <li><i class="fa fa-trash text-danger mr-2"></i> Veri Silme Hakkı</li>
+                    <li><i class="fa fa-download text-primary mr-2"></i> Veri Taşınabilirlik</li>
+                    <li><i class="fa fa-ban text-secondary mr-2"></i> İşleme İtiraz Hakkı</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

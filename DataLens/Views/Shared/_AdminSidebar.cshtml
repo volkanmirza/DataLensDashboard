@@ -1,0 +1,346 @@
+<!-- Main Sidebar Container -->
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <!-- Brand Logo -->
+    <a href="@Url.Action("Index", "Home")" class="brand-link">
+        <img src="~/lib/admin-lte/img/AdminLTELogo.png" alt="DataLens Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+        <span class="brand-text font-weight-light">DataLens Admin</span>
+    </a>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <!-- Sidebar user panel (optional) -->
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+            <div class="image">
+                <img src="~/lib/admin-lte/img/user2-160x160.jpg" class="img-circle elevation-2" alt="Admin Image">
+            </div>
+            <div class="info">
+                <a href="@Url.Action("Index", "Profile", new { area = "Profile" })" class="d-block">Admin Kullanıcı</a>
+                <small class="text-muted">Sistem Yöneticisi</small>
+            </div>
+        </div>
+
+        <!-- SidebarSearch Form -->
+        <div class="form-inline">
+            <div class="input-group" data-widget="sidebar-search">
+                <input class="form-control form-control-sidebar" type="search" placeholder="Menüde ara..." aria-label="Search">
+                <div class="input-group-append">
+                    <button class="btn btn-sidebar">
+                        <i class="fa fa-search fa-fw"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Menu -->
+        <nav class="mt-2">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                <!-- Dashboard Overview -->
+                <li class="nav-item">
+                    <a href="@Url.Action("Index", "Home")" class="nav-link">
+                        <i class="nav-icon fa fa-tachometer"></i>
+                        <p>Ana Sayfa</p>
+                    </a>
+                </li>
+                
+                <!-- User Management -->
+                <li class="nav-header">KULLANICI YÖNETİMİ</li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fa fa-users"></i>
+                        <p>
+                            Kullanıcılar
+                            <i class="right fa fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="@Url.Action("Index", "User", new { area = "Admin" })" class="nav-link">
+                                <i class="fa fa-circle-o nav-icon"></i>
+                                <p>Kullanıcı Listesi</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="@Url.Action("Create", "User", new { area = "Admin" })" class="nav-link">
+                                <i class="fa fa-circle-o nav-icon"></i>
+                                <p>Yeni Kullanıcı</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fa fa-circle-o nav-icon"></i>
+                                <p>Aktif Kullanıcılar</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fa fa-circle-o nav-icon"></i>
+                                <p>Pasif Kullanıcılar</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                
+                <!-- User Groups -->
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fa fa-group"></i>
+                        <p>
+                            Kullanıcı Grupları
+                            <i class="right fa fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="@Url.Action("Index", "UserGroup", new { area = "Admin" })" class="nav-link">
+                                <i class="fa fa-circle-o nav-icon"></i>
+                                <p>Grup Listesi</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="@Url.Action("Create", "UserGroup", new { area = "Admin" })" class="nav-link">
+                                <i class="fa fa-circle-o nav-icon"></i>
+                                <p>Yeni Grup</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fa fa-circle-o nav-icon"></i>
+                                <p>Grup Üyelikleri</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                
+                <!-- Dashboard Management -->
+                <li class="nav-header">DASHBOARD YÖNETİMİ</li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fa fa-dashboard"></i>
+                        <p>
+                            Dashboard'lar
+                            <i class="right fa fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="@Url.Action("Index", "Dashboard", new { area = "Dashboard" })" class="nav-link">
+                                <i class="fa fa-circle-o nav-icon"></i>
+                                <p>Tüm Dashboard'lar</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="@Url.Action("Create", "Dashboard", new { area = "Dashboard" })" class="nav-link">
+                                <i class="fa fa-circle-o nav-icon"></i>
+                                <p>Yeni Dashboard</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="@Url.Action("Designer", "Dashboard", new { area = "Dashboard" })" class="nav-link">
+                                <i class="fa fa-circle-o nav-icon"></i>
+                                <p>Dashboard Tasarımcısı</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                
+                <!-- Permissions -->
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fa fa-lock"></i>
+                        <p>
+                            İzin Yönetimi
+                            <i class="right fa fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="@Url.Action("Manage", "DashboardPermission", new { area = "Dashboard" })" class="nav-link">
+                                <i class="fa fa-circle-o nav-icon"></i>
+                                <p>Dashboard İzinleri</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fa fa-circle-o nav-icon"></i>
+                                <p>Kullanıcı İzinleri</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fa fa-circle-o nav-icon"></i>
+                                <p>Grup İzinleri</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                
+                <!-- Reports & Analytics -->
+                <li class="nav-header">RAPORLAR VE ANALİTİK</li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fa fa-bar-chart"></i>
+                        <p>
+                            Sistem Raporları
+                            <i class="right fa fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fa fa-circle-o nav-icon"></i>
+                                <p>Kullanım İstatistikleri</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fa fa-circle-o nav-icon"></i>
+                                <p>Performans Raporları</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fa fa-circle-o nav-icon"></i>
+                                <p>Kullanıcı Aktiviteleri</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fa fa-circle-o nav-icon"></i>
+                                <p>Dashboard Kullanımı</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                
+                <!-- System Management -->
+                <li class="nav-header">SİSTEM YÖNETİMİ</li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fa fa-cogs"></i>
+                        <p>
+                            Sistem Ayarları
+                            <i class="right fa fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fa fa-circle-o nav-icon"></i>
+                                <p>Genel Ayarlar</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fa fa-circle-o nav-icon"></i>
+                                <p>Veritabanı Ayarları</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fa fa-circle-o nav-icon"></i>
+                                <p>E-posta Ayarları</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fa fa-circle-o nav-icon"></i>
+                                <p>Güvenlik Ayarları</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                
+                <!-- Logs & Monitoring -->
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fa fa-file-text-o"></i>
+                        <p>
+                            Loglar ve İzleme
+                            <i class="right fa fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fa fa-circle-o nav-icon"></i>
+                                <p>Sistem Logları</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fa fa-circle-o nav-icon"></i>
+                                <p>Hata Logları</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fa fa-circle-o nav-icon"></i>
+                                <p>Kullanıcı Aktivite Logları</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fa fa-circle-o nav-icon"></i>
+                                <p>Sistem Performansı</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                
+                <!-- Backup & Maintenance -->
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fa fa-database"></i>
+                        <p>
+                            Yedekleme ve Bakım
+                            <i class="right fa fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fa fa-circle-o nav-icon"></i>
+                                <p>Veritabanı Yedekleme</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fa fa-circle-o nav-icon"></i>
+                                <p>Sistem Bakımı</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fa fa-circle-o nav-icon"></i>
+                                <p>Temizlik İşlemleri</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                
+                <!-- Quick Links -->
+                <li class="nav-header">HIZLI ERİŞİM</li>
+                <li class="nav-item">
+                    <a href="@Url.Action("Index", "Dashboard", new { area = "Dashboard" })" class="nav-link">
+                        <i class="nav-icon fa fa-eye"></i>
+                        <p>Dashboard Görünümü</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="@Url.Action("Index", "Profile", new { area = "Profile" })" class="nav-link">
+                        <i class="nav-icon fa fa-user"></i>
+                        <p>Profil</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="@Url.Action("Logout", "Account")" class="nav-link">
+                        <i class="nav-icon fa fa-sign-out"></i>
+                        <p>Çıkış Yap</p>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <!-- /.sidebar-menu -->
+    </div>
+    <!-- /.sidebar -->
+</aside>

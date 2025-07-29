@@ -1,8 +1,488 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@{
+    ViewData["Title"] = "Ana Sayfa";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+@section Breadcrumb {
+    <li class="breadcrumb-item active">Ana Sayfa</li>
+}
+
+<!-- Small boxes (Stat box) -->
+<div class="row">
+    <div class="col-lg-3 col-6">
+        <!-- small box -->
+        <div class="small-box bg-info">
+            <div class="inner">
+                <h3>150</h3>
+                <p>Toplam Dashboard</p>
+            </div>
+            <div class="icon">
+                <i class="fa fa-dashboard"></i>
+            </div>
+            <a href="@Url.Action("Index", "Dashboard", new { area = "Dashboard" })" class="small-box-footer">Daha fazla bilgi <i class="fa fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+    <!-- ./col -->
+    <div class="col-lg-3 col-6">
+        <!-- small box -->
+        <div class="small-box bg-success">
+            <div class="inner">
+                <h3>53<sup style="font-size: 20px">%</sup></h3>
+                <p>Aktif Kullanıcılar</p>
+            </div>
+            <div class="icon">
+                <i class="fa fa-users"></i>
+            </div>
+            <a href="@Url.Action("Index", "User", new { area = "Admin" })" class="small-box-footer">Daha fazla bilgi <i class="fa fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+    <!-- ./col -->
+    <div class="col-lg-3 col-6">
+        <!-- small box -->
+        <div class="small-box bg-warning">
+            <div class="inner">
+                <h3>44</h3>
+                <p>Kullanıcı Grupları</p>
+            </div>
+            <div class="icon">
+                <i class="fa fa-group"></i>
+            </div>
+            <a href="@Url.Action("Index", "UserGroup", new { area = "Admin" })" class="small-box-footer">Daha fazla bilgi <i class="fa fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+    <!-- ./col -->
+    <div class="col-lg-3 col-6">
+        <!-- small box -->
+        <div class="small-box bg-danger">
+            <div class="inner">
+                <h3>65</h3>
+                <p>Aylık Görüntüleme</p>
+            </div>
+            <div class="icon">
+                <i class="fa fa-eye"></i>
+            </div>
+            <a href="#" class="small-box-footer">Daha fazla bilgi <i class="fa fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+    <!-- ./col -->
 </div>
+<!-- /.row -->
+
+<!-- Main row -->
+<div class="row">
+    <!-- Left col -->
+    <section class="col-lg-7 connectedSortable">
+        <!-- Custom tabs (Charts with tabs)-->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fa fa-chart-pie mr-1"></i>
+                    Dashboard Kullanım İstatistikleri
+                </h3>
+                <div class="card-tools">
+                    <ul class="nav nav-pills ml-auto">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#revenue-chart" data-toggle="tab">Günlük</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#sales-chart" data-toggle="tab">Haftalık</a>
+                        </li>
+                    </ul>
+                </div>
+            </div><!-- /.card-header -->
+            <div class="card-body">
+                <div class="tab-content p-0">
+                    <!-- Morris chart - Sales -->
+                    <div class="chart tab-pane active" id="revenue-chart" style="position: relative; height: 300px;">
+                        <canvas id="revenue-chart-canvas" height="300" style="height: 300px;"></canvas>
+                    </div>
+                    <div class="chart tab-pane" id="sales-chart" style="position: relative; height: 300px;">
+                        <canvas id="sales-chart-canvas" height="300" style="height: 300px;"></canvas>
+                    </div>
+                </div>
+            </div><!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+
+        <!-- DIRECT CHAT -->
+        <div class="card direct-chat direct-chat-primary">
+            <div class="card-header">
+                <h3 class="card-title">Son Aktiviteler</h3>
+                <div class="card-tools">
+                    <span title="3 Yeni Mesaj" class="badge badge-primary">3</span>
+                    <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        <i class="fa fa-minus"></i>
+                    </button>
+                    <button type="button" class="btn btn-tool" title="Contacts" data-widget="chat-pane-toggle">
+                        <i class="fa fa-comments"></i>
+                    </button>
+                    <button type="button" class="btn btn-tool" data-card-widget="remove">
+                        <i class="fa fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+                <!-- Conversations are loaded here -->
+                <div class="direct-chat-messages">
+                    <!-- Message. Default to the left -->
+                    <div class="direct-chat-msg">
+                        <div class="direct-chat-infos clearfix">
+                            <span class="direct-chat-name float-left">Alexander Pierce</span>
+                            <span class="direct-chat-timestamp float-right">23 Ocak 2:00 pm</span>
+                        </div>
+                        <!-- /.direct-chat-infos -->
+                        <img class="direct-chat-img" src="~/lib/admin-lte/img/user1-128x128.jpg" alt="message user image">
+                        <!-- /.direct-chat-img -->
+                        <div class="direct-chat-text">
+                            Yeni dashboard oluşturuldu: Satış Raporu
+                        </div>
+                        <!-- /.direct-chat-text -->
+                    </div>
+                    <!-- /.direct-chat-msg -->
+
+                    <!-- Message to the right -->
+                    <div class="direct-chat-msg right">
+                        <div class="direct-chat-infos clearfix">
+                            <span class="direct-chat-name float-right">Sarah Bullock</span>
+                            <span class="direct-chat-timestamp float-left">23 Ocak 2:05 pm</span>
+                        </div>
+                        <!-- /.direct-chat-infos -->
+                        <img class="direct-chat-img" src="~/lib/admin-lte/img/user3-128x128.jpg" alt="message user image">
+                        <!-- /.direct-chat-img -->
+                        <div class="direct-chat-text">
+                            Dashboard paylaşıldı: Müşteri Analizi
+                        </div>
+                        <!-- /.direct-chat-text -->
+                    </div>
+                    <!-- /.direct-chat-msg -->
+                </div>
+                <!--/.direct-chat-messages-->
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!--/.direct-chat -->
+    </section>
+    <!-- /.Left col -->
+    
+    <!-- right col (We are only adding the ID to make the widgets sortable)-->
+    <section class="col-lg-5 connectedSortable">
+        <!-- Map card -->
+        <div class="card bg-gradient-primary">
+            <div class="card-header border-0">
+                <h3 class="card-title">
+                    <i class="fa fa-map-marker mr-1"></i>
+                    Kullanıcı Dağılımı
+                </h3>
+                <!-- card tools -->
+                <div class="card-tools">
+                    <button type="button" class="btn btn-primary btn-sm daterange" title="Date range">
+                        <i class="fa fa-calendar"></i>
+                    </button>
+                    <button type="button" class="btn btn-primary btn-sm" data-card-widget="collapse" title="Collapse">
+                        <i class="fa fa-minus"></i>
+                    </button>
+                </div>
+                <!-- /.card-tools -->
+            </div>
+            <div class="card-body">
+                <div id="world-map" style="height: 250px; width: 100%;"></div>
+            </div>
+            <!-- /.card-body-->
+            <div class="card-footer bg-transparent">
+                <div class="row">
+                    <div class="col-4 text-center">
+                        <div id="sparkline-1"></div>
+                        <div class="text-white">Türkiye</div>
+                    </div>
+                    <!-- ./col -->
+                    <div class="col-4 text-center">
+                        <div id="sparkline-2"></div>
+                        <div class="text-white">Avrupa</div>
+                    </div>
+                    <!-- ./col -->
+                    <div class="col-4 text-center">
+                        <div id="sparkline-3"></div>
+                        <div class="text-white">Amerika</div>
+                    </div>
+                    <!-- ./col -->
+                </div>
+                <!-- /.row -->
+            </div>
+        </div>
+        <!-- /.card -->
+
+        <!-- solid sales graph -->
+        <div class="card bg-gradient-info">
+            <div class="card-header border-0">
+                <h3 class="card-title">
+                    <i class="fa fa-th mr-1"></i>
+                    Dashboard Performansı
+                </h3>
+                <div class="card-tools">
+                    <button type="button" class="btn bg-info btn-sm" data-card-widget="collapse">
+                        <i class="fa fa-minus"></i>
+                    </button>
+                    <button type="button" class="btn bg-info btn-sm" data-card-widget="remove">
+                        <i class="fa fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <canvas class="chart" id="line-chart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
+            </div>
+            <!-- /.card-body -->
+            <div class="card-footer bg-transparent">
+                <div class="row">
+                    <div class="col-4 text-center">
+                        <input type="text" class="knob" readonly value="20" data-width="60" data-height="60" data-fgColor="#39CCCC">
+                        <div class="text-white">Yükleme Hızı</div>
+                    </div>
+                    <!-- ./col -->
+                    <div class="col-4 text-center">
+                        <input type="text" class="knob" readonly value="50" data-width="60" data-height="60" data-fgColor="#39CCCC">
+                        <div class="text-white">Kullanım Oranı</div>
+                    </div>
+                    <!-- ./col -->
+                    <div class="col-4 text-center">
+                        <input type="text" class="knob" readonly value="80" data-width="60" data-height="60" data-fgColor="#39CCCC">
+                        <div class="text-white">Memnuniyet</div>
+                    </div>
+                    <!-- ./col -->
+                </div>
+                <!-- /.row -->
+            </div>
+            <!-- /.card-footer -->
+        </div>
+        <!-- /.card -->
+
+        <!-- Calendar -->
+        <div class="card bg-gradient-success">
+            <div class="card-header border-0">
+                <h3 class="card-title">
+                    <i class="fa fa-calendar"></i>
+                    Takvim
+                </h3>
+                <!-- tools card -->
+                <div class="card-tools">
+                    <!-- button with a dropdown -->
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-success btn-sm dropdown-toggle" data-toggle="dropdown" data-offset="-52">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <div class="dropdown-menu" role="menu">
+                            <a href="#" class="dropdown-item">Yeni Etkinlik Ekle</a>
+                            <a href="#" class="dropdown-item">Tüm Etkinlikleri Temizle</a>
+                            <div class="dropdown-divider"></div>
+                            <a href="#" class="dropdown-item">Görünüm</a>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-success btn-sm" data-card-widget="collapse">
+                        <i class="fa fa-minus"></i>
+                    </button>
+                    <button type="button" class="btn btn-success btn-sm" data-card-widget="remove">
+                        <i class="fa fa-times"></i>
+                    </button>
+                </div>
+                <!-- /. tools -->
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body pt-0">
+                <!--The calendar -->
+                <div id="calendar" style="width: 100%"></div>
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+    </section>
+    <!-- right col -->
+</div>
+<!-- /.row (main row) -->
+
+@section Scripts {
+    <!-- ChartJS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
+    <script src="~/lib/admin-lte/js/demo.js"></script>
+    <!-- AdminLTE for demo purposes -->
+    <script>
+        // Sample chart data
+        $(function () {
+            'use strict'
+
+            var ticksStyle = {
+                color: '#495057',
+                font: {
+                    weight: 'bold'
+                }
+            }
+
+            var mode = 'index'
+            var intersect = true
+
+            // Sales Chart
+            var $salesChart = $('#sales-chart-canvas')
+            if ($salesChart.length > 0) {
+                var salesChart = new Chart($salesChart, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz'],
+                        datasets: [{
+                            backgroundColor: '#007bff',
+                            borderColor: '#007bff',
+                            data: [1000, 2000, 3000, 2500, 2700, 2500, 3000]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                mode: mode,
+                                intersect: intersect
+                            }
+                        },
+                        interaction: {
+                            mode: mode,
+                            intersect: intersect
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    display: true,
+                                    lineWidth: 4,
+                                    color: 'rgba(0, 0, 0, .2)'
+                                },
+                                ticks: {
+                                    ...ticksStyle,
+                                    callback: function (value) {
+                                        if (value >= 1000) {
+                                            return (value / 1000) + 'k'
+                                        }
+                                        return value
+                                    }
+                                }
+                            },
+                            x: {
+                                display: true,
+                                grid: {
+                                    display: false
+                                },
+                                ticks: ticksStyle
+                            }
+                        }
+                    }
+                })
+            }
+
+            // Revenue Chart (Line Chart)
+            var $revenueChart = $('#revenue-chart-canvas')
+            if ($revenueChart.length > 0) {
+                var revenueChart = new Chart($revenueChart, {
+                    type: 'line',
+                    data: {
+                        labels: ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'],
+                        datasets: [{
+                            label: 'Günlük Kullanım',
+                            data: [100, 120, 170, 167, 180, 177, 160],
+                            backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                            borderColor: '#007bff',
+                            pointBorderColor: '#007bff',
+                            pointBackgroundColor: '#007bff',
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                mode: mode,
+                                intersect: intersect
+                            }
+                        },
+                        interaction: {
+                            mode: mode,
+                            intersect: intersect
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                suggestedMax: 200,
+                                grid: {
+                                    display: true,
+                                    lineWidth: 4,
+                                    color: 'rgba(0, 0, 0, .2)'
+                                },
+                                ticks: ticksStyle
+                            },
+                            x: {
+                                display: true,
+                                grid: {
+                                    display: false
+                                },
+                                ticks: ticksStyle
+                            }
+                        }
+                    }
+                })
+            }
+
+            // Line Chart for Dashboard Performance
+            var $lineChart = $('#line-chart')
+            if ($lineChart.length > 0) {
+                var lineChart = new Chart($lineChart, {
+                    type: 'line',
+                    data: {
+                        labels: ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran'],
+                        datasets: [{
+                            label: 'Performans',
+                            data: [65, 59, 80, 81, 56, 85],
+                            backgroundColor: 'rgba(57, 204, 204, 0.2)',
+                            borderColor: '#39CCCC',
+                            pointBorderColor: '#39CCCC',
+                            pointBackgroundColor: '#39CCCC',
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.2)'
+                                },
+                                ticks: {
+                                    color: '#fff'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.2)'
+                                },
+                                ticks: {
+                                    color: '#fff'
+                                }
+                            }
+                        }
+                    }
+                })
+            }
+        })
+    </script>
+}

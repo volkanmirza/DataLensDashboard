@@ -1,0 +1,625 @@
+@model DataLens.Models.UserGroup
+
+@{
+    ViewData["Title"] = "Yeni Kullanıcı Grubu";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+@section Styles {
+    <!-- Select2 -->
+    <link rel="stylesheet" href="~/lib/admin-lte/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="~/lib/admin-lte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+    <!-- iCheck for checkboxes and radio inputs -->
+    <link rel="stylesheet" href="~/lib/admin-lte/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+    <!-- Tempusdominus Bootstrap 4 -->
+    <link rel="stylesheet" href="~/lib/admin-lte/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
+}
+
+@section Breadcrumbs {
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">Yeni Kullanıcı Grubu</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home", new { area = "Admin" })">Ana Sayfa</a></li>
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "UserGroups", new { area = "Admin" })">Kullanıcı Grupları</a></li>
+                        <li class="breadcrumb-item active">Yeni Grup</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Grup Bilgileri</h3>
+                    </div>
+                    <form asp-action="Create" method="post" id="createGroupForm">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="Name">Grup Adı <span class="text-danger">*</span></label>
+                                        <input asp-for="Name" class="form-control" placeholder="Grup adını giriniz" />
+                                        <span asp-validation-for="Name" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="Type">Grup Tipi <span class="text-danger">*</span></label>
+                                        <select asp-for="Type" class="form-control select2" style="width: 100%;">
+                                            <option value="">Tip seçiniz...</option>
+                                            <option value="Department">Departman</option>
+                                            <option value="Project">Proje</option>
+                                            <option value="Role">Rol</option>
+                                            <option value="Custom">Özel</option>
+                                        </select>
+                                        <span asp-validation-for="Type" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="Description">Açıklama</label>
+                                <textarea asp-for="Description" class="form-control" rows="3" placeholder="Grup hakkında açıklama yazınız"></textarea>
+                                <span asp-validation-for="Description" class="text-danger"></span>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="ParentGroupId">Üst Grup</label>
+                                        <select id="ParentGroupId" name="ParentGroupId" class="form-control select2" style="width: 100%;">
+                                            <option value="">Üst grup seçiniz (isteğe bağlı)</option>
+                                        </select>
+                                        <small class="form-text text-muted">Bu grup başka bir grubun alt grubu olacaksa seçiniz.</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="MaxMembers">Maksimum Üye Sayısı</label>
+                                        <input type="number" id="MaxMembers" name="MaxMembers" class="form-control" min="1" max="1000" placeholder="Sınırsız" />
+                                        <small class="form-text text-muted">Boş bırakılırsa sınırsız olur.</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <div class="icheck-primary">
+                                            <input asp-for="IsActive" type="checkbox" id="IsActive" checked />
+                                            <label for="IsActive">Aktif</label>
+                                        </div>
+                                        <small class="form-text text-muted">Grup aktif olarak işaretlenirse kullanıcılar eklenebilir.</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <div class="icheck-primary">
+                                            <input type="checkbox" id="AllowSelfJoin" name="AllowSelfJoin" />
+                                            <label for="AllowSelfJoin">Kendiliğinden Katılıma İzin Ver</label>
+                                        </div>
+                                        <small class="form-text text-muted">Kullanıcılar bu gruba kendileri katılabilir.</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="Tags">Etiketler</label>
+                                <input type="text" id="Tags" name="Tags" class="form-control" placeholder="Etiketleri virgülle ayırarak yazınız" />
+                                <small class="form-text text-muted">Örnek: IT, Yazılım, Geliştirme</small>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Grubu Oluştur
+                            </button>
+                            <a href="@Url.Action("Index", "UserGroups", new { area = "Admin" })" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> İptal
+                            </a>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Initial Members Card -->
+                <div class="card card-info" id="initialMembersCard" style="display: none;">
+                    <div class="card-header">
+                        <h3 class="card-title">Başlangıç Üyeleri</h3>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="InitialMembers">Kullanıcıları Seç</label>
+                            <select id="InitialMembers" name="InitialMembers" class="form-control select2" multiple="multiple" style="width: 100%;">
+                                <!-- Users will be loaded via AJAX -->
+                            </select>
+                            <small class="form-text text-muted">Grup oluşturulduktan sonra bu kullanıcılar otomatik olarak gruba eklenecektir.</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="DefaultRole">Varsayılan Rol</label>
+                            <select id="DefaultRole" name="DefaultRole" class="form-control select2">
+                                <option value="Member">Üye</option>
+                                <option value="Moderator">Moderatör</option>
+                                <option value="Admin">Yönetici</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <!-- Help Card -->
+                <div class="card card-success">
+                    <div class="card-header">
+                        <h3 class="card-title">Yardım</h3>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <h6><i class="fas fa-info-circle"></i> Grup Tipleri</h6>
+                        <ul class="list-unstyled">
+                            <li><strong>Departman:</strong> Şirket departmanları için</li>
+                            <li><strong>Proje:</strong> Proje ekipleri için</li>
+                            <li><strong>Rol:</strong> İş rolleri için</li>
+                            <li><strong>Özel:</strong> Özel amaçlar için</li>
+                        </ul>
+
+                        <h6><i class="fas fa-users"></i> Üyelik Yönetimi</h6>
+                        <ul class="list-unstyled">
+                            <li>• Grup oluşturduktan sonra üye ekleyebilirsiniz</li>
+                            <li>• Maksimum üye sayısı belirleyebilirsiniz</li>
+                            <li>• Kullanıcıların kendilerini eklemesine izin verebilirsiniz</li>
+                        </ul>
+
+                        <h6><i class="fas fa-sitemap"></i> Hiyerarşi</h6>
+                        <ul class="list-unstyled">
+                            <li>• Gruplar alt gruplara sahip olabilir</li>
+                            <li>• Üst grup seçerek hiyerarşi oluşturabilirsiniz</li>
+                            <li>• Alt gruplar üst grubun özelliklerini devralır</li>
+                        </ul>
+
+                        <h6><i class="fas fa-exclamation-triangle"></i> Önemli Notlar</h6>
+                        <ul class="list-unstyled">
+                            <li>• Grup adı benzersiz olmalıdır</li>
+                            <li>• Pasif gruplar görünmez</li>
+                            <li>• Etiketler arama için kullanılır</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Preview Card -->
+                <div class="card card-warning">
+                    <div class="card-header">
+                        <h3 class="card-title">Önizleme</h3>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center">
+                            <i class="fas fa-users fa-3x text-muted mb-3" id="previewIcon"></i>
+                            <h5 id="previewName">Grup Adı</h5>
+                            <p class="text-muted" id="previewType">Tip</p>
+                            <p id="previewDescription">Açıklama</p>
+                            <span class="badge badge-secondary" id="previewStatus">Pasif</span>
+                        </div>
+                        <hr>
+                        <dl class="row">
+                            <dt class="col-sm-6">Maksimum Üye:</dt>
+                            <dd class="col-sm-6" id="previewMaxMembers">Sınırsız</dd>
+                            <dt class="col-sm-6">Kendiliğinden Katılım:</dt>
+                            <dd class="col-sm-6" id="previewSelfJoin">Hayır</dd>
+                            <dt class="col-sm-6">Üst Grup:</dt>
+                            <dd class="col-sm-6" id="previewParent">Yok</dd>
+                        </dl>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="card card-info">
+                    <div class="card-header">
+                        <h3 class="card-title">Hızlı İşlemler</h3>
+                    </div>
+                    <div class="card-body">
+                        <button type="button" class="btn btn-outline-primary btn-block" id="toggleInitialMembers">
+                            <i class="fas fa-user-plus"></i> Başlangıç Üyeleri Ekle
+                        </button>
+                        <button type="button" class="btn btn-outline-info btn-block" id="loadTemplate">
+                            <i class="fas fa-file-import"></i> Şablon Yükle
+                        </button>
+                        <button type="button" class="btn btn-outline-success btn-block" id="previewGroup">
+                            <i class="fas fa-eye"></i> Önizlemeyi Güncelle
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Template Selection Modal -->
+<div class="modal fade" id="templateModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Grup Şablonu Seç</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card card-outline card-primary template-card" data-template="department">
+                            <div class="card-header">
+                                <h5 class="card-title">Departman Şablonu</h5>
+                            </div>
+                            <div class="card-body">
+                                <p>Şirket departmanları için hazır şablon</p>
+                                <ul class="list-unstyled">
+                                    <li>• Tip: Departman</li>
+                                    <li>• Hiyerarşik yapı</li>
+                                    <li>• Yönetici rolleri</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card card-outline card-info template-card" data-template="project">
+                            <div class="card-header">
+                                <h5 class="card-title">Proje Şablonu</h5>
+                            </div>
+                            <div class="card-body">
+                                <p>Proje ekipleri için hazır şablon</p>
+                                <ul class="list-unstyled">
+                                    <li>• Tip: Proje</li>
+                                    <li>• Geçici yapı</li>
+                                    <li>• Esnek üyelik</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card card-outline card-warning template-card" data-template="role">
+                            <div class="card-header">
+                                <h5 class="card-title">Rol Şablonu</h5>
+                            </div>
+                            <div class="card-body">
+                                <p>İş rolleri için hazır şablon</p>
+                                <ul class="list-unstyled">
+                                    <li>• Tip: Rol</li>
+                                    <li>• Yetki tabanlı</li>
+                                    <li>• Sabit yapı</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card card-outline card-secondary template-card" data-template="custom">
+                            <div class="card-header">
+                                <h5 class="card-title">Özel Şablon</h5>
+                            </div>
+                            <div class="card-body">
+                                <p>Özel amaçlar için hazır şablon</p>
+                                <ul class="list-unstyled">
+                                    <li>• Tip: Özel</li>
+                                    <li>• Esnek yapı</li>
+                                    <li>• Özelleştirilebilir</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- Select2 -->
+    <script src="~/lib/admin-lte/plugins/select2/js/select2.full.min.js"></script>
+    <!-- jquery-validation -->
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+    <script>
+        $(function () {
+            // Initialize Select2
+            $('.select2').select2({
+                theme: 'bootstrap4'
+            });
+
+            // Load parent groups and users
+            loadParentGroups();
+            loadUsers();
+
+            // Setup form validation
+            setupFormValidation();
+
+            // Setup event handlers
+            setupEventHandlers();
+
+            // Update preview initially
+            updatePreview();
+        });
+
+        function setupEventHandlers() {
+            // Form field changes for preview
+            $('#Name, #Type, #Description, #IsActive, #MaxMembers, #AllowSelfJoin, #ParentGroupId').on('input change', function () {
+                updatePreview();
+            });
+
+            // Toggle initial members card
+            $('#toggleInitialMembers').click(function () {
+                $('#initialMembersCard').toggle();
+                var icon = $(this).find('i');
+                if ($('#initialMembersCard').is(':visible')) {
+                    icon.removeClass('fa-user-plus').addClass('fa-user-minus');
+                    $(this).html('<i class="fas fa-user-minus"></i> Başlangıç Üyelerini Gizle');
+                } else {
+                    icon.removeClass('fa-user-minus').addClass('fa-user-plus');
+                    $(this).html('<i class="fas fa-user-plus"></i> Başlangıç Üyeleri Ekle');
+                }
+            });
+
+            // Load template
+            $('#loadTemplate').click(function () {
+                $('#templateModal').modal('show');
+            });
+
+            // Template selection
+            $('.template-card').click(function () {
+                var template = $(this).data('template');
+                loadTemplate(template);
+                $('#templateModal').modal('hide');
+            });
+
+            // Preview update
+            $('#previewGroup').click(function () {
+                updatePreview();
+                toastr.info('Önizleme güncellendi.');
+            });
+        }
+
+        function setupFormValidation() {
+            $('#createGroupForm').validate({
+                rules: {
+                    Name: {
+                        required: true,
+                        minlength: 2,
+                        maxlength: 100
+                    },
+                    Type: {
+                        required: true
+                    },
+                    Description: {
+                        maxlength: 500
+                    },
+                    MaxMembers: {
+                        min: 1,
+                        max: 1000
+                    }
+                },
+                messages: {
+                    Name: {
+                        required: "Grup adı gereklidir",
+                        minlength: "Grup adı en az 2 karakter olmalıdır",
+                        maxlength: "Grup adı en fazla 100 karakter olabilir"
+                    },
+                    Type: {
+                        required: "Grup tipi seçilmelidir"
+                    },
+                    Description: {
+                        maxlength: "Açıklama en fazla 500 karakter olabilir"
+                    },
+                    MaxMembers: {
+                        min: "Maksimum üye sayısı en az 1 olmalıdır",
+                        max: "Maksimum üye sayısı en fazla 1000 olabilir"
+                    }
+                },
+                errorElement: 'span',
+                errorPlacement: function (error, element) {
+                    error.addClass('invalid-feedback');
+                    element.closest('.form-group').append(error);
+                },
+                highlight: function (element, errorClass, validClass) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function (element, errorClass, validClass) {
+                    $(element).removeClass('is-invalid');
+                }
+            });
+        }
+
+        function loadParentGroups() {
+            $.ajax({
+                url: '@Url.Action("GetParentGroups", "UserGroups", new { area = "Admin" })',
+                type: 'GET',
+                success: function (data) {
+                    var select = $('#ParentGroupId');
+                    select.empty().append('<option value="">Üst grup seçiniz (isteğe bağlı)</option>');
+                    
+                    data.forEach(function (group) {
+                        select.append('<option value="' + group.id + '">' + group.name + ' (' + group.type + ')</option>');
+                    });
+                    
+                    select.trigger('change');
+                },
+                error: function () {
+                    console.log('Üst gruplar yüklenirken hata oluştu.');
+                }
+            });
+        }
+
+        function loadUsers() {
+            $.ajax({
+                url: '@Url.Action("GetAllUsers", "Users", new { area = "Admin" })',
+                type: 'GET',
+                success: function (data) {
+                    var select = $('#InitialMembers');
+                    select.empty();
+                    
+                    data.forEach(function (user) {
+                        select.append('<option value="' + user.id + '">' + user.userName + ' (' + user.email + ')</option>');
+                    });
+                    
+                    select.trigger('change');
+                },
+                error: function () {
+                    console.log('Kullanıcılar yüklenirken hata oluştu.');
+                }
+            });
+        }
+
+        function updatePreview() {
+            var name = $('#Name').val() || 'Grup Adı';
+            var type = $('#Type').val() || 'Tip';
+            var description = $('#Description').val() || 'Açıklama';
+            var isActive = $('#IsActive').is(':checked');
+            var maxMembers = $('#MaxMembers').val() || 'Sınırsız';
+            var allowSelfJoin = $('#AllowSelfJoin').is(':checked') ? 'Evet' : 'Hayır';
+            var parentGroup = $('#ParentGroupId option:selected').text() || 'Yok';
+            if (parentGroup === 'Üst grup seçiniz (isteğe bağlı)') parentGroup = 'Yok';
+
+            $('#previewName').text(name);
+            $('#previewType').text(type);
+            $('#previewDescription').text(description);
+            $('#previewMaxMembers').text(maxMembers);
+            $('#previewSelfJoin').text(allowSelfJoin);
+            $('#previewParent').text(parentGroup);
+
+            // Update status badge
+            var statusBadge = $('#previewStatus');
+            if (isActive) {
+                statusBadge.removeClass('badge-secondary').addClass('badge-success').text('Aktif');
+            } else {
+                statusBadge.removeClass('badge-success').addClass('badge-secondary').text('Pasif');
+            }
+
+            // Update icon based on type
+            var icon = $('#previewIcon');
+            icon.removeClass();
+            switch (type) {
+                case 'Department':
+                    icon.addClass('fas fa-building fa-3x text-primary mb-3');
+                    break;
+                case 'Project':
+                    icon.addClass('fas fa-project-diagram fa-3x text-info mb-3');
+                    break;
+                case 'Role':
+                    icon.addClass('fas fa-user-tag fa-3x text-warning mb-3');
+                    break;
+                case 'Custom':
+                    icon.addClass('fas fa-users-cog fa-3x text-secondary mb-3');
+                    break;
+                default:
+                    icon.addClass('fas fa-users fa-3x text-muted mb-3');
+            }
+        }
+
+        function loadTemplate(templateType) {
+            var templates = {
+                department: {
+                    type: 'Department',
+                    description: 'Şirket departmanı için oluşturulmuş grup',
+                    allowSelfJoin: false,
+                    maxMembers: 50
+                },
+                project: {
+                    type: 'Project',
+                    description: 'Proje ekibi için oluşturulmuş grup',
+                    allowSelfJoin: true,
+                    maxMembers: 20
+                },
+                role: {
+                    type: 'Role',
+                    description: 'İş rolü için oluşturulmuş grup',
+                    allowSelfJoin: false,
+                    maxMembers: 100
+                },
+                custom: {
+                    type: 'Custom',
+                    description: 'Özel amaç için oluşturulmuş grup',
+                    allowSelfJoin: true,
+                    maxMembers: ''
+                }
+            };
+
+            var template = templates[templateType];
+            if (template) {
+                $('#Type').val(template.type).trigger('change');
+                $('#Description').val(template.description);
+                $('#AllowSelfJoin').prop('checked', template.allowSelfJoin);
+                $('#MaxMembers').val(template.maxMembers);
+                
+                updatePreview();
+                toastr.success('Şablon yüklendi.');
+            }
+        }
+
+        // Form submission with initial members
+        $('#createGroupForm').submit(function (e) {
+            if ($(this).valid()) {
+                var formData = $(this).serializeArray();
+                
+                // Add initial members if any
+                var initialMembers = $('#InitialMembers').val();
+                if (initialMembers && initialMembers.length > 0) {
+                    initialMembers.forEach(function (userId) {
+                        formData.push({ name: 'InitialMembers', value: userId });
+                    });
+                    formData.push({ name: 'DefaultRole', value: $('#DefaultRole').val() });
+                }
+                
+                // Add other fields
+                formData.push({ name: 'AllowSelfJoin', value: $('#AllowSelfJoin').is(':checked') });
+                formData.push({ name: 'MaxMembers', value: $('#MaxMembers').val() });
+                formData.push({ name: 'ParentGroupId', value: $('#ParentGroupId').val() });
+                formData.push({ name: 'Tags', value: $('#Tags').val() });
+                
+                // Submit via AJAX for better control
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: 'POST',
+                    data: formData,
+                    success: function (result) {
+                        if (result.success) {
+                            toastr.success('Grup başarıyla oluşturuldu.');
+                            window.location.href = '@Url.Action("Index", "UserGroups", new { area = "Admin" })';
+                        } else {
+                            toastr.error(result.message || 'Grup oluşturulurken hata oluştu.');
+                        }
+                    },
+                    error: function () {
+                        toastr.error('Grup oluşturulurken hata oluştu.');
+                    }
+                });
+                
+                e.preventDefault();
+            }
+        });
+    </script>
+}
