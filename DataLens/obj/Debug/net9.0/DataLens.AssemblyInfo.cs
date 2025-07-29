@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DataLens")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b446fe702cfc5e6682c966f229b88297e1263de2")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d8645ba57d03c2741f95fc0a38cf468d762ffa09")]
 [assembly: System.Reflection.AssemblyProductAttribute("DataLens")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DataLens")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

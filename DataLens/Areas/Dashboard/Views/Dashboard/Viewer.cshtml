@@ -1,0 +1,215 @@
+@{
+    ViewData["Title"] = "Dashboard Viewer";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles {
+    <!-- DevExpress Dashboard Viewer Styles -->
+    <link href="~/lib/devextreme/css/dx.light.css" rel="stylesheet" />
+    <style>
+        .dashboard-viewer-container {
+            height: calc(100vh - 100px);
+            width: 100%;
+        }
+        
+        .viewer-toolbar {
+            background: #f8f9fa;
+            padding: 10px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .viewer-toolbar .btn {
+            margin-right: 5px;
+        }
+        
+        .dashboard-loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            font-size: 18px;
+            color: #6c757d;
+        }
+    </style>
+}
+
+<div class="content-wrapper">
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">Dashboard Görüntüleyici</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home", new { area = "" })">Ana Sayfa</a></li>
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Dashboard")">Dashboard'lar</a></li>
+                        <li class="breadcrumb-item active">Görüntüleyici</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-chart-line"></i>
+                                Dashboard Görünümü
+                            </h3>
+                            <div class="card-tools">
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-info btn-sm" id="refreshDashboard">
+                                        <i class="fas fa-sync-alt"></i> Yenile
+                                    </button>
+                                    <button type="button" class="btn btn-success btn-sm" id="exportPdf">
+                                        <i class="fas fa-file-pdf"></i> PDF
+                                    </button>
+                                    <button type="button" class="btn btn-success btn-sm" id="exportExcel">
+                                        <i class="fas fa-file-excel"></i> Excel
+                                    </button>
+                                    <button type="button" class="btn btn-success btn-sm" id="exportImage">
+                                        <i class="fas fa-image"></i> Resim
+                                    </button>
+                                </div>
+                                <button type="button" class="btn btn-secondary btn-sm ml-2" onclick="window.history.back()">
+                                    <i class="fas fa-arrow-left"></i> Geri
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <!-- Loading indicator -->
+                            <div id="dashboard-loading" class="dashboard-loading">
+                                <i class="fas fa-spinner fa-spin mr-2"></i>
+                                Dashboard yükleniyor...
+                            </div>
+                            
+                            <!-- DevExpress Dashboard Viewer Container -->
+                            <div id="dashboard-viewer" class="dashboard-viewer-container" style="display: none;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+@section Scripts {
+    <!-- DevExpress Dashboard Viewer Scripts -->
+    <script src="~/lib/devextreme/js/dx.all.js"></script>
+    <script src="~/lib/devexpress-dashboard/js/dx-dashboard.min.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            var dashboardId = '@ViewBag.DashboardId';
+            
+            if (!dashboardId) {
+                showNotification('Dashboard ID bulunamadı!', 'error');
+                return;
+            }
+            
+            // DevExpress Dashboard Viewer Configuration
+            var dashboardViewer = new DevExpress.Dashboard.Viewer.DashboardViewer({
+                endpoint: '/api/dashboard',
+                workingMode: 'Viewer',
+                height: '100%',
+                allowExportDashboardItems: true,
+                allowExportDashboard: true,
+                allowPrintDashboardItems: true,
+                allowPrintDashboard: true,
+                onDashboardLoaded: function(e) {
+                    $('#dashboard-loading').hide();
+                    $('#dashboard-viewer').show();
+                    showNotification('Dashboard başarıyla yüklendi!', 'success');
+                },
+                onDashboardLoadFailed: function(e) {
+                    $('#dashboard-loading').hide();
+                    showNotification('Dashboard yüklenirken hata oluştu: ' + e.error, 'error');
+                },
+                onItemClick: function(e) {
+                    // Handle dashboard item clicks
+                    console.log('Dashboard item clicked:', e);
+                },
+                onItemSelectionChanged: function(e) {
+                    // Handle item selection changes
+                    console.log('Item selection changed:', e);
+                }
+            });
+            
+            // Render the viewer
+            dashboardViewer.render(document.getElementById('dashboard-viewer'));
+            
+            // Load the dashboard
+            dashboardViewer.loadDashboard(dashboardId);
+            
+            // Refresh button click handler
+            $('#refreshDashboard').click(function() {
+                $('#dashboard-loading').show();
+                $('#dashboard-viewer').hide();
+                dashboardViewer.reloadData();
+            });
+            
+            // Export button click handlers
+            $('#exportPdf').click(function() {
+                exportDashboard('pdf');
+            });
+            
+            $('#exportExcel').click(function() {
+                exportDashboard('excel');
+            });
+            
+            $('#exportImage').click(function() {
+                exportDashboard('image');
+            });
+            
+            function exportDashboard(format) {
+                $.ajax({
+                    url: '@Url.Action("Export", "Dashboard")',
+                    type: 'POST',
+                    data: {
+                        dashboardId: dashboardId,
+                        format: format
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            showNotification('Dashboard ' + format.toUpperCase() + ' formatında dışa aktarıldı!', 'success');
+                        } else {
+                            showNotification('Dışa aktarma işlemi başarısız: ' + response.message, 'error');
+                        }
+                    },
+                    error: function() {
+                        showNotification('Dışa aktarma işlemi sırasında hata oluştu!', 'error');
+                    }
+                });
+            }
+        });
+        
+        function showNotification(message, type) {
+            // AdminLTE notification system
+            var bgClass = 'bg-info';
+            switch(type) {
+                case 'success':
+                    bgClass = 'bg-success';
+                    break;
+                case 'error':
+                    bgClass = 'bg-danger';
+                    break;
+                case 'warning':
+                    bgClass = 'bg-warning';
+                    break;
+            }
+            
+            $(document).Toasts('create', {
+                class: bgClass,
+                title: 'Dashboard Viewer',
+                body: message,
+                autohide: true,
+                delay: 3000
+            });
+        }
+    </script>
+}

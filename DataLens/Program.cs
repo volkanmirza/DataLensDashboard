@@ -9,11 +9,18 @@ using DataLens.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using DevExpress.AspNetCore;
+using DevExpress.DashboardAspNetCore;
+using DevExpress.DashboardCommon;
+using DevExpress.DashboardWeb;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// DevExpress Dashboard Configuration
+builder.Services.AddDevExpressControls();
 
 // Database Configuration
 builder.Services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>();
@@ -30,10 +37,21 @@ switch (databaseType)
     case "SqlServer":
     case "PostgreSQL":
         builder.Services.AddScoped<IUserRepository, SqlUserRepository>();
-        // Dashboard repositories for SQL databases would be added here when implemented
+        builder.Services.AddScoped<IUserGroupMembershipRepository, SqlUserGroupMembershipRepository>();
+        builder.Services.AddScoped<IDashboardRepository>(provider =>
+        {
+            var connectionFactory = provider.GetRequiredService<IDbConnectionFactory>();
+            return new SqlDashboardRepository(connectionFactory.ConnectionString);
+        });
+        builder.Services.AddScoped<IDashboardPermissionRepository>(provider =>
+        {
+            var connectionFactory = provider.GetRequiredService<IDbConnectionFactory>();
+            return new SqlDashboardPermissionRepository(connectionFactory.ConnectionString);
+        });
         break;
     case "MongoDB":
         builder.Services.AddScoped<IUserRepository, MongoUserRepository>();
+        builder.Services.AddScoped<IUserGroupMembershipRepository, MongoUserGroupMembershipRepository>();
         builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
         builder.Services.AddScoped<IDashboardPermissionRepository, DashboardPermissionRepository>();
         break;
@@ -89,7 +107,14 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
+// DevExpress Controls
+app.UseDevExpressControls();
+
 app.UseRouting();
+
+// DevExpress Dashboard endpoint
+app.MapDashboardRoute("api/dashboard", "DefaultDashboard");
 
 // JWT Cookie Middleware - must be before UseAuthentication
 app.UseJwtCookie();

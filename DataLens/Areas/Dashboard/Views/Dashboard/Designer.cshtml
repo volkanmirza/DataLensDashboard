@@ -1,0 +1,142 @@
+@{
+    ViewData["Title"] = "Dashboard Designer";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles {
+    <!-- DevExpress Dashboard Designer Styles -->
+    <link href="~/lib/devextreme/css/dx.light.css" rel="stylesheet" />
+    <link href="~/lib/ace/ace.css" rel="stylesheet" />
+    <style>
+        .dashboard-designer-container {
+            height: calc(100vh - 100px);
+            width: 100%;
+        }
+        
+        .designer-toolbar {
+            background: #f8f9fa;
+            padding: 10px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .designer-toolbar .btn {
+            margin-right: 5px;
+        }
+    </style>
+}
+
+<div class="content-wrapper">
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">Dashboard Designer</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home", new { area = "" })">Ana Sayfa</a></li>
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Dashboard")">Dashboard'lar</a></li>
+                        <li class="breadcrumb-item active">Designer</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-chart-bar"></i>
+                                Dashboard Tasarım Aracı
+                            </h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-success btn-sm" id="saveDashboard">
+                                    <i class="fas fa-save"></i> Kaydet
+                                </button>
+                                <button type="button" class="btn btn-info btn-sm" id="previewDashboard">
+                                    <i class="fas fa-eye"></i> Önizleme
+                                </button>
+                                <button type="button" class="btn btn-secondary btn-sm" onclick="window.history.back()">
+                                    <i class="fas fa-arrow-left"></i> Geri
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <!-- DevExpress Dashboard Designer Container -->
+                            <div id="dashboard-designer" class="dashboard-designer-container"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+@section Scripts {
+    <!-- DevExpress Dashboard Designer Scripts -->
+    <script src="~/lib/devextreme/js/dx.all.js"></script>
+    <script src="~/lib/ace/ace.js"></script>
+    <script src="~/lib/devexpress-dashboard/js/dx-dashboard.min.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            // DevExpress Dashboard Designer Configuration
+            var dashboardDesigner = new DevExpress.Dashboard.Designer.DashboardDesigner({
+                endpoint: '/api/dashboard',
+                workingMode: 'Designer',
+                height: '100%',
+                allowCreateNewJsonConnection: true,
+                allowCreateNewSqlConnection: true,
+                allowCreateNewExcelDataSource: true,
+                allowCreateNewJsonDataSource: true,
+                onDashboardSaved: function(e) {
+                    showNotification('Dashboard başarıyla kaydedildi!', 'success');
+                },
+                onDashboardSaving: function(e) {
+                    // Custom save logic can be added here
+                    console.log('Dashboard saving...', e);
+                }
+            });
+            
+            // Render the designer
+            dashboardDesigner.render(document.getElementById('dashboard-designer'));
+            
+            // Load existing dashboard if ID is provided
+            var dashboardId = '@ViewBag.DashboardId';
+            if (dashboardId && dashboardId !== '') {
+                dashboardDesigner.loadDashboard(dashboardId);
+            }
+            
+            // Save button click handler
+            $('#saveDashboard').click(function() {
+                dashboardDesigner.saveDashboard();
+            });
+            
+            // Preview button click handler
+            $('#previewDashboard').click(function() {
+                var currentDashboardId = dashboardDesigner.getDashboardId();
+                if (currentDashboardId) {
+                    var previewUrl = '@Url.Action("Viewer", "Dashboard")' + '/' + currentDashboardId;
+                    window.open(previewUrl, '_blank');
+                } else {
+                    showNotification('Önizleme için önce dashboard\'u kaydedin.', 'warning');
+                }
+            });
+        });
+        
+        function showNotification(message, type) {
+            // AdminLTE notification system
+            $(document).Toasts('create', {
+                class: 'bg-' + (type === 'success' ? 'success' : type === 'warning' ? 'warning' : 'info'),
+                title: 'Dashboard Designer',
+                body: message,
+                autohide: true,
+                delay: 3000
+            });
+        }
+    </script>
+}

@@ -1,0 +1,25 @@
+/*
+ * DevExpress Dashboard CSS Styles
+ * This is a placeholder file. In a real implementation, you would:
+ * 1. Download the actual DevExpress Dashboard CSS files from your DevExpress account
+ * 2. Copy them to this location
+ * 3. Or use CDN links in your views
+ * 
+ * For development purposes, you can use CDN:
+ * https://cdn3.devexpress.com/jslib/25.1.3/css/dx-dashboard.min.css
+ */
+
+/* Placeholder for DevExpress Dashboard CSS */
+.dx-dashboard {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.dx-dashboard-designer {
+    height: 100%;
+    width: 100%;
+}
+
+.dx-dashboard-viewer {
+    height: 100%;
+    width: 100%;
+}
