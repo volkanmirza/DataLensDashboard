@@ -284,7 +284,7 @@ namespace DataLens.Controllers
             {
                 try
                 {
-                    var result = await _userService.ChangePasswordAsync(userId, currentPassword, newPassword);
+                    var result = await _userService.ChangePasswordAsync(userId!, currentPassword, newPassword);
                     if (result)
                     {
                         TempData["Success"] = "Şifreniz başarıyla değiştirildi.";
@@ -299,7 +299,7 @@ namespace DataLens.Controllers
                 {
                     ModelState.AddModelError("", ex.Message);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     ModelState.AddModelError("", "Şifre değiştirilirken bir hata oluştu.");
                 }

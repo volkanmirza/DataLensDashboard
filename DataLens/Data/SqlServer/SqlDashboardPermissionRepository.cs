@@ -137,7 +137,8 @@ namespace DataLens.Data.SqlServer
             await connection.OpenAsync();
             
             var command = new SqlCommand("SELECT COUNT(*) FROM DashboardPermissions", connection);
-            var count = (int)await command.ExecuteScalarAsync();
+            var result = await command.ExecuteScalarAsync();
+            var count = result != null ? (int)result : 0;
             return count;
         }
 
@@ -149,7 +150,8 @@ namespace DataLens.Data.SqlServer
             var command = new SqlCommand("SELECT COUNT(*) FROM DashboardPermissions WHERE Id = @Id", connection);
             command.Parameters.AddWithValue("@Id", id);
             
-            var count = (int)await command.ExecuteScalarAsync();
+            var result = await command.ExecuteScalarAsync();
+            var count = result != null ? (int)result : 0;
             return count > 0;
         }
 
@@ -261,7 +263,8 @@ namespace DataLens.Data.SqlServer
             command.Parameters.AddWithValue("@DashboardId", dashboardId);
             command.Parameters.AddWithValue("@PermissionType", permissionType);
             
-            var count = (int)await command.ExecuteScalarAsync();
+            var result = await command.ExecuteScalarAsync();
+            var count = result != null ? (int)result : 0;
             return count > 0;
         }
 
@@ -278,7 +281,8 @@ namespace DataLens.Data.SqlServer
             command.Parameters.AddWithValue("@DashboardId", dashboardId);
             command.Parameters.AddWithValue("@PermissionType", permissionType);
             
-            var count = (int)await command.ExecuteScalarAsync();
+            var result = await command.ExecuteScalarAsync();
+            var count = result != null ? (int)result : 0;
             return count > 0;
         }
 

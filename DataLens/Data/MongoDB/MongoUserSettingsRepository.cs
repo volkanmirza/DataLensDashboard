@@ -96,7 +96,7 @@ namespace DataLens.Data.MongoDB
                     if (property != null)
                     {
                         var value = property.GetValue(userSettings);
-                        return (T)value;
+                        return value != null ? (T)value : default(T)!;
                     }
                 }
                 catch

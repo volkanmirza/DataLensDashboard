@@ -140,7 +140,8 @@ namespace DataLens.Data.SqlServer
             var command = new SqlCommand("SELECT COUNT(*) FROM UserSettings WHERE Id = @Id", connection);
             command.Parameters.AddWithValue("@Id", id);
             
-            var count = (int)await command.ExecuteScalarAsync();
+            var result = await command.ExecuteScalarAsync();
+            var count = result != null ? (int)result : 0;
             return count > 0;
         }
 
@@ -328,7 +329,8 @@ namespace DataLens.Data.SqlServer
             await connection.OpenAsync();
             
             var command = new SqlCommand("SELECT COUNT(*) FROM UserSettings WHERE IsActive = 1", connection);
-            var count = (int)await command.ExecuteScalarAsync();
+            var result = await command.ExecuteScalarAsync();
+            var count = result != null ? (int)result : 0;
             return count;
         }
 

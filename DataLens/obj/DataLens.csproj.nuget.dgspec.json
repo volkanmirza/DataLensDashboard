@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\VOLKAN\\Documents\\GitHub\\DataLens\\DataLens\\DataLens.csproj": {}
+    "C:\\Users\\VOLKAN\\Documents\\GitHub\\DataLensDashboard\\DataLens\\DataLens.csproj": {}
   },
   "projects": {
-    "C:\\Users\\VOLKAN\\Documents\\GitHub\\DataLens\\DataLens\\DataLens.csproj": {
+    "C:\\Users\\VOLKAN\\Documents\\GitHub\\DataLensDashboard\\DataLens\\DataLens.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\VOLKAN\\Documents\\GitHub\\DataLens\\DataLens\\DataLens.csproj",
+        "projectUniqueName": "C:\\Users\\VOLKAN\\Documents\\GitHub\\DataLensDashboard\\DataLens\\DataLens.csproj",
         "projectName": "DataLens",
-        "projectPath": "C:\\Users\\VOLKAN\\Documents\\GitHub\\DataLens\\DataLens\\DataLens.csproj",
+        "projectPath": "C:\\Users\\VOLKAN\\Documents\\GitHub\\DataLensDashboard\\DataLens\\DataLens.csproj",
         "packagesPath": "C:\\Users\\VOLKAN\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\VOLKAN\\Documents\\GitHub\\DataLens\\DataLens\\obj\\",
+        "outputPath": "C:\\Users\\VOLKAN\\Documents\\GitHub\\DataLensDashboard\\DataLens\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\DevExpress 25.1\\Components\\Offline Packages",

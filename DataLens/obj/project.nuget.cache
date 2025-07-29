@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "nBF4hKYdELU=",
+  "dgSpecHash": "PHYCxkLzOj8=",
   "success": true,
-  "projectFilePath": "C:\\Users\\VOLKAN\\Documents\\GitHub\\DataLens\\DataLens\\DataLens.csproj",
+  "projectFilePath": "C:\\Users\\VOLKAN\\Documents\\GitHub\\DataLensDashboard\\DataLens\\DataLens.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\VOLKAN\\.nuget\\packages\\azure.core\\1.44.1\\azure.core.1.44.1.nupkg.sha512",
     "C:\\Users\\VOLKAN\\.nuget\\packages\\azure.identity\\1.13.2\\azure.identity.1.13.2.nupkg.sha512",

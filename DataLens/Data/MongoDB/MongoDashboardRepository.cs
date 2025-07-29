@@ -162,10 +162,10 @@ namespace DataLens.Data.MongoDB
             return result.ModifiedCount > 0;
         }
 
-        public async Task<IEnumerable<Dashboard>> GetByConditionAsync(string condition, object? parameters = null)
+        public Task<IEnumerable<Dashboard>> GetByConditionAsync(string condition, object? parameters = null)
         {
             // MongoDB doesn't use SQL conditions, return empty for now
-            return new List<Dashboard>();
+            return Task.FromResult<IEnumerable<Dashboard>>(new List<Dashboard>());
         }
 
         public async Task<int> CountAsync()

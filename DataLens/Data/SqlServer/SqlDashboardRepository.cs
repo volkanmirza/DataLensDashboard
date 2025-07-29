@@ -147,7 +147,8 @@ namespace DataLens.Data.SqlServer
             var command = new SqlCommand("SELECT COUNT(*) FROM Dashboards WHERE Id = @Id", connection);
             command.Parameters.AddWithValue("@Id", id);
             
-            var count = (int)await command.ExecuteScalarAsync();
+            var result = await command.ExecuteScalarAsync();
+            var count = result != null ? (int)result : 0;
             return count > 0;
         }
 
@@ -177,7 +178,8 @@ namespace DataLens.Data.SqlServer
             await connection.OpenAsync();
             
             var command = new SqlCommand("SELECT COUNT(*) FROM Dashboards WHERE IsActive = 1", connection);
-            var count = (int)await command.ExecuteScalarAsync();
+            var result = await command.ExecuteScalarAsync();
+            var count = result != null ? (int)result : 0;
             return count;
         }
 
@@ -211,7 +213,8 @@ namespace DataLens.Data.SqlServer
             var command = new SqlCommand("SELECT COUNT(*) FROM Dashboards WHERE CreatedBy = @UserId AND IsActive = 1", connection);
             command.Parameters.AddWithValue("@UserId", userId);
             
-            var count = (long)await command.ExecuteScalarAsync();
+            var result = await command.ExecuteScalarAsync();
+            var count = result != null ? (long)result : 0L;
             return count;
         }
 
@@ -255,7 +258,8 @@ namespace DataLens.Data.SqlServer
                 command.Parameters.AddWithValue("@ExcludeId", excludeId);
             }
             
-            var count = (int)await command.ExecuteScalarAsync();
+            var result = await command.ExecuteScalarAsync();
+            var count = result != null ? (int)result : 0;
             return count > 0;
         }
 
@@ -320,11 +324,11 @@ namespace DataLens.Data.SqlServer
             return dashboards;
         }
 
-        public async Task<IEnumerable<Dashboard>> GetByTagAsync(string tag)
+        public Task<IEnumerable<Dashboard>> GetByTagAsync(string tag)
         {
             // SQL Server implementation would need a separate Tags table
             // For now, return empty list
-            return new List<Dashboard>();
+            return Task.FromResult<IEnumerable<Dashboard>>(new List<Dashboard>());
         }
 
         public async Task<IEnumerable<Dashboard>> GetUserAccessibleDashboardsAsync(string userId)
@@ -459,11 +463,11 @@ namespace DataLens.Data.SqlServer
             return categories;
         }
 
-        public async Task<IEnumerable<string>> GetTagsAsync()
+        public Task<IEnumerable<string>> GetTagsAsync()
         {
             // SQL Server implementation would need a separate Tags table
             // For now, return empty list
-            return new List<string>();
+            return Task.FromResult<IEnumerable<string>>(new List<string>());
         }
 
         private Dashboard MapFromReader(SqlDataReader reader)

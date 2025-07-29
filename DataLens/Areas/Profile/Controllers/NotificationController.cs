@@ -93,14 +93,14 @@ namespace DataLens.Areas.Profile.Controllers
         }
 
         // GET: Profile/Notification/Preferences
-        public async Task<IActionResult> Preferences()
+        public Task<IActionResult> Preferences()
         {
             try
             {
                 var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (string.IsNullOrEmpty(userId))
                 {
-                    return RedirectToAction("Login", "Account", new { area = "" });
+                    return Task.FromResult<IActionResult>(RedirectToAction("Login", "Account", new { area = "" }));
                 }
 
                 var preferences = new NotificationPreferencesViewModel
@@ -117,144 +117,144 @@ namespace DataLens.Areas.Profile.Controllers
                     MonthlyReport = false
                 };
 
-                return View(preferences);
+                return Task.FromResult<IActionResult>(View(preferences));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving notification preferences");
                 TempData["Error"] = "Bildirim tercihleri yüklenirken bir hata oluştu.";
-                return RedirectToAction("Index");
+                return Task.FromResult<IActionResult>(RedirectToAction("Index"));
             }
         }
 
         // POST: Profile/Notification/Preferences
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Preferences(NotificationPreferencesViewModel preferences)
+        public Task<IActionResult> Preferences(NotificationPreferencesViewModel preferences)
         {
             try
             {
                 var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (string.IsNullOrEmpty(userId) || userId != preferences.UserId)
                 {
-                    return Forbid();
+                    return Task.FromResult<IActionResult>(Forbid());
                 }
 
                 if (ModelState.IsValid)
                 {
                     // Here you would typically save notification preferences to database
                     TempData["Success"] = "Bildirim tercihleriniz başarıyla kaydedildi.";
-                    return RedirectToAction("Preferences");
+                    return Task.FromResult<IActionResult>(RedirectToAction("Preferences"));
                 }
 
-                return View(preferences);
+                return Task.FromResult<IActionResult>(View(preferences));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error saving notification preferences");
                 TempData["Error"] = "Bildirim tercihleri kaydedilirken bir hata oluştu.";
-                return View(preferences);
+                return Task.FromResult<IActionResult>(View(preferences));
             }
         }
 
         // POST: Profile/Notification/MarkAsRead
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> MarkAsRead(string notificationId)
+        public Task<IActionResult> MarkAsRead(string notificationId)
         {
             try
             {
                 var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (string.IsNullOrEmpty(userId))
                 {
-                    return Json(new { success = false, message = "Kullanıcı bulunamadı." });
+                    return Task.FromResult<IActionResult>(Json(new { success = false, message = "Kullanıcı bulunamadı." }));
                 }
 
                 if (string.IsNullOrEmpty(notificationId))
                 {
-                    return Json(new { success = false, message = "Bildirim ID'si gereklidir." });
+                    return Task.FromResult<IActionResult>(Json(new { success = false, message = "Bildirim ID'si gereklidir." }));
                 }
 
                 // Here you would typically mark notification as read in database
-                return Json(new { success = true, message = "Bildirim okundu olarak işaretlendi." });
+                return Task.FromResult<IActionResult>(Json(new { success = true, message = "Bildirim okundu olarak işaretlendi." }));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error marking notification as read");
-                return Json(new { success = false, message = "Bildirim işaretlenirken bir hata oluştu." });
+                return Task.FromResult<IActionResult>(Json(new { success = false, message = "Bildirim işaretlenirken bir hata oluştu." }));
             }
         }
 
         // POST: Profile/Notification/MarkAllAsRead
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> MarkAllAsRead()
+        public Task<IActionResult> MarkAllAsRead()
         {
             try
             {
                 var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (string.IsNullOrEmpty(userId))
                 {
-                    return Json(new { success = false, message = "Kullanıcı bulunamadı." });
+                    return Task.FromResult<IActionResult>(Json(new { success = false, message = "Kullanıcı bulunamadı." }));
                 }
 
                 // Here you would typically mark all notifications as read in database
-                return Json(new { success = true, message = "Tüm bildirimler okundu olarak işaretlendi." });
+                return Task.FromResult<IActionResult>(Json(new { success = true, message = "Tüm bildirimler okundu olarak işaretlendi." }));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error marking all notifications as read");
-                return Json(new { success = false, message = "Bildirimler işaretlenirken bir hata oluştu." });
+                return Task.FromResult<IActionResult>(Json(new { success = false, message = "Bildirimler işaretlenirken bir hata oluştu." }));
             }
         }
 
         // POST: Profile/Notification/Delete
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(string notificationId)
+        public Task<IActionResult> Delete(string notificationId)
         {
             try
             {
                 var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (string.IsNullOrEmpty(userId))
                 {
-                    return Json(new { success = false, message = "Kullanıcı bulunamadı." });
+                    return Task.FromResult<IActionResult>(Json(new { success = false, message = "Kullanıcı bulunamadı." }));
                 }
 
                 if (string.IsNullOrEmpty(notificationId))
                 {
-                    return Json(new { success = false, message = "Bildirim ID'si gereklidir." });
+                    return Task.FromResult<IActionResult>(Json(new { success = false, message = "Bildirim ID'si gereklidir." }));
                 }
 
                 // Here you would typically delete notification from database
-                return Json(new { success = true, message = "Bildirim silindi." });
+                return Task.FromResult<IActionResult>(Json(new { success = true, message = "Bildirim silindi." }));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error deleting notification");
-                return Json(new { success = false, message = "Bildirim silinirken bir hata oluştu." });
+                return Task.FromResult<IActionResult>(Json(new { success = false, message = "Bildirim silinirken bir hata oluştu." }));
             }
         }
 
         // GET: Profile/Notification/GetUnreadCount
-        public async Task<IActionResult> GetUnreadCount()
+        public Task<IActionResult> GetUnreadCount()
         {
             try
             {
                 var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (string.IsNullOrEmpty(userId))
                 {
-                    return Json(new { count = 0 });
+                    return Task.FromResult<IActionResult>(Json(new { count = 0 }));
                 }
 
                 // Here you would typically get unread count from database
                 var unreadCount = 2; // Mock data
-                return Json(new { count = unreadCount });
+                return Task.FromResult<IActionResult>(Json(new { count = unreadCount }));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting unread notification count");
-                return Json(new { count = 0 });
+                return Task.FromResult<IActionResult>(Json(new { count = 0 }));
             }
         }
     }

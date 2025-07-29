@@ -332,25 +332,28 @@ namespace DataLens.Data.MongoDB
             _logger.LogInformation($"Inserted {groups.Length} user groups.");
         }
 
-        private async Task SeedUserGroupMembersAsync()
+        private Task SeedUserGroupMembersAsync()
         {
             // This would require getting the actual user and group IDs from the database
             // For simplicity, we'll skip this in the initial implementation
             _logger.LogInformation("User group members seeding skipped for initial implementation.");
+            return Task.CompletedTask;
         }
 
-        private async Task SeedDashboardsAsync()
+        private Task SeedDashboardsAsync()
         {
             // This would require getting actual user IDs from the database
             // For simplicity, we'll skip this in the initial implementation
             _logger.LogInformation("Dashboards seeding skipped for initial implementation.");
+            return Task.CompletedTask;
         }
 
-        private async Task SeedDashboardPermissionsAsync()
+        private Task SeedDashboardPermissionsAsync()
         {
             // This would require getting actual dashboard and user IDs from the database
             // For simplicity, we'll skip this in the initial implementation
             _logger.LogInformation("Dashboard permissions seeding skipped for initial implementation.");
+            return Task.CompletedTask;
         }
 
         private string HashPassword(string password)

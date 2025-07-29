@@ -199,10 +199,10 @@ namespace DataLens.Data.MongoDB
             return count > 0;
         }
 
-        public async Task<IEnumerable<DashboardPermission>> GetByConditionAsync(string condition, object? parameters = null)
+        public Task<IEnumerable<DashboardPermission>> GetByConditionAsync(string condition, object? parameters = null)
         {
             // MongoDB doesn't use SQL conditions, return empty for now
-            return new List<DashboardPermission>();
+            return Task.FromResult<IEnumerable<DashboardPermission>>(new List<DashboardPermission>());
         }
 
         public async Task<int> CountAsync()

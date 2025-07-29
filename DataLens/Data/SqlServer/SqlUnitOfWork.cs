@@ -134,16 +134,20 @@ namespace DataLens.Data.SqlServer
         public IDbConnection? Connection => _connection;
         public IDbTransaction? Transaction => _transaction;
 
-        public async Task BeginTransactionAsync()
+        public Task BeginTransactionAsync()
         {
             EnsureConnection();
             if (_transaction != null)
                 throw new InvalidOperationException("Transaction already started");
 
             if (_connection!.State != ConnectionState.Open)
-                await Task.Run(() => _connection.Open());
+                return Task.Run(() => {
+                    _connection.Open();
+                    _transaction = _connection.BeginTransaction();
+                });
 
             _transaction = _connection.BeginTransaction();
+            return Task.CompletedTask;
         }
 
         public async Task CommitAsync()
@@ -191,10 +195,9 @@ namespace DataLens.Data.SqlServer
             return 0; // Return number of affected rows if needed
         }
 
-        public async Task<bool> SaveChangesMongoAsync()
+        public Task<bool> SaveChangesMongoAsync()
         {
             // Not applicable for SQL databases
-            await Task.CompletedTask;
             throw new NotSupportedException("SaveChangesMongoAsync is not supported for SQL databases");
         }
 
