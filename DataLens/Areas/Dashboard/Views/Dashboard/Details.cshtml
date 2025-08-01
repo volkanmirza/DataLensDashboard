@@ -1,0 +1,205 @@
+@model DataLens.Models.Dashboard
+@{
+    ViewData["Title"] = "Dashboard Detayları";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="content-wrapper">
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">Dashboard Detayları</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home", new { area = "" })">Ana Sayfa</a></li>
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index")">Dashboardlar</a></li>
+                        <li class="breadcrumb-item active">Detaylar</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="content">
+        <div class="container-fluid">
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                    @TempData["Success"]
+                </div>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                    @TempData["Error"]
+                </div>
+            }
+
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">@Model.Name</h3>
+                            <div class="card-tools">
+                                @if (Model.IsPublic)
+                                {
+                                    <span class="badge badge-success">Genel</span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-warning">Özel</span>
+                                }
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <strong>Açıklama:</strong>
+                                </div>
+                                <div class="col-sm-8">
+                                    @(Model.Description ?? "Açıklama bulunmuyor.")
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <strong>Kategori:</strong>
+                                </div>
+                                <div class="col-sm-8">
+                                    <span class="badge badge-info">@Model.Category</span>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <strong>Oluşturan:</strong>
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.CreatedBy
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <strong>Oluşturulma Tarihi:</strong>
+                                </div>
+                                <div class="col-sm-8">
+                                    @Model.CreatedDate.ToString("dd.MM.yyyy HH:mm")
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <strong>Son Güncelleme:</strong>
+                                </div>
+                                <div class="col-sm-8">
+                                    @(Model.UpdatedDate?.ToString("dd.MM.yyyy HH:mm") ?? "Hiç güncellenmedi")
+                                </div>
+                            </div>
+                            @if (!string.IsNullOrEmpty(Model.UpdatedBy))
+                            {
+                                <hr>
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <strong>Güncelleyen:</strong>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        @Model.UpdatedBy
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Dashboard Content Preview -->
+                    @if (!string.IsNullOrEmpty(Model.Content))
+                    {
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h3 class="card-title">Dashboard İçeriği</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle"></i>
+                                    Bu dashboard'ın içeriği JSON formatında saklanmaktadır. Tam görünümü için viewer'ı kullanın.
+                                </div>
+                                <pre class="bg-light p-3" style="max-height: 300px; overflow-y: auto;"><code>@Model.Content</code></pre>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="col-md-4">
+                    <!-- Actions Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">İşlemler</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <a href="@Url.Action("Viewer", new { id = Model.Id })" class="btn btn-primary btn-block">
+                                    <i class="fas fa-eye"></i> Dashboard'ı Görüntüle
+                                </a>
+                                
+                                @if (ViewBag.CanEdit)
+                                {
+                                    <a href="@Url.Action("Designer", new { id = Model.Id })" class="btn btn-warning btn-block">
+                                        <i class="fas fa-edit"></i> Dashboard'ı Düzenle
+                                    </a>
+                                }
+                                
+                                @if (ViewBag.CanDelete)
+                                {
+                                    <a href="@Url.Action("Manage", "DashboardPermission", new { id = Model.Id })" class="btn btn-info btn-block">
+                                        <i class="fas fa-users"></i> İzinleri Yönet
+                                    </a>
+                                    
+                                    <a href="@Url.Action("Clone", new { id = Model.Id })" class="btn btn-secondary btn-block">
+                                        <i class="fas fa-copy"></i> Dashboard'ı Kopyala
+                                    </a>
+                                    
+                                    <hr>
+                                    
+                                    <a href="@Url.Action("Delete", new { id = Model.Id })" class="btn btn-danger btn-block" onclick="return confirm('Bu dashboard\'ı silmek istediğinizden emin misiniz?')">
+                                        <i class="fas fa-trash"></i> Dashboard'ı Sil
+                                    </a>
+                                }
+                                
+                                <hr>
+                                
+                                <a href="@Url.Action("Index")" class="btn btn-outline-secondary btn-block">
+                                    <i class="fas fa-arrow-left"></i> Geri Dön
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Statistics Card -->
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h3 class="card-title">İstatistikler</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-6 text-center">
+                                    <div class="border-right">
+                                        <h4 class="text-primary">@Model.ViewCount</h4>
+                                        <small class="text-muted">Görüntülenme</small>
+                                    </div>
+                                </div>
+                                <div class="col-6 text-center">
+                                    <h4 class="text-success">@(Model.IsPublic ? "Genel" : "Özel")</h4>
+                                    <small class="text-muted">Erişim</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

@@ -1,0 +1,184 @@
+@model DataLens.Areas.Profile.Models.NotificationPreferencesViewModel
+@{
+    ViewData["Title"] = "Bildirim Tercihleri";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Content Header (Page header) -->
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">@ViewData["Title"]</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home", new { area = "" })">Ana Sayfa</a></li>
+                    <li class="breadcrumb-item"><a href="@Url.Action("Index", "Profile")">Profil</a></li>
+                    <li class="breadcrumb-item"><a href="@Url.Action("Index", "Notification")">Bildirimler</a></li>
+                    <li class="breadcrumb-item active">Tercihler</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <h5><i class="icon fas fa-check"></i> Başarılı!</h5>
+                @TempData["Success"]
+            </div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <h5><i class="icon fas fa-ban"></i> Hata!</h5>
+                @TempData["Error"]
+            </div>
+        }
+
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Bildirim Tercihleri</h3>
+                    </div>
+                    <form asp-action="Preferences" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="UserId" />
+                        <input type="hidden" asp-for="CreatedDate" />
+                        <input type="hidden" asp-for="UpdatedDate" />
+                        
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h5>Genel Bildirimler</h5>
+                                    <hr>
+                                    
+                                    <div class="form-group">
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input" asp-for="EmailNotifications" id="emailNotifications">
+                                            <label class="custom-control-label" for="emailNotifications" asp-for="EmailNotifications"></label>
+                                        </div>
+                                        <small class="form-text text-muted">E-posta yoluyla bildirim almak istiyorsanız işaretleyin.</small>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input" asp-for="BrowserNotifications" id="browserNotifications">
+                                            <label class="custom-control-label" for="browserNotifications" asp-for="BrowserNotifications"></label>
+                                        </div>
+                                        <small class="form-text text-muted">Tarayıcı bildirimleri almak istiyorsanız işaretleyin.</small>
+                                    </div>
+                                    
+                                    <h5 class="mt-4">Dashboard Bildirimleri</h5>
+                                    <hr>
+                                    
+                                    <div class="form-group">
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input" asp-for="DashboardShared" id="dashboardShared">
+                                            <label class="custom-control-label" for="dashboardShared" asp-for="DashboardShared"></label>
+                                        </div>
+                                        <small class="form-text text-muted">Bir dashboard sizinle paylaşıldığında bildirim alın.</small>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input" asp-for="DashboardUpdated" id="dashboardUpdated">
+                                            <label class="custom-control-label" for="dashboardUpdated" asp-for="DashboardUpdated"></label>
+                                        </div>
+                                        <small class="form-text text-muted">Takip ettiğiniz dashboard'lar güncellendiğinde bildirim alın.</small>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input" asp-for="PermissionChanged" id="permissionChanged">
+                                            <label class="custom-control-label" for="permissionChanged" asp-for="PermissionChanged"></label>
+                                        </div>
+                                        <small class="form-text text-muted">Yetki değişikliklerinde bildirim alın.</small>
+                                    </div>
+                                    
+                                    <h5 class="mt-4">Sistem Bildirimleri</h5>
+                                    <hr>
+                                    
+                                    <div class="form-group">
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input" asp-for="SystemUpdates" id="systemUpdates">
+                                            <label class="custom-control-label" for="systemUpdates" asp-for="SystemUpdates"></label>
+                                        </div>
+                                        <small class="form-text text-muted">Sistem güncellemeleri hakkında bildirim alın.</small>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input" asp-for="SecurityAlerts" id="securityAlerts">
+                                            <label class="custom-control-label" for="securityAlerts" asp-for="SecurityAlerts"></label>
+                                        </div>
+                                        <small class="form-text text-muted">Güvenlik uyarıları için bildirim alın (önerilen).</small>
+                                    </div>
+                                    
+                                    <h5 class="mt-4">Periyodik Raporlar</h5>
+                                    <hr>
+                                    
+                                    <div class="form-group">
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input" asp-for="WeeklyDigest" id="weeklyDigest">
+                                            <label class="custom-control-label" for="weeklyDigest" asp-for="WeeklyDigest"></label>
+                                        </div>
+                                        <small class="form-text text-muted">Haftalık aktivite özeti alın.</small>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input" asp-for="MonthlyReport" id="monthlyReport">
+                                            <label class="custom-control-label" for="monthlyReport" asp-for="MonthlyReport"></label>
+                                        </div>
+                                        <small class="form-text text-muted">Aylık kullanım raporu alın.</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Kaydet
+                            </button>
+                            <a href="@Url.Action("Index", "Notification")" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Geri Dön
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card card-info">
+                    <div class="card-header">
+                        <h3 class="card-title">Bilgi</h3>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Bildirim Türleri:</strong></p>
+                        <ul>
+                            <li><strong>E-posta:</strong> E-posta adresinize gönderilir</li>
+                            <li><strong>Tarayıcı:</strong> Tarayıcınızda popup olarak görünür</li>
+                            <li><strong>Dashboard:</strong> Uygulama içinde görüntülenir</li>
+                        </ul>
+                        
+                        <p class="mt-3"><strong>Önemli:</strong></p>
+                        <ul>
+                            <li>Güvenlik uyarılarını kapatmanız önerilmez</li>
+                            <li>Değişiklikler anında etkili olur</li>
+                            <li>E-posta tercihlerinizi istediğiniz zaman değiştirebilirsiniz</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

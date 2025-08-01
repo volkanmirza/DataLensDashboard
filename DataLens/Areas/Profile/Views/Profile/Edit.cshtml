@@ -1,0 +1,136 @@
+@model DataLens.Models.User
+@{
+    ViewData["Title"] = "Profil Düzenle";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0"><i class="fas fa-user-edit mr-2"></i>Profil Düzenle</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home", new { area = "" })">Ana Sayfa</a></li>
+                    <li class="breadcrumb-item"><a href="@Url.Action("Index", "Profile", new { area = "Profile" })">Profil</a></li>
+                    <li class="breadcrumb-item active">Düzenle</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <i class="icon fas fa-check"></i> @TempData["Success"]
+            </div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <i class="icon fas fa-ban"></i> @TempData["Error"]
+            </div>
+        }
+
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card card-light card-outline">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-user-edit mr-2"></i>Profil Bilgilerini Düzenle</h3>
+                    </div>
+                    @using (Html.BeginForm("Edit", "Profile", null, FormMethod.Post, false, new { @class = "form-horizontal" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.HiddenFor(model => model.Id)
+                        @Html.HiddenFor(model => model.UserName)
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.FirstName, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.EditorFor(model => model.FirstName, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.FirstName, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.LastName, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.EditorFor(model => model.LastName, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.LastName, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => @Model.UserName, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.EditorFor(model => @Model.UserName, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
+                                @Html.ValidationMessageFor(model => @Model.UserName, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => @Model.Role, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.EditorFor(model => @Model.Role, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
+                                @Html.ValidationMessageFor(model => @Model.Role, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-offset-2 col-md-10">
+                                <input type="submit" value="Kaydet" class="btn btn-primary" />
+                                <a href="@Url.Action("Index", "Profile", new { area = "Profile" })" class="btn btn-default">İptal</a>
+                            </div>
+                        </div>
+
+                    }
+
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card card-light card-outline">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-lightbulb mr-2"></i>Güvenlik Önerileri</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="callout callout-info">
+                            <h5><i class="fas fa-info-circle"></i> Bilgi:</h5>
+                            Profilinizi güncel tutmak, hesap güvenliğinizi artırır.
+                        </div>
+                        <div class="list-group list-group-flush">
+                            <div class="list-group-item bg-light border-0">
+                                <i class="fas fa-shield-alt text-success mr-2"></i>
+                                <strong>Güçlü Şifre:</strong> En az 8 karakter, büyük-küçük harf ve rakam içeren şifre kullanın.
+                            </div>
+                            <div class="list-group-item bg-light border-0">
+                                <i class="fas fa-envelope text-info mr-2"></i>
+                                <strong>Güncel E-posta:</strong> E-posta adresinizin güncel olduğundan emin olun.
+                            </div>
+                            <div class="list-group-item bg-light border-0">
+                                <i class="fas fa-mobile-alt text-warning mr-2"></i>
+                                <strong>İki Faktörlü Doğrulama:</strong> Hesap güvenliğinizi artırmak için etkinleştirin.
+                            </div>
+                            <div class="list-group-item bg-light border-0">
+                                <i class="fas fa-clock text-primary mr-2"></i>
+                                <strong>Düzenli Güncelleme:</strong> Bilgilerinizi düzenli olarak kontrol edin.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -53,7 +53,7 @@ namespace DataLens.Services
                 user.IsActive = true;
 
                 // Check if username or email already exists
-                if (await _unitOfWork.Users.IsUsernameExistsAsync(user.Username))
+                if (await _unitOfWork.Users.IsUsernameExistsAsync(user.UserName))
                 {
                     throw new InvalidOperationException("Username already exists");
                 }
@@ -88,7 +88,7 @@ namespace DataLens.Services
                 }
 
                 // Check if username or email already exists for other users
-                var userWithSameUsername = await _unitOfWork.Users.GetByUsernameAsync(user.Username);
+                var userWithSameUsername = await _unitOfWork.Users.GetByUsernameAsync(user.UserName);
                 if (userWithSameUsername != null && userWithSameUsername.Id != user.Id)
                 {
                     throw new InvalidOperationException("Username already exists");
@@ -109,20 +109,6 @@ namespace DataLens.Services
             {
                 await _unitOfWork.RollbackAsync();
                 throw;
-            }
-        }
-
-        public async Task<bool> UpdateAsync(User user)
-        {
-            try
-            {
-                var result = await _unitOfWork.Users.UpdateAsync(user);
-                await _unitOfWork.CommitAsync();
-                return result;
-            }
-            catch
-            {
-                return false;
             }
         }
 
@@ -213,4 +199,10 @@ namespace DataLens.Services
             return passwordHash == hash;
         }
     }
+}
+
+public static class UnitOfWorkExtensions
+{
+    public static bool IsRelationalDb(this IUnitOfWork unitOfWork)
+        => unitOfWork.DatabaseType == "SqlServer" || unitOfWork.DatabaseType == "PostgreSQL";
 }

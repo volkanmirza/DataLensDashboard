@@ -5,11 +5,11 @@ using DataLens.Data.MongoDB;
 using MongoDB.Driver;
 using DataLens.Services;
 using DataLens.Services.Interfaces;
-using DataLens.Middleware;
 using DataLens.Repositories;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
+using DataLens.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+
 using DevExpress.AspNetCore;
 using DevExpress.DashboardAspNetCore;
 using DevExpress.DashboardCommon;
@@ -26,11 +26,105 @@ builder.Services.AddDevExpressControls();
 // Database Configuration
 builder.Services.AddSingleton<IDbConnectionFactory, DbConnectionFactory>();
 
+// Database type configuration
+var databaseType = builder.Configuration["DatabaseSettings:DatabaseType"] ?? "SqlServer";
+
+// Entity Framework and Identity Configuration (only for SQL databases)
+if (databaseType == "SqlServer" || databaseType == "PostgreSQL")
+{
+    var connectionString = databaseType == "SqlServer" 
+        ? builder.Configuration["DatabaseSettings:ConnectionStrings:SqlServer"]
+        : builder.Configuration["DatabaseSettings:ConnectionStrings:PostgreSQL"];
+    
+    if (string.IsNullOrEmpty(connectionString))
+        throw new InvalidOperationException($"Connection string for {databaseType} not found.");
+
+    builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    {
+        if (databaseType == "SqlServer")
+            options.UseSqlServer(connectionString);
+        else
+            options.UseNpgsql(connectionString);
+    });
+}
+
+// Identity configuration
+if (databaseType == "SqlServer" || databaseType == "PostgreSQL")
+{
+    builder.Services.AddIdentity<User, IdentityRole>(options =>
+    {
+        // Password settings
+        options.Password.RequireDigit = true;
+        options.Password.RequireLowercase = true;
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequireUppercase = true;
+        options.Password.RequiredLength = 6;
+        options.Password.RequiredUniqueChars = 1;
+
+        // Lockout settings
+        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+        options.Lockout.MaxFailedAccessAttempts = 5;
+        options.Lockout.AllowedForNewUsers = true;
+
+        // User settings
+        options.User.AllowedUserNameCharacters =
+            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+        options.User.RequireUniqueEmail = true;
+
+        // Sign in settings
+        options.SignIn.RequireConfirmedEmail = false;
+        options.SignIn.RequireConfirmedPhoneNumber = false;
+    })
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
+}
+else if (databaseType == "MongoDB")
+{
+    // MongoDB Identity configuration
+    builder.Services.AddIdentity<User, DataLens.Identity.MongoRole>(options =>
+    {
+        // Password settings
+        options.Password.RequireDigit = true;
+        options.Password.RequireLowercase = true;
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequireUppercase = true;
+        options.Password.RequiredLength = 6;
+        options.Password.RequiredUniqueChars = 1;
+
+        // Lockout settings
+        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+        options.Lockout.MaxFailedAccessAttempts = 5;
+        options.Lockout.AllowedForNewUsers = true;
+
+        // User settings
+        options.User.AllowedUserNameCharacters =
+            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+        options.User.RequireUniqueEmail = true;
+
+        // Sign in settings
+        options.SignIn.RequireConfirmedEmail = false;
+        options.SignIn.RequireConfirmedPhoneNumber = false;
+    })
+    .AddUserStore<DataLens.Identity.MongoUserStore>()
+    .AddRoleStore<DataLens.Identity.MongoRoleStore>()
+    .AddDefaultTokenProviders();
+}
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Account/Login";
+    options.LogoutPath = "/Account/Logout";
+    options.AccessDeniedPath = "/Account/AccessDenied";
+    options.ExpireTimeSpan = TimeSpan.FromHours(24);
+    options.SlidingExpiration = true;
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+});
+
 // Unit of Work Factory Registration
 builder.Services.AddScoped<IUnitOfWorkFactory, UnitOfWorkFactory>();
 
 // Repository Registration based on Database Type
-var databaseType = builder.Configuration["DatabaseSettings:DatabaseType"] ?? "SqlServer";
 
 switch (databaseType)
 {
@@ -70,35 +164,14 @@ switch (databaseType)
         throw new NotSupportedException($"Database type '{databaseType}' is not supported");
 }
 
-// JWT Service Registration
-builder.Services.AddScoped<IJwtService, JwtService>();
+
 
 // Business Services Registration
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserGroupService, UserGroupService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 
-// JWT Authentication Configuration
-var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-var secretKey = jwtSettings["SecretKey"] ?? throw new ArgumentNullException("JwtSettings:SecretKey");
-var issuer = jwtSettings["Issuer"] ?? throw new ArgumentNullException("JwtSettings:Issuer");
-var audience = jwtSettings["Audience"] ?? throw new ArgumentNullException("JwtSettings:Audience");
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secretKey)),
-            ValidateIssuer = true,
-            ValidIssuer = issuer,
-            ValidateAudience = true,
-            ValidAudience = audience,
-            ValidateLifetime = true,
-            ClockSkew = TimeSpan.Zero
-        };
-    });
 
 builder.Services.AddAuthorization(options =>
 {
@@ -124,14 +197,13 @@ app.UseDevExpressControls();
 
 app.UseRouting();
 
-// DevExpress Dashboard endpoint
-app.MapDashboardRoute("api/dashboard", "DefaultDashboard");
 
-// JWT Cookie Middleware - must be before UseAuthentication
-app.UseJwtCookie();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+// DevExpress Dashboard endpoint - must be after authentication
+app.MapDashboardRoute("api/dashboard", "DefaultDashboard");
 
 // Area routing
 app.MapControllerRoute(
@@ -140,7 +212,7 @@ app.MapControllerRoute(
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Account}/{action=Login}/{id?}");
 
 // MongoDB Database Initialization
 if (databaseType == "MongoDB")

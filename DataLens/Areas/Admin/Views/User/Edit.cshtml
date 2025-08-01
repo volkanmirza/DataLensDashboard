@@ -1,0 +1,497 @@
+@model DataLens.Models.User
+
+@{
+    ViewData["Title"] = "Kullanıcı Düzenle";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@section Styles {
+    <!-- Select2 -->
+    <link rel="stylesheet" href="~/lib/admin-lte/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="~/lib/admin-lte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+    <!-- iCheck for checkboxes and radio inputs -->
+    <link rel="stylesheet" href="~/lib/admin-lte/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+}
+
+@section Breadcrumb {
+    <li class="breadcrumb-item"><a href="@Url.Action("Index", "User", new { area = "Admin" })">Kullanıcılar</a></li>
+    <li class="breadcrumb-item active">Düzenle</li>
+}
+
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-8">
+                <!-- User Information Card -->
+                <div class="card card-light card-outline">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-user-edit mr-2"></i>Kullanıcı Bilgileri</h3>
+                        <div class="card-tools">
+                            <span class="badge badge-info">ID: @Model.Id</span>
+                        </div>
+                    </div>
+                    <form asp-action="Edit" method="post" id="editUserForm">
+                        <input asp-for="Id" type="hidden" />
+                        <input asp-for="CreatedDate" type="hidden" />
+                        <input asp-for="PasswordHash" type="hidden" />
+                        
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="Username" class="form-label">Kullanıcı Adı <span class="text-danger">*</span></label>
+                                        <input asp-for="Username" class="form-control" placeholder="Kullanıcı adını giriniz" />
+                                        <span asp-validation-for="Username" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="Email" class="form-label">E-posta <span class="text-danger">*</span></label>
+                                        <input asp-for="Email" type="email" class="form-control" placeholder="E-posta adresini giriniz" />
+                                        <span asp-validation-for="Email" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="Role" class="form-label">Rol <span class="text-danger">*</span></label>
+                                        <select asp-for="Role" class="form-control select2" style="width: 100%;">
+                                            <option value="">Rol seçiniz</option>
+                                            <option value="Viewer">Viewer - Sadece Görüntüleme</option>
+                                            <option value="Designer">Designer - Dashboard Tasarımı</option>
+                                            <option value="Admin">Admin - Tam Yetki</option>
+                                        </select>
+                                        <span asp-validation-for="Role" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Durum</label>
+                                        <div class="icheck-primary">
+                                            <input type="checkbox" asp-for="IsActive" id="IsActive" />
+                                            <label for="IsActive">Aktif Kullanıcı</label>
+                                        </div>
+                                        <small class="form-text text-muted">Kullanıcının sisteme giriş yapabilmesi için aktif olması gerekir.</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="FirstName" class="form-label">Ad</label>
+                                <input type="text" id="FirstName" name="FirstName" value="@ViewBag.FirstName" class="form-control" placeholder="Adını giriniz" />
+                            </div>
+
+                            <div class="form-group">
+                                <label for="LastName" class="form-label">Soyad</label>
+                                <input type="text" id="LastName" name="LastName" value="@ViewBag.LastName" class="form-control" placeholder="Soyadını giriniz" />
+                            </div>
+
+                            <div class="form-group">
+                                <label for="Phone" class="form-label">Telefon</label>
+                                <input type="tel" id="Phone" name="Phone" value="@ViewBag.Phone" class="form-control" placeholder="Telefon numarasını giriniz" />
+                            </div>
+
+                            <div class="form-group">
+                                <label for="Department" class="form-label">Departman</label>
+                                <input type="text" id="Department" name="Department" value="@ViewBag.Department" class="form-control" placeholder="Departmanını giriniz" />
+                            </div>
+
+                            <!-- Account Information -->
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Oluşturma Tarihi</label>
+                                        <input type="text" class="form-control" value="@Model.CreatedDate.ToString("dd.MM.yyyy HH:mm")" readonly />
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Son Giriş</label>
+                                        <input type="text" class="form-control" value="@(ViewBag.LastLoginDate != null ? ((DateTime)ViewBag.LastLoginDate).ToString("dd.MM.yyyy HH:mm") : "Hiç giriş yapmamış")" readonly />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-save"></i> Değişiklikleri Kaydet
+                            </button>
+                            <a href="@Url.Action("Index", "Users", new { area = "Admin" })" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> İptal
+                            </a>
+                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#changePasswordModal">
+                                <i class="fas fa-key"></i> Şifre Değiştir
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <!-- User Statistics Card -->
+                <div class="card card-light card-outline">
+                    <div class="card-header">
+                        <h3 class="card-title">Kullanıcı İstatistikleri</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-box bg-info">
+                            <span class="info-box-icon"><i class="fas fa-chart-bar"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">Dashboard Sayısı</span>
+                                <span class="info-box-number" id="dashboardCount">0</span>
+                            </div>
+                        </div>
+                        
+                        <div class="info-box bg-success">
+                            <span class="info-box-icon"><i class="fas fa-eye"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">Toplam Görüntüleme</span>
+                                <span class="info-box-number" id="totalViews">0</span>
+                            </div>
+                        </div>
+
+                        <div class="info-box bg-warning">
+                            <span class="info-box-icon"><i class="fas fa-clock"></i></span>
+                            <div class="info-box-content">
+                                <span class="info-box-text">Aktif Gün</span>
+                                <span class="info-box-number" id="activeDays">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Groups Card -->
+                <div class="card card-success">
+                    <div class="card-header">
+                        <h3 class="card-title">Kullanıcı Grupları</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="userGroups">
+                            <!-- Groups will be loaded via AJAX -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity Card -->
+                <div class="card card-warning">
+                    <div class="card-header">
+                        <h3 class="card-title">Son Aktiviteler</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="timeline" id="recentActivities">
+                            <!-- Activities will be loaded via AJAX -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Change Password Modal -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1" role="dialog" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="changePasswordModalLabel">Şifre Değiştir</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="changePasswordForm">
+                <div class="modal-body">
+                    <input type="hidden" id="userId" value="@Model.Id" />
+                    
+                    <div class="form-group">
+                        <label for="newPassword" class="form-label">Yeni Şifre <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <input type="password" id="newPassword" name="newPassword" class="form-control" placeholder="Yeni şifreyi giriniz" />
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-outline-secondary" id="toggleNewPassword">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmNewPassword" class="form-label">Yeni Şifre Tekrar <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <input type="password" id="confirmNewPassword" name="confirmNewPassword" class="form-control" placeholder="Yeni şifreyi tekrar giriniz" />
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-outline-secondary" id="toggleConfirmNewPassword">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="progress mb-2">
+                        <div class="progress-bar" id="newPasswordStrength" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <small id="newPasswordStrengthText" class="text-muted">Şifre gücü: Zayıf</small>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-primary">Şifreyi Değiştir</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- Select2 -->
+    <script src="~/lib/admin-lte/plugins/select2/js/select2.full.min.js"></script>
+    <!-- jquery-validation -->
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+    <script>
+        $(function () {
+            // Initialize Select2
+            $('.select2').select2({
+                theme: 'bootstrap4'
+            });
+
+            // Load user statistics
+            loadUserStatistics();
+            loadUserGroups();
+            loadRecentActivities();
+
+            // Password visibility toggles
+            $('#toggleNewPassword').click(function () {
+                togglePasswordVisibility('#newPassword', $(this));
+            });
+
+            $('#toggleConfirmNewPassword').click(function () {
+                togglePasswordVisibility('#confirmNewPassword', $(this));
+            });
+
+            // Password strength checker
+            $('#newPassword').on('input', function () {
+                var password = $(this).val();
+                var strength = checkPasswordStrength(password);
+                updatePasswordStrengthUI(strength, '#newPasswordStrength', '#newPasswordStrengthText');
+            });
+
+            // Form validations
+            $('#editUserForm').validate({
+                rules: {
+                    Username: {
+                        required: true,
+                        minlength: 3,
+                        maxlength: 50
+                    },
+                    Email: {
+                        required: true,
+                        email: true
+                    },
+                    Role: {
+                        required: true
+                    }
+                },
+                messages: {
+                    Username: {
+                        required: "Kullanıcı adı gereklidir",
+                        minlength: "Kullanıcı adı en az 3 karakter olmalıdır",
+                        maxlength: "Kullanıcı adı en fazla 50 karakter olabilir"
+                    },
+                    Email: {
+                        required: "E-posta adresi gereklidir",
+                        email: "Geçerli bir e-posta adresi giriniz"
+                    },
+                    Role: {
+                        required: "Rol seçimi gereklidir"
+                    }
+                },
+                errorElement: 'span',
+                errorPlacement: function (error, element) {
+                    error.addClass('text-danger');
+                    error.insertAfter(element);
+                },
+                highlight: function (element, errorClass, validClass) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function (element, errorClass, validClass) {
+                    $(element).removeClass('is-invalid');
+                }
+            });
+
+            $('#changePasswordForm').validate({
+                rules: {
+                    newPassword: {
+                        required: true,
+                        minlength: 8
+                    },
+                    confirmNewPassword: {
+                        required: true,
+                        equalTo: "#newPassword"
+                    }
+                },
+                messages: {
+                    newPassword: {
+                        required: "Yeni şifre gereklidir",
+                        minlength: "Şifre en az 8 karakter olmalıdır"
+                    },
+                    confirmNewPassword: {
+                        required: "Şifre tekrarı gereklidir",
+                        equalTo: "Şifreler eşleşmiyor"
+                    }
+                },
+                submitHandler: function (form) {
+                    changePassword();
+                    return false;
+                }
+            });
+        });
+
+        function loadUserStatistics() {
+            $.ajax({
+                url: '@Url.Action("GetUserStatistics", "Users", new { area = "Admin" })/' + @Model.Id,
+                type: 'GET',
+                success: function (data) {
+                    $('#dashboardCount').text(data.dashboardCount);
+                    $('#totalViews').text(data.totalViews);
+                    $('#activeDays').text(data.activeDays);
+                },
+                error: function () {
+                    console.log('İstatistikler yüklenirken hata oluştu.');
+                }
+            });
+        }
+
+        function loadUserGroups() {
+            $.ajax({
+                url: '@Url.Action("GetUserGroups", "Users", new { area = "Admin" })/' + @Model.Id,
+                type: 'GET',
+                success: function (data) {
+                    var html = '';
+                    if (data.length > 0) {
+                        data.forEach(function (group) {
+                            html += '<span class="badge badge-info mr-1 mb-1">' + group.groupName + '</span>';
+                        });
+                    } else {
+                        html = '<p class="text-muted">Henüz hiçbir gruba dahil değil.</p>';
+                    }
+                    $('#userGroups').html(html);
+                },
+                error: function () {
+                    $('#userGroups').html('<p class="text-danger">Gruplar yüklenirken hata oluştu.</p>');
+                }
+            });
+        }
+
+        function loadRecentActivities() {
+            $.ajax({
+                url: '@Url.Action("GetUserActivities", "Users", new { area = "Admin" })/' + @Model.Id,
+                type: 'GET',
+                success: function (data) {
+                    var html = '';
+                    if (data.length > 0) {
+                        data.forEach(function (activity, index) {
+                            html += '<div class="time-label"><span class="bg-info">' + new Date(activity.date).toLocaleDateString('tr-TR') + '</span></div>';
+                            html += '<div><i class="fas fa-' + activity.icon + ' bg-blue"></i>';
+                            html += '<div class="timeline-item"><span class="time"><i class="fas fa-clock"></i> ' + new Date(activity.date).toLocaleTimeString('tr-TR') + '</span>';
+                            html += '<h3 class="timeline-header">' + activity.title + '</h3>';
+                            html += '<div class="timeline-body">' + activity.description + '</div></div></div>';
+                        });
+                    } else {
+                        html = '<p class="text-muted">Henüz aktivite bulunmuyor.</p>';
+                    }
+                    $('#recentActivities').html(html);
+                },
+                error: function () {
+                    $('#recentActivities').html('<p class="text-danger">Aktiviteler yüklenirken hata oluştu.</p>');
+                }
+            });
+        }
+
+        function togglePasswordVisibility(fieldSelector, buttonElement) {
+            var passwordField = $(fieldSelector);
+            var icon = buttonElement.find('i');
+            if (passwordField.attr('type') === 'password') {
+                passwordField.attr('type', 'text');
+                icon.removeClass('fa-eye').addClass('fa-eye-slash');
+            } else {
+                passwordField.attr('type', 'password');
+                icon.removeClass('fa-eye-slash').addClass('fa-eye');
+            }
+        }
+
+        function checkPasswordStrength(password) {
+            var strength = 0;
+            var checks = {
+                length: password.length >= 8,
+                lowercase: /[a-z]/.test(password),
+                uppercase: /[A-Z]/.test(password),
+                number: /[0-9]/.test(password),
+                special: /[^A-Za-z0-9]/.test(password)
+            };
+
+            for (var check in checks) {
+                if (checks[check]) strength += 20;
+            }
+
+            return {
+                score: strength,
+                checks: checks
+            };
+        }
+
+        function updatePasswordStrengthUI(strength, progressSelector, textSelector) {
+            var progressBar = $(progressSelector);
+            var strengthText = $(textSelector);
+            var score = strength.score;
+
+            progressBar.css('width', score + '%').attr('aria-valuenow', score);
+
+            if (score < 40) {
+                progressBar.removeClass().addClass('progress-bar bg-danger');
+                strengthText.text('Şifre gücü: Çok Zayıf');
+            } else if (score < 60) {
+                progressBar.removeClass().addClass('progress-bar bg-warning');
+                strengthText.text('Şifre gücü: Zayıf');
+            } else if (score < 80) {
+                progressBar.removeClass().addClass('progress-bar bg-info');
+                strengthText.text('Şifre gücü: Orta');
+            } else if (score < 100) {
+                progressBar.removeClass().addClass('progress-bar bg-primary');
+                strengthText.text('Şifre gücü: Güçlü');
+            } else {
+                progressBar.removeClass().addClass('progress-bar bg-success');
+                strengthText.text('Şifre gücü: Çok Güçlü');
+            }
+        }
+
+        function changePassword() {
+            var userId = $('#userId').val();
+            var newPassword = $('#newPassword').val();
+            var confirmNewPassword = $('#confirmNewPassword').val();
+
+            $.ajax({
+                url: '@Url.Action("ChangePassword", "Users", new { area = "Admin" })',
+                type: 'POST',
+                data: {
+                    userId: userId,
+                    newPassword: newPassword,
+                    confirmNewPassword: confirmNewPassword
+                },
+                success: function (result) {
+                    if (result.success) {
+                        $('#changePasswordModal').modal('hide');
+                        $('#changePasswordForm')[0].reset();
+                        toastr.success('Şifre başarıyla değiştirildi.');
+                    } else {
+                        toastr.error(result.message || 'Şifre değiştirilirken hata oluştu.');
+                    }
+                },
+                error: function () {
+                    toastr.error('Şifre değiştirilirken hata oluştu.');
+                }
+            });
+        }
+    </script>
+}

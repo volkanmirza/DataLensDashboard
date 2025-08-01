@@ -6,7 +6,9 @@
 <div class="login-page">
     <div class="login-box">
         <div class="login-logo">
-            <a href="/"><b>Data</b>Lens</a>
+            <a href="/">
+                <img src="~/img/datalens-logo.svg" alt="DataLens" style="height: 60px; width: auto; margin-bottom: 10px;">
+            </a>
         </div>
         <!-- /.login-logo -->
         <div class="card">
@@ -40,8 +42,9 @@
                     <div class="row">
                         <div class="col-8">
                             <div class="icheck-primary">
-                                <input type="checkbox" id="remember">
-                                <label for="remember">
+                                <input type="checkbox" id="rememberMe" name="rememberMe" value="true">
+                                <input type="hidden" name="rememberMe" value="false">
+                                <label for="rememberMe">
                                     Beni Hatırla
                                 </label>
                             </div>

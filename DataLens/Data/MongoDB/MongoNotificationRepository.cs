@@ -22,7 +22,7 @@ namespace DataLens.Data.MongoDB
         public async Task<IEnumerable<Notification>> GetAllAsync()
         {
             return await _notifications.Find(_ => true)
-                .SortByDescending(n => n.CreatedAt)
+                .SortByDescending(n => n.CreatedDate)
                 .ToListAsync();
         }
 
@@ -38,7 +38,7 @@ namespace DataLens.Data.MongoDB
             {
                 entity.Id = ObjectId.GenerateNewId().ToString();
             }
-            entity.CreatedAt = DateTime.UtcNow;
+            entity.CreatedDate = DateTime.UtcNow;
             await _notifications.InsertOneAsync(entity);
             return entity.Id;
         }
@@ -70,7 +70,7 @@ namespace DataLens.Data.MongoDB
         {
             var filter = Builders<Notification>.Filter.Eq(n => n.UserId, userId);
             return await _notifications.Find(filter)
-                .SortByDescending(n => n.CreatedAt)
+                .SortByDescending(n => n.CreatedDate)
                 .ToListAsync();
         }
 
@@ -81,7 +81,7 @@ namespace DataLens.Data.MongoDB
                 Builders<Notification>.Filter.Eq(n => n.IsRead, false)
             );
             return await _notifications.Find(filter)
-                .SortByDescending(n => n.CreatedAt)
+                .SortByDescending(n => n.CreatedDate)
                 .ToListAsync();
         }
 
@@ -90,7 +90,7 @@ namespace DataLens.Data.MongoDB
             var filter = Builders<Notification>.Filter.Eq(n => n.Id, notificationId);
             var update = Builders<Notification>.Update
                 .Set(n => n.IsRead, true)
-                .Set(n => n.ReadAt, DateTime.UtcNow);
+                .Set(n => n.ReadDate, DateTime.UtcNow);
             
             var result = await _notifications.UpdateOneAsync(filter, update);
             return result.ModifiedCount > 0;
@@ -104,7 +104,7 @@ namespace DataLens.Data.MongoDB
             );
             var update = Builders<Notification>.Update
                 .Set(n => n.IsRead, true)
-                .Set(n => n.ReadAt, DateTime.UtcNow);
+                .Set(n => n.ReadDate, DateTime.UtcNow);
             
             var result = await _notifications.UpdateOneAsync(filter, update);
             return result.ModifiedCount > 0;
@@ -118,7 +118,7 @@ namespace DataLens.Data.MongoDB
             );
             var update = Builders<Notification>.Update
                 .Set(n => n.IsRead, true)
-                .Set(n => n.ReadAt, DateTime.UtcNow);
+                .Set(n => n.ReadDate, DateTime.UtcNow);
             
             var result = await _notifications.UpdateManyAsync(filter, update);
             return result.ModifiedCount > 0;
@@ -135,7 +135,7 @@ namespace DataLens.Data.MongoDB
 
         public async Task<bool> DeleteOldNotificationsAsync(DateTime cutoffDate)
         {
-            var filter = Builders<Notification>.Filter.Lt(n => n.CreatedAt, cutoffDate);
+            var filter = Builders<Notification>.Filter.Lt(n => n.CreatedDate, cutoffDate);
             var result = await _notifications.DeleteManyAsync(filter);
             return result.DeletedCount > 0;
         }

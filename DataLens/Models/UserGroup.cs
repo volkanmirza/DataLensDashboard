@@ -29,6 +29,7 @@ namespace DataLens.Models
         [StringLength(200)]
         public string? Tags { get; set; }
 
+        [BsonElement("CreatedDate")]
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
         public DateTime? UpdatedDate { get; set; }

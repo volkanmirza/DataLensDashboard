@@ -21,6 +21,7 @@ namespace DataLens.Models
         [StringLength(20)]
         public string PermissionType { get; set; } = string.Empty; // View, Edit, Delete, Share
 
+        [BsonElement("GrantedDate")]
         public DateTime GrantedDate { get; set; } = DateTime.UtcNow;
 
         public string GrantedBy { get; set; } = string.Empty;

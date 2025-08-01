@@ -1,8 +1,8 @@
 <!-- Main Sidebar Container -->
-<aside class="main-sidebar sidebar-dark-primary elevation-4">
+<aside class="main-sidebar sidebar-light-primary elevation-4">
     <!-- Brand Logo -->
     <a href="@Url.Action("Index", "Home")" class="brand-link">
-        <img src="~/lib/admin-lte/img/AdminLTELogo.png" alt="DataLens Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+        <img src="~/img/datalens-logo.svg" alt="DataLens Logo" class="brand-image elevation-3" style="width: 33px; height: 33px; opacity: .9">
         <span class="brand-text font-weight-light">DataLens</span>
     </a>
 
@@ -14,7 +14,7 @@
                 <img src="~/lib/admin-lte/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
             </div>
             <div class="info">
-                <a href="@Url.Action("Index", "Profile", new { area = "Profile" })" class="d-block">Kullanıcı Adı</a>
+                                        <a href="@Url.Action("Index", "Profile", new { area = "Profile" })" class="d-block">@User.Identity.Name</a>
             </div>
         </div>
 
@@ -111,33 +111,10 @@
                 <!-- Profile Section -->
                 <li class="nav-header">PROFİL</li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="@Url.Action("Index", "Profile", new { area = "Profile" })" class="nav-link">
                         <i class="nav-icon fa fa-user"></i>
-                        <p>
-                            Hesabım
-                            <i class="right fa fa-angle-left"></i>
-                        </p>
+                        <p>Hesabım</p>
                     </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="@Url.Action("Index", "Profile", new { area = "Profile" })" class="nav-link">
-                                <i class="fa fa-circle-o nav-icon"></i>
-                                <p>Profil Bilgileri</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="@Url.Action("Index", "Settings", new { area = "Profile" })" class="nav-link">
-                                <i class="fa fa-circle-o nav-icon"></i>
-                                <p>Ayarlar</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="@Url.Action("Index", "Notification", new { area = "Profile" })" class="nav-link">
-                                <i class="fa fa-circle-o nav-icon"></i>
-                                <p>Bildirimler</p>
-                            </a>
-                        </li>
-                    </ul>
                 </li>
                 
                 <!-- Reports -->

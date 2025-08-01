@@ -4,23 +4,28 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@ViewData["Title"] - DataLens Dashboard</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="~/img/favicon.svg">
+    <link rel="icon" type="image/png" href="~/img/logo.png">
 
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="~/lib/font-awesome/css/font-awesome.min.css">
+    <!-- Font Awesome 5 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <!-- AdminLTE -->
     <link rel="stylesheet" href="~/lib/admin-lte/css/adminlte.min.css">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/DataLens.styles.css" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", required: false)
 </head>
-<body class="hold-transition sidebar-mini layout-fixed">
+<body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed">
 <div class="wrapper">
 
     <!-- Preloader -->
     <div class="preloader flex-column justify-content-center align-items-center">
-        <img class="animation__shake" src="~/lib/admin-lte/img/AdminLTELogo.png" alt="DataLens Logo" height="60" width="60">
+        <img class="animation__shake" src="~/img/datalens-logo.svg" alt="DataLens Logo" style="height: 80px; width: auto; opacity: 0.9;">
     </div>
 
     <!-- Navbar -->
@@ -59,7 +64,7 @@
     @await Html.PartialAsync("_Footer")
 
     <!-- Control Sidebar -->
-    <aside class="control-sidebar control-sidebar-dark">
+    <aside class="control-sidebar">
         <!-- Control sidebar content goes here -->
     </aside>
 </div>

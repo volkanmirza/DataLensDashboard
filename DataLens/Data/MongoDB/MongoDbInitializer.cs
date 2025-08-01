@@ -3,6 +3,7 @@ using MongoDB.Bson;
 using DataLens.Models;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.AspNetCore.Identity;
 
 namespace DataLens.Data.MongoDB
 {
@@ -17,11 +18,13 @@ namespace DataLens.Data.MongoDB
     {
         private readonly IMongoDatabase _database;
         private readonly ILogger<MongoDbInitializer> _logger;
+        private readonly IPasswordHasher<User> _passwordHasher;
 
-        public MongoDbInitializer(IMongoDatabase database, ILogger<MongoDbInitializer> logger)
+        public MongoDbInitializer(IMongoDatabase database, ILogger<MongoDbInitializer> logger, IPasswordHasher<User> passwordHasher)
         {
             _database = database;
             _logger = logger;
+            _passwordHasher = passwordHasher;
         }
 
         public async Task<bool> IsDatabaseInitializedAsync()
@@ -118,8 +121,10 @@ namespace DataLens.Data.MongoDB
             
             await collection.Indexes.CreateManyAsync(new[]
             {
-                new CreateIndexModel<User>(indexKeysDefinition.Ascending(x => x.Username), new CreateIndexOptions { Unique = true }),
+                new CreateIndexModel<User>(indexKeysDefinition.Ascending(x => x.UserName), new CreateIndexOptions { Unique = true }),
+                new CreateIndexModel<User>(indexKeysDefinition.Ascending(x => x.NormalizedUserName), new CreateIndexOptions { Unique = true }),
                 new CreateIndexModel<User>(indexKeysDefinition.Ascending(x => x.Email), new CreateIndexOptions { Unique = true }),
+                new CreateIndexModel<User>(indexKeysDefinition.Ascending(x => x.NormalizedEmail), new CreateIndexOptions { Unique = true }),
                 new CreateIndexModel<User>(indexKeysDefinition.Ascending(x => x.Role)),
                 new CreateIndexModel<User>(indexKeysDefinition.Ascending(x => x.IsActive)),
                 new CreateIndexModel<User>(indexKeysDefinition.Ascending(x => x.CreatedDate))
@@ -254,8 +259,10 @@ namespace DataLens.Data.MongoDB
                 new User
                 {
                     Id = ObjectId.GenerateNewId().ToString(),
-                    Username = "admin",
+                    UserName = "admin",
+                    NormalizedUserName = "ADMIN",
                     Email = "admin@datalens.com",
+                    NormalizedEmail = "ADMIN@DATALENS.COM",
                     PasswordHash = HashPassword("admin123"),
                     FirstName = "System",
                     LastName = "Administrator",
@@ -266,8 +273,10 @@ namespace DataLens.Data.MongoDB
                 new User
                 {
                     Id = ObjectId.GenerateNewId().ToString(),
-                    Username = "designer",
+                    UserName = "designer",
+                    NormalizedUserName = "DESIGNER",
                     Email = "designer@datalens.com",
+                    NormalizedEmail = "DESIGNER@DATALENS.COM",
                     PasswordHash = HashPassword("designer123"),
                     FirstName = "Dashboard",
                     LastName = "Designer",
@@ -278,8 +287,10 @@ namespace DataLens.Data.MongoDB
                 new User
                 {
                     Id = ObjectId.GenerateNewId().ToString(),
-                    Username = "viewer",
+                    UserName = "viewer",
+                    NormalizedUserName = "VIEWER",
                     Email = "viewer@datalens.com",
+                    NormalizedEmail = "VIEWER@DATALENS.COM",
                     PasswordHash = HashPassword("viewer123"),
                     FirstName = "Report",
                     LastName = "Viewer",
@@ -358,11 +369,8 @@ namespace DataLens.Data.MongoDB
 
         private string HashPassword(string password)
         {
-            using (var sha256 = SHA256.Create())
-            {
-                var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-                return Convert.ToBase64String(hashedBytes);
-            }
+            var user = new User();
+            return _passwordHasher.HashPassword(user, password);
         }
     }
 }

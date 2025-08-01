@@ -1,0 +1,262 @@
+@{
+    ViewData["Title"] = "Kullanıcı Yönetimi";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@section Styles {
+    <!-- DataTables -->
+    <link rel="stylesheet" href="~/lib/admin-lte/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="~/lib/admin-lte/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+    <link rel="stylesheet" href="~/lib/admin-lte/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
+}
+
+@section Breadcrumb {
+    <li class="breadcrumb-item active">Kullanıcılar</li>
+}
+
+<div class="content">
+    <div class="container-fluid">
+        <!-- Info boxes -->
+        <div class="row">
+            <div class="col-12 col-sm-6 col-md-3">
+                <div class="info-box">
+                    <span class="info-box-icon bg-info elevation-1"><i class="fas fa-users"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Toplam Kullanıcı</span>
+                        <span class="info-box-number" id="totalUsers">0</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-3">
+                <div class="info-box mb-3">
+                    <span class="info-box-icon bg-success elevation-1"><i class="fas fa-user-check"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Aktif Kullanıcı</span>
+                        <span class="info-box-number" id="activeUsers">0</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-3">
+                <div class="info-box mb-3">
+                    <span class="info-box-icon bg-warning elevation-1"><i class="fas fa-user-shield"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Admin</span>
+                        <span class="info-box-number" id="adminUsers">0</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-3">
+                <div class="info-box mb-3">
+                    <span class="info-box-icon bg-danger elevation-1"><i class="fas fa-user-times"></i></span>
+                    <div class="info-box-content">
+                        <span class="info-box-text">Pasif Kullanıcı</span>
+                        <span class="info-box-number" id="inactiveUsers">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Kullanıcı Listesi</h3>
+                        <div class="card-tools">
+                            <a href="@Url.Action("Create", "Users", new { area = "Admin" })" class="btn btn-primary btn-sm">
+                                <i class="fas fa-plus"></i> Yeni Kullanıcı
+                            </a>
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <table id="usersTable" class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Kullanıcı Adı</th>
+                                    <th>E-posta</th>
+                                    <th>Rol</th>
+                                    <th>Durum</th>
+                                    <th>Oluşturma Tarihi</th>
+                                    <th>Son Giriş</th>
+                                    <th>İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Data will be loaded via AJAX -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Kullanıcı Silme Onayı</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Bu kullanıcıyı silmek istediğinizden emin misiniz?</p>
+                <p><strong>Kullanıcı:</strong> <span id="deleteUserName"></span></p>
+                <p class="text-danger"><small>Bu işlem geri alınamaz!</small></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-danger" id="confirmDelete">Sil</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- DataTables & Plugins -->
+    <script src="~/lib/admin-lte/plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="~/lib/admin-lte/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="~/lib/admin-lte/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/lib/admin-lte/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+    <script src="~/lib/admin-lte/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="~/lib/admin-lte/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+    <script src="~/lib/admin-lte/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
+    <script src="~/lib/admin-lte/plugins/datatables-buttons/js/buttons.print.min.js"></script>
+    <script src="~/lib/admin-lte/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
+
+    <script>
+        $(function () {
+            // Initialize DataTable
+            var table = $('#usersTable').DataTable({
+                "responsive": true,
+                "lengthChange": false,
+                "autoWidth": false,
+                "processing": true,
+                "serverSide": true,
+                "ajax": {
+                    "url": "@Url.Action("GetUsers", "Users", new { area = "Admin" })",
+                    "type": "POST",
+                    "datatype": "json"
+                },
+                "columns": [
+                    { "data": "id", "name": "Id" },
+                    { "data": "username", "name": "Username" },
+                    { "data": "email", "name": "Email" },
+                    {
+                        "data": "role",
+                        "name": "Role",
+                        "render": function (data, type, row) {
+                            var badgeClass = '';
+                            switch (data) {
+                                case 'Admin':
+                                    badgeClass = 'badge-danger';
+                                    break;
+                                case 'Designer':
+                                    badgeClass = 'badge-warning';
+                                    break;
+                                case 'Viewer':
+                                    badgeClass = 'badge-info';
+                                    break;
+                                default:
+                                    badgeClass = 'badge-secondary';
+                            }
+                            return '<span class="badge ' + badgeClass + '">' + data + '</span>';
+                        }
+                    },
+                    {
+                        "data": "isActive",
+                        "name": "IsActive",
+                        "render": function (data, type, row) {
+                            return data ? '<span class="badge badge-success">Aktif</span>' : '<span class="badge badge-secondary">Pasif</span>';
+                        }
+                    },
+                    {
+                        "data": "createdDate",
+                        "name": "CreatedDate",
+                        "render": function (data, type, row) {
+                            return new Date(data).toLocaleDateString('tr-TR');
+                        }
+                    },
+                    {
+                        "data": "lastLoginDate",
+                        "name": "LastLoginDate",
+                        "render": function (data, type, row) {
+                            return data ? new Date(data).toLocaleDateString('tr-TR') : 'Hiç giriş yapmamış';
+                        }
+                    },
+                    {
+                        "data": null,
+                        "orderable": false,
+                        "render": function (data, type, row) {
+                            return '<div class="btn-group">' +
+                                '<a href="@Url.Action("Details", "Users", new { area = "Admin" })/' + row.id + '" class="btn btn-info btn-sm" title="Detaylar">' +
+                                '<i class="fas fa-eye"></i>' +
+                                '</a>' +
+                                '<a href="@Url.Action("Edit", "Users", new { area = "Admin" })/' + row.id + '" class="btn btn-warning btn-sm" title="Düzenle">' +
+                                '<i class="fas fa-edit"></i>' +
+                                '</a>' +
+                                '<button class="btn btn-danger btn-sm" onclick="confirmDeleteUser(' + row.id + ', \'' + row.username + '\')" title="Sil">' +
+                                '<i class="fas fa-trash"></i>' +
+                                '</button>' +
+                                '</div>';
+                        }
+                    }
+                ],
+                "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+            }).buttons().container().appendTo('#usersTable_wrapper .col-md-6:eq(0)');
+
+            // Load statistics
+            loadUserStatistics();
+        });
+
+        function loadUserStatistics() {
+            $.ajax({
+                url: '@Url.Action("GetUserStatistics", "Users", new { area = "Admin" })',
+                type: 'GET',
+                success: function (data) {
+                    $('#totalUsers').text(data.totalUsers);
+                    $('#activeUsers').text(data.activeUsers);
+                    $('#adminUsers').text(data.adminUsers);
+                    $('#inactiveUsers').text(data.inactiveUsers);
+                },
+                error: function () {
+                    toastr.error('İstatistikler yüklenirken hata oluştu.');
+                }
+            });
+        }
+
+        function confirmDeleteUser(userId, username) {
+            $('#deleteUserName').text(username);
+            $('#confirmDelete').data('user-id', userId);
+            $('#deleteModal').modal('show');
+        }
+
+        $('#confirmDelete').click(function () {
+            var userId = $(this).data('user-id');
+            $.ajax({
+                url: '@Url.Action("Delete", "Users", new { area = "Admin" })/' + userId,
+                type: 'DELETE',
+                success: function (result) {
+                    if (result.success) {
+                        $('#deleteModal').modal('hide');
+                        $('#usersTable').DataTable().ajax.reload();
+                        loadUserStatistics();
+                        toastr.success('Kullanıcı başarıyla silindi.');
+                    } else {
+                        toastr.error(result.message || 'Kullanıcı silinirken hata oluştu.');
+                    }
+                },
+                error: function () {
+                    toastr.error('Kullanıcı silinirken hata oluştu.');
+                }
+            });
+        });
+    </script>
+}

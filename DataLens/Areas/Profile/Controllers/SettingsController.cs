@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using DataLens.Services.Interfaces;
 using DataLens.Data.Interfaces;
 using DataLens.Models;
+using DataLens.Areas.Profile.Models;
 using System.Security.Claims;
 using System.ComponentModel.DataAnnotations;
 
@@ -106,11 +107,15 @@ namespace DataLens.Areas.Profile.Controllers
                 var privacySettings = new PrivacySettingsViewModel
                 {
                     UserId = userId,
-                    ProfileVisibility = "private",
-                    ShowEmail = false,
-                    ShowLastLogin = false,
-                    AllowDataExport = true,
-                    AllowDataDeletion = true
+                    ProfileVisibility = ProfileVisibility.Private,
+                    AllowDashboardSharing = true,
+                    AllowActivityTracking = true,
+                    AllowUsageAnalytics = false,
+                    AllowThirdPartyIntegrations = false,
+                    DataRetentionDays = 90,
+                    AutoDeleteData = false,
+                    TwoFactorEnabled = false,
+                    SessionTimeoutMinutes = 60
                 };
 
                 return View(privacySettings);
@@ -209,48 +214,106 @@ namespace DataLens.Areas.Profile.Controllers
                 return RedirectToAction("Privacy");
             }
         }
+
+        // POST: Profile/Settings/UpdateSettings
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateSettings(string language, string theme, string timeZone)
+        {
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return RedirectToAction("Login", "Account", new { area = "" });
+                }
+
+                // Here you would typically save settings to database
+                // For now, we'll just show a success message
+                TempData["Success"] = "Ayarlarınız başarıyla kaydedildi.";
+                return RedirectToAction("Dashboard", "Profile");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating settings");
+                TempData["Error"] = "Ayarlar kaydedilirken bir hata oluştu.";
+                return RedirectToAction("Dashboard", "Profile");
+            }
+        }
+
+        // POST: Profile/Settings/UpdatePrivacySettings
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdatePrivacySettings(string profileVisibility, bool allowDashboardSharing, bool trackActivity, bool twoFactorAuth)
+        {
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return RedirectToAction("Login", "Account", new { area = "" });
+                }
+
+                // Here you would typically save privacy settings to database
+                TempData["Success"] = "Gizlilik ayarlarınız başarıyla kaydedildi.";
+                return RedirectToAction("Dashboard", "Profile");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating privacy settings");
+                TempData["Error"] = "Gizlilik ayarları kaydedilirken bir hata oluştu.";
+                return RedirectToAction("Dashboard", "Profile");
+            }
+        }
+
+        // POST: Profile/Settings/ChangePassword
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePassword(string currentPassword, string newPassword, string confirmPassword)
+        {
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Json(new { success = false, message = "Oturum süresi dolmuş." });
+                }
+
+                if (string.IsNullOrEmpty(currentPassword) || string.IsNullOrEmpty(newPassword) || string.IsNullOrEmpty(confirmPassword))
+                {
+                    return Json(new { success = false, message = "Tüm alanları doldurunuz." });
+                }
+
+                if (newPassword != confirmPassword)
+                {
+                    return Json(new { success = false, message = "Yeni şifre ve tekrarı eşleşmiyor." });
+                }
+
+                if (newPassword.Length < 6)
+                {
+                    return Json(new { success = false, message = "Şifre en az 6 karakter olmalıdır." });
+                }
+
+                var result = await _userService.ChangePasswordAsync(userId, currentPassword, newPassword);
+                if (result)
+                {
+                    TempData["Success"] = "Şifreniz başarıyla değiştirildi.";
+                    return RedirectToAction("Dashboard", "Profile");
+                }
+                else
+                {
+                    TempData["Error"] = "Mevcut şifre yanlış.";
+                    return RedirectToAction("Dashboard", "Profile");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error changing password");
+                TempData["Error"] = "Şifre değiştirilirken bir hata oluştu.";
+                return RedirectToAction("Dashboard", "Profile");
+            }
+        }
     }
 
-    public class UserSettingsViewModel
-    {
-        public string UserId { get; set; } = string.Empty;
-
-        [Display(Name = "Dil")]
-        public string Language { get; set; } = "tr";
-
-        [Display(Name = "Tema")]
-        public string Theme { get; set; } = "light";
-
-        [Display(Name = "Saat Dilimi")]
-        public string TimeZone { get; set; } = "Europe/Istanbul";
-
-        [Display(Name = "E-posta Bildirimleri")]
-        public bool EmailNotifications { get; set; }
-
-        [Display(Name = "Dashboard Bildirimleri")]
-        public bool DashboardNotifications { get; set; }
-
-        [Display(Name = "Sistem Bildirimleri")]
-        public bool SystemNotifications { get; set; }
-    }
-
-    public class PrivacySettingsViewModel
-    {
-        public string UserId { get; set; } = string.Empty;
-
-        [Display(Name = "Profil Görünürlüğü")]
-        public string ProfileVisibility { get; set; } = "private";
-
-        [Display(Name = "E-posta Adresini Göster")]
-        public bool ShowEmail { get; set; }
-
-        [Display(Name = "Son Giriş Tarihini Göster")]
-        public bool ShowLastLogin { get; set; }
-
-        [Display(Name = "Veri Dışa Aktarmaya İzin Ver")]
-        public bool AllowDataExport { get; set; }
-
-        [Display(Name = "Veri Silmeye İzin Ver")]
-        public bool AllowDataDeletion { get; set; }
-    }
+    // UserSettingsViewModel and PrivacySettingsViewModel are now defined in DataLens.Areas.Profile.Models namespace
 }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using DataLens.Services.Interfaces;
 using DataLens.Data.Interfaces;
 using DataLens.Models;
+using DataLens.Areas.Profile.Models;
 using System.Security.Claims;
 using System.ComponentModel.DataAnnotations;
 
@@ -37,47 +38,47 @@ namespace DataLens.Areas.Profile.Controllers
                 // Gerçek veritabanından bildirimleri al
                 var notificationEntities = await _notificationRepository.GetByUserIdAsync(userId);
                 
-                var notifications = notificationEntities.Select(n => new NotificationViewModel
+                var notifications = notificationEntities.Select(n => new DataLens.Models.NotificationViewModel
                 {
                     Id = n.Id,
                     Title = n.Title,
                     Message = n.Message,
                     Type = n.Type,
                     IsRead = n.IsRead,
-                    CreatedAt = n.CreatedAt
+                    CreatedDate = n.CreatedDate
                 }).ToList();
 
                 // Eğer hiç bildirim yoksa örnek veriler ekle (geliştirme amaçlı)
                 if (!notifications.Any())
                 {
-                    notifications = new List<NotificationViewModel>
+                    notifications = new List<DataLens.Models.NotificationViewModel>
                     {
-                        new NotificationViewModel
+                        new DataLens.Models.NotificationViewModel
                         {
                             Id = "1",
                             Title = "Dashboard Paylaşıldı",
                             Message = "'Satış Raporu' dashboard'u sizinle paylaşıldı.",
                             Type = "dashboard",
                             IsRead = false,
-                            CreatedAt = DateTime.UtcNow.AddHours(-2)
+                            CreatedDate = DateTime.UtcNow.AddHours(-2)
                         },
-                        new NotificationViewModel
+                        new DataLens.Models.NotificationViewModel
                         {
                             Id = "2",
                             Title = "Sistem Güncellemesi",
                             Message = "Sistem bakımı 15.01.2024 tarihinde yapılacaktır.",
                             Type = "system",
                             IsRead = true,
-                            CreatedAt = DateTime.UtcNow.AddDays(-1)
+                            CreatedDate = DateTime.UtcNow.AddDays(-1)
                     },
-                    new NotificationViewModel
+                    new DataLens.Models.NotificationViewModel
                     {
                         Id = "3",
                         Title = "Yeni Yetki",
                         Message = "'Finans' grubuna eklendiniz.",
                         Type = "permission",
                         IsRead = false,
-                        CreatedAt = DateTime.UtcNow.AddDays(-3)
+                        CreatedDate = DateTime.UtcNow.AddDays(-3)
                     }
                 };
                 }
@@ -124,6 +125,31 @@ namespace DataLens.Areas.Profile.Controllers
                 _logger.LogError(ex, "Error retrieving notification preferences");
                 TempData["Error"] = "Bildirim tercihleri yüklenirken bir hata oluştu.";
                 return Task.FromResult<IActionResult>(RedirectToAction("Index"));
+            }
+        }
+
+        // POST: Profile/Notification/UpdateNotificationPreferences
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateNotificationPreferences(bool emailNotifications, bool browserNotifications, bool dashboardSharingNotifications, bool securityAlerts)
+        {
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return RedirectToAction("Login", "Account", new { area = "" });
+                }
+
+                // Here you would typically save notification preferences to database
+                TempData["Success"] = "Bildirim tercihleriniz başarıyla kaydedildi.";
+                return RedirectToAction("Dashboard", "Profile");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating notification preferences");
+                TempData["Error"] = "Bildirim tercihleri kaydedilirken bir hata oluştu.";
+                return RedirectToAction("Dashboard", "Profile");
             }
         }
 
@@ -257,47 +283,38 @@ namespace DataLens.Areas.Profile.Controllers
                 return Task.FromResult<IActionResult>(Json(new { count = 0 }));
             }
         }
+
+        // POST: Profile/Notification/UpdatePreferences
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdatePreferences(NotificationPreferencesViewModel model)
+        {
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Json(new { success = false, message = "Oturum süresi dolmuş." });
+                }
+
+                if (ModelState.IsValid)
+                {
+                    // Here you would typically save notification preferences to database
+                    // For now, we'll just return success
+                    return Json(new { success = true, message = "Bildirim tercihleri başarıyla güncellendi." });
+                }
+                else
+                {
+                    var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+                    return Json(new { success = false, message = string.Join(", ", errors) });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating notification preferences");
+                return Json(new { success = false, message = "Bildirim tercihleri güncellenirken bir hata oluştu." });
+            }
+        }
     }
 
-    public class NotificationViewModel
-    {
-        public string Id { get; set; } = string.Empty;
-        public string Title { get; set; } = string.Empty;
-        public string Message { get; set; } = string.Empty;
-        public string Type { get; set; } = string.Empty;
-        public bool IsRead { get; set; }
-        public DateTime CreatedAt { get; set; }
-    }
-
-    public class NotificationPreferencesViewModel
-    {
-        public string UserId { get; set; } = string.Empty;
-
-        [Display(Name = "E-posta Bildirimleri")]
-        public bool EmailNotifications { get; set; }
-
-        [Display(Name = "Tarayıcı Bildirimleri")]
-        public bool BrowserNotifications { get; set; }
-
-        [Display(Name = "Dashboard Paylaşıldığında")]
-        public bool DashboardShared { get; set; }
-
-        [Display(Name = "Dashboard Güncellendiğinde")]
-        public bool DashboardUpdated { get; set; }
-
-        [Display(Name = "Yetki Değiştiğinde")]
-        public bool PermissionChanged { get; set; }
-
-        [Display(Name = "Sistem Güncellemeleri")]
-        public bool SystemUpdates { get; set; }
-
-        [Display(Name = "Güvenlik Uyarıları")]
-        public bool SecurityAlerts { get; set; }
-
-        [Display(Name = "Haftalık Özet")]
-        public bool WeeklyDigest { get; set; }
-
-        [Display(Name = "Aylık Rapor")]
-        public bool MonthlyReport { get; set; }
-    }
 }

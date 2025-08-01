@@ -55,8 +55,8 @@ namespace DataLens.Data.SqlServer
             await connection.OpenAsync();
             
             var command = new SqlCommand(@"
-                INSERT INTO Notifications (Id, UserId, Title, Message, Type, IsRead, CreatedAt, ReadAt, RelatedEntityId, RelatedEntityType, CreatedBy, IsActive)
-                VALUES (@Id, @UserId, @Title, @Message, @Type, @IsRead, @CreatedAt, @ReadAt, @RelatedEntityId, @RelatedEntityType, @CreatedBy, @IsActive)", connection);
+                INSERT INTO Notifications (Id, UserId, Title, Message, Type, IsRead, CreatedDate, ReadDate, RelatedEntityId, RelatedEntityType, CreatedBy, IsActive)
+VALUES (@Id, @UserId, @Title, @Message, @Type, @IsRead, @CreatedDate, @ReadDate, @RelatedEntityId, @RelatedEntityType, @CreatedBy, @IsActive)", connection);
             
             command.Parameters.AddWithValue("@Id", notification.Id);
             command.Parameters.AddWithValue("@UserId", notification.UserId);
@@ -64,8 +64,8 @@ namespace DataLens.Data.SqlServer
             command.Parameters.AddWithValue("@Message", notification.Message);
             command.Parameters.AddWithValue("@Type", notification.Type);
             command.Parameters.AddWithValue("@IsRead", notification.IsRead);
-            command.Parameters.AddWithValue("@CreatedAt", notification.CreatedAt);
-            command.Parameters.AddWithValue("@ReadAt", notification.ReadAt ?? (object)DBNull.Value);
+            command.Parameters.AddWithValue("@CreatedDate", notification.CreatedDate);
+            command.Parameters.AddWithValue("@ReadDate", notification.ReadDate ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@RelatedEntityId", notification.RelatedEntityId ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@RelatedEntityType", notification.RelatedEntityType ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@CreatedBy", notification.CreatedBy);
@@ -83,7 +83,7 @@ namespace DataLens.Data.SqlServer
             var command = new SqlCommand(@"
                 UPDATE Notifications SET 
                     UserId = @UserId, Title = @Title, Message = @Message, Type = @Type,
-                    IsRead = @IsRead, CreatedAt = @CreatedAt, ReadAt = @ReadAt, RelatedEntityId = @RelatedEntityId, RelatedEntityType = @RelatedEntityType, CreatedBy = @CreatedBy, IsActive = @IsActive
+                    IsRead = @IsRead, CreatedDate = @CreatedDate, ReadDate = @ReadDate, RelatedEntityId = @RelatedEntityId, RelatedEntityType = @RelatedEntityType, CreatedBy = @CreatedBy, IsActive = @IsActive
                 WHERE Id = @Id", connection);
             
             command.Parameters.AddWithValue("@Id", notification.Id);
@@ -92,8 +92,8 @@ namespace DataLens.Data.SqlServer
             command.Parameters.AddWithValue("@Message", notification.Message);
             command.Parameters.AddWithValue("@Type", notification.Type);
             command.Parameters.AddWithValue("@IsRead", notification.IsRead);
-            command.Parameters.AddWithValue("@CreatedAt", notification.CreatedAt);
-            command.Parameters.AddWithValue("@ReadAt", notification.ReadAt ?? (object)DBNull.Value);
+            command.Parameters.AddWithValue("@CreatedDate", notification.CreatedDate);
+            command.Parameters.AddWithValue("@ReadDate", notification.ReadDate ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@RelatedEntityId", notification.RelatedEntityId ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@RelatedEntityType", notification.RelatedEntityType ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@CreatedBy", notification.CreatedBy);
@@ -121,7 +121,7 @@ namespace DataLens.Data.SqlServer
             using var connection = new SqlConnection(_connectionString);
             await connection.OpenAsync();
             
-            var command = new SqlCommand("SELECT * FROM Notifications WHERE UserId = @UserId AND IsActive = 1 ORDER BY CreatedAt DESC", connection);
+            var command = new SqlCommand("SELECT * FROM Notifications WHERE UserId = @UserId AND IsActive = 1 ORDER BY CreatedDate DESC", connection);
             command.Parameters.AddWithValue("@UserId", userId);
             
             using var reader = await command.ExecuteReaderAsync();
@@ -140,7 +140,7 @@ namespace DataLens.Data.SqlServer
             using var connection = new SqlConnection(_connectionString);
             await connection.OpenAsync();
             
-            var command = new SqlCommand("SELECT * FROM Notifications WHERE UserId = @UserId AND IsRead = 0 AND IsActive = 1 ORDER BY CreatedAt DESC", connection);
+            var command = new SqlCommand("SELECT * FROM Notifications WHERE UserId = @UserId AND IsRead = 0 AND IsActive = 1 ORDER BY CreatedDate DESC", connection);
             command.Parameters.AddWithValue("@UserId", userId);
             
             using var reader = await command.ExecuteReaderAsync();
@@ -158,7 +158,7 @@ namespace DataLens.Data.SqlServer
             using var connection = new SqlConnection(_connectionString);
             await connection.OpenAsync();
             
-            var command = new SqlCommand("UPDATE Notifications SET IsRead = 1, ReadAt = GETDATE() WHERE Id = @Id", connection);
+            var command = new SqlCommand("UPDATE Notifications SET IsRead = 1, ReadDate = GETDATE() WHERE Id = @Id", connection);
             command.Parameters.AddWithValue("@Id", id);
             
             var rowsAffected = await command.ExecuteNonQueryAsync();
@@ -170,7 +170,7 @@ namespace DataLens.Data.SqlServer
             using var connection = new SqlConnection(_connectionString);
             await connection.OpenAsync();
             
-            var command = new SqlCommand("UPDATE Notifications SET IsRead = 1, ReadAt = GETDATE() WHERE UserId = @UserId AND IsRead = 0", connection);
+            var command = new SqlCommand("UPDATE Notifications SET IsRead = 1, ReadDate = GETDATE() WHERE UserId = @UserId AND IsRead = 0", connection);
             command.Parameters.AddWithValue("@UserId", userId);
             
             var rowsAffected = await command.ExecuteNonQueryAsync();
@@ -214,7 +214,7 @@ namespace DataLens.Data.SqlServer
             using var connection = new SqlConnection(_connectionString);
             await connection.OpenAsync();
             
-            var command = new SqlCommand("SELECT * FROM Notifications WHERE UserId = @UserId AND Type = @Type AND IsActive = 1 ORDER BY CreatedAt DESC", connection);
+            var command = new SqlCommand("SELECT * FROM Notifications WHERE UserId = @UserId AND Type = @Type AND IsActive = 1 ORDER BY CreatedDate DESC", connection);
             command.Parameters.AddWithValue("@UserId", userId);
             command.Parameters.AddWithValue("@Type", type);
             
@@ -233,7 +233,7 @@ namespace DataLens.Data.SqlServer
             using var connection = new SqlConnection(_connectionString);
             await connection.OpenAsync();
             
-            var command = new SqlCommand("UPDATE Notifications SET IsRead = 1, ReadAt = GETDATE() WHERE Id = @Id AND UserId = @UserId", connection);
+            var command = new SqlCommand("UPDATE Notifications SET IsRead = 1, ReadDate = GETDATE() WHERE Id = @Id AND UserId = @UserId", connection);
             command.Parameters.AddWithValue("@Id", notificationId);
             command.Parameters.AddWithValue("@UserId", userId);
             
@@ -260,7 +260,7 @@ namespace DataLens.Data.SqlServer
             using var connection = new SqlConnection(_connectionString);
             await connection.OpenAsync();
             
-            var command = new SqlCommand("SELECT * FROM Notifications WHERE UserId = @UserId AND IsActive = 1 ORDER BY CreatedAt DESC", connection);
+            var command = new SqlCommand("SELECT * FROM Notifications WHERE UserId = @UserId AND IsActive = 1 ORDER BY CreatedDate DESC", connection);
             command.Parameters.AddWithValue("@UserId", userId);
             
             using var reader = await command.ExecuteReaderAsync();
@@ -279,7 +279,7 @@ namespace DataLens.Data.SqlServer
             using var connection = new SqlConnection(_connectionString);
             await connection.OpenAsync();
             
-            var command = new SqlCommand("SELECT * FROM Notifications WHERE RelatedEntityId = @RelatedEntityId AND RelatedEntityType = @RelatedEntityType AND IsActive = 1 ORDER BY CreatedAt DESC", connection);
+            var command = new SqlCommand("SELECT * FROM Notifications WHERE RelatedEntityId = @RelatedEntityId AND RelatedEntityType = @RelatedEntityType AND IsActive = 1 ORDER BY CreatedDate DESC", connection);
             command.Parameters.AddWithValue("@RelatedEntityId", relatedEntityId);
             command.Parameters.AddWithValue("@RelatedEntityType", relatedEntityType);
             
@@ -304,8 +304,8 @@ namespace DataLens.Data.SqlServer
                 foreach (var notification in notifications)
                 {
                     var command = new SqlCommand(@"
-                        INSERT INTO Notifications (Id, UserId, Title, Message, Type, IsRead, CreatedAt, ReadAt, RelatedEntityId, RelatedEntityType, CreatedBy, IsActive)
-                        VALUES (@Id, @UserId, @Title, @Message, @Type, @IsRead, @CreatedAt, @ReadAt, @RelatedEntityId, @RelatedEntityType, @CreatedBy, @IsActive)", connection, (SqlTransaction)transaction);
+                        INSERT INTO Notifications (Id, UserId, Title, Message, Type, IsRead, CreatedDate, ReadDate, RelatedEntityId, RelatedEntityType, CreatedBy, IsActive)
+                VALUES (@Id, @UserId, @Title, @Message, @Type, @IsRead, @CreatedDate, @ReadDate, @RelatedEntityId, @RelatedEntityType, @CreatedBy, @IsActive)", connection, (SqlTransaction)transaction);
                     
                     command.Parameters.AddWithValue("@Id", notification.Id);
                     command.Parameters.AddWithValue("@UserId", notification.UserId);
@@ -313,8 +313,8 @@ namespace DataLens.Data.SqlServer
                     command.Parameters.AddWithValue("@Message", notification.Message);
                     command.Parameters.AddWithValue("@Type", notification.Type);
                     command.Parameters.AddWithValue("@IsRead", notification.IsRead);
-                    command.Parameters.AddWithValue("@CreatedAt", notification.CreatedAt);
-                    command.Parameters.AddWithValue("@ReadAt", notification.ReadAt ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("@CreatedDate", notification.CreatedDate);
+                command.Parameters.AddWithValue("@ReadDate", notification.ReadDate ?? (object)DBNull.Value);
                     command.Parameters.AddWithValue("@RelatedEntityId", notification.RelatedEntityId ?? (object)DBNull.Value);
                     command.Parameters.AddWithValue("@RelatedEntityType", notification.RelatedEntityType ?? (object)DBNull.Value);
                     command.Parameters.AddWithValue("@CreatedBy", notification.CreatedBy);
@@ -338,7 +338,7 @@ namespace DataLens.Data.SqlServer
             using var connection = new SqlConnection(_connectionString);
             await connection.OpenAsync();
             
-            var command = new SqlCommand("UPDATE Notifications SET IsActive = 0 WHERE CreatedAt < @CutoffDate", connection);
+            var command = new SqlCommand("UPDATE Notifications SET IsActive = 0 WHERE CreatedDate < @CutoffDate", connection);
             command.Parameters.AddWithValue("@CutoffDate", cutoffDate);
             
             var rowsAffected = await command.ExecuteNonQueryAsync();
@@ -388,8 +388,8 @@ namespace DataLens.Data.SqlServer
                 Message = reader.GetString("Message"),
                 Type = reader.GetString("Type"),
                 IsRead = reader.GetBoolean("IsRead"),
-                CreatedAt = reader.GetDateTime("CreatedAt"),
-                ReadAt = reader.IsDBNull("ReadAt") ? null : reader.GetDateTime("ReadAt"),
+                CreatedDate = reader.GetDateTime("CreatedDate"),
+                    ReadDate = reader.IsDBNull("ReadDate") ? null : reader.GetDateTime("ReadDate"),
                 RelatedEntityId = reader.IsDBNull("RelatedEntityId") ? null : reader.GetString("RelatedEntityId"),
                 RelatedEntityType = reader.IsDBNull("RelatedEntityType") ? null : reader.GetString("RelatedEntityType"),
                 CreatedBy = reader.GetString("CreatedBy"),

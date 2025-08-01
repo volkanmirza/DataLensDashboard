@@ -1,0 +1,311 @@
+@model DataLens.Models.User
+@{
+    ViewData["Title"] = "Kullanıcı Profili";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Content Header (Page header) -->
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0"><i class="fas fa-user-circle mr-2"></i>Kullanıcı Profili</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home", new { area = "" })">Ana Sayfa</a></li>
+                    <li class="breadcrumb-item active">Profil</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <i class="icon fas fa-check"></i> @TempData["Success"]
+            </div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <i class="icon fas fa-ban"></i> @TempData["Error"]
+            </div>
+        }
+
+        <div class="row">
+            <!-- Profile Info Card -->
+            <div class="col-md-4">
+                <div class="card card-primary card-outline">
+                    <div class="card-body box-profile">
+                        <div class="text-center">
+                            <img class="profile-user-img img-fluid img-circle"
+                                 src="~/lib/admin-lte/img/user2-160x160.jpg"
+                                 alt="User profile picture">
+                        </div>
+
+                        <h3 class="profile-username text-center">@Model.FirstName @Model.LastName</h3>
+
+                        <p class="text-muted text-center">@Model.Role</p>
+
+                        <ul class="list-group list-group-unbordered mb-3">
+                            <li class="list-group-item">
+                                <b>E-posta</b> <a class="float-right">@Model.Email</a>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Kullanıcı Adı</b> <a class="float-right">@Model.Email</a>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Kayıt Tarihi</b> <a class="float-right">@Model.CreatedDate.ToString("dd.MM.yyyy")</a>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Son Giriş</b> <a class="float-right">@DateTime.Now.ToString("dd.MM.yyyy HH:mm")</a>
+                            </li>
+                        </ul>
+
+                        <a href="@Url.Action("Edit", "Profile", new { area = "Profile" })" class="btn btn-primary btn-block"><b>Profili Düzenle</b></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Profile Content -->
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header p-0 pt-1">
+                        <ul class="nav nav-tabs" id="custom-tabs-two-tab" role="tablist">
+                            <li class="pt-2 px-3"><h3 class="card-title">Profil Yönetimi</h3></li>
+                            <li class="nav-item">
+                                <a class="nav-link active" id="custom-tabs-two-home-tab" data-toggle="pill" href="#custom-tabs-two-home" role="tab" aria-controls="custom-tabs-two-home" aria-selected="true">
+                                    <i class="fas fa-cog"></i> Genel Ayarlar
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="custom-tabs-two-profile-tab" data-toggle="pill" href="#custom-tabs-two-profile" role="tab" aria-controls="custom-tabs-two-profile" aria-selected="false">
+                                    <i class="fas fa-bell"></i> Bildirimler
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="custom-tabs-two-messages-tab" data-toggle="pill" href="#custom-tabs-two-messages" role="tab" aria-controls="custom-tabs-two-messages" aria-selected="false">
+                                    <i class="fas fa-shield-alt"></i> Gizlilik
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="custom-tabs-two-settings-tab" data-toggle="pill" href="#custom-tabs-two-settings" role="tab" aria-controls="custom-tabs-two-settings" aria-selected="false">
+                                    <i class="fas fa-key"></i> Şifre Değiştir
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-body">
+                        <div class="tab-content" id="custom-tabs-two-tabContent">
+                            <!-- Genel Ayarlar Tab -->
+                            <div class="tab-pane fade show active" id="custom-tabs-two-home" role="tabpanel" aria-labelledby="custom-tabs-two-home-tab">
+                                <form asp-action="UpdateSettings" asp-controller="Settings" method="post">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="language">Dil</label>
+                                                <select class="form-control" id="language" name="language">
+                                                    <option value="tr">Türkçe</option>
+                                                    <option value="en">English</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="theme">Tema</label>
+                                                <select class="form-control" id="theme" name="theme">
+                                                    <option value="light">Açık Tema</option>
+                                                    <option value="dark">Koyu Tema</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="timezone">Saat Dilimi</label>
+                                        <select class="form-control" id="timezone" name="timeZone">
+                                            <option value="Europe/Istanbul">İstanbul (UTC+3)</option>
+                                            <option value="UTC">UTC (UTC+0)</option>
+                                            <option value="Europe/London">Londra (UTC+0)</option>
+                                            <option value="America/New_York">New York (UTC-5)</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                                </form>
+                            </div>
+
+                            <!-- Bildirimler Tab -->
+                            <div class="tab-pane fade" id="custom-tabs-two-profile" role="tabpanel" aria-labelledby="custom-tabs-two-profile-tab">
+                                <form asp-action="UpdateNotificationPreferences" asp-controller="Notification" method="post">
+                                    <div class="form-group">
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input" id="emailNotifications" name="emailNotifications">
+                                            <label class="custom-control-label" for="emailNotifications">E-posta Bildirimleri</label>
+                                        </div>
+                                        <small class="form-text text-muted">Önemli güncellemeler ve bildirimler e-posta ile gönderilsin.</small>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input" id="browserNotifications" name="browserNotifications">
+                                            <label class="custom-control-label" for="browserNotifications">Tarayıcı Bildirimleri</label>
+                                        </div>
+                                        <small class="form-text text-muted">Tarayıcı üzerinden anlık bildirimler alın.</small>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input" id="dashboardSharing" name="dashboardSharingNotifications">
+                                            <label class="custom-control-label" for="dashboardSharing">Dashboard Paylaşım Bildirimleri</label>
+                                        </div>
+                                        <small class="form-text text-muted">Dashboard paylaşıldığında bildirim alın.</small>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input" id="securityAlerts" name="securityAlerts">
+                                            <label class="custom-control-label" for="securityAlerts">Güvenlik Uyarıları</label>
+                                        </div>
+                                        <small class="form-text text-muted">Güvenlik ile ilgili önemli uyarıları alın.</small>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                                </form>
+                            </div>
+
+                            <!-- Gizlilik Tab -->
+                            <div class="tab-pane fade" id="custom-tabs-two-messages" role="tabpanel" aria-labelledby="custom-tabs-two-messages-tab">
+                                <form asp-action="UpdatePrivacySettings" asp-controller="Settings" method="post">
+                                    <div class="form-group">
+                                        <label for="profileVisibility">Profil Görünürlüğü</label>
+                                        <select class="form-control" id="profileVisibility" name="profileVisibility">
+                                            <option value="Public">Herkese Açık</option>
+                                            <option value="Private">Özel</option>
+                                            <option value="Organization">Sadece Organizasyon</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input" id="allowDashboardSharing" name="allowDashboardSharing">
+                                            <label class="custom-control-label" for="allowDashboardSharing">Dashboard Paylaşımına İzin Ver</label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input" id="trackActivity" name="trackActivity">
+                                            <label class="custom-control-label" for="trackActivity">Aktivite Takibine İzin Ver</label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input" id="twoFactorAuth" name="twoFactorAuth">
+                                            <label class="custom-control-label" for="twoFactorAuth">İki Faktörlü Kimlik Doğrulama</label>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <h5>Veri Yönetimi</h5>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <button type="button" class="btn btn-info btn-block" onclick="exportData()">Verilerimi İndir</button>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <button type="button" class="btn btn-danger btn-block" onclick="deleteAccount()">Hesabımı Sil</button>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary mt-3">Kaydet</button>
+                                </form>
+                            </div>
+
+                            <!-- Şifre Değiştir Tab -->
+                            <div class="tab-pane fade" id="custom-tabs-two-settings" role="tabpanel" aria-labelledby="custom-tabs-two-settings-tab">
+                                <form asp-action="ChangePassword" asp-controller="Settings" method="post">
+                                    <div class="form-group">
+                                        <label for="currentPassword">Mevcut Şifre</label>
+                                        <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="newPassword">Yeni Şifre</label>
+                                        <input type="password" class="form-control" id="newPassword" name="newPassword" required>
+                                        <small class="form-text text-muted">Şifreniz en az 8 karakter olmalı ve büyük harf, küçük harf, rakam içermelidir.</small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="confirmPassword">Yeni Şifre Tekrar</label>
+                                        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Şifreyi Değiştir</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Delete Account Modal -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1" role="dialog" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteAccountModalLabel">Hesap Silme Onayı</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Hesabınızı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.</p>
+                <p><strong>Uyarı:</strong> Tüm verileriniz kalıcı olarak silinecektir.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <form asp-action="DeleteAccount" asp-controller="Settings" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Hesabımı Sil</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Bootstrap tab initialization
+            $('#custom-tabs-two-tab a').on('click', function (e) {
+                e.preventDefault();
+                $(this).tab('show');
+            });
+
+            // URL hash support for tabs
+            var hash = window.location.hash;
+            if (hash) {
+                $('#custom-tabs-two-tab a[href="' + hash + '"]').tab('show');
+            }
+
+            // Update URL when tab changes
+            $('#custom-tabs-two-tab a').on('shown.bs.tab', function (e) {
+                window.location.hash = e.target.getAttribute('href');
+            });
+        });
+
+        function exportData() {
+            $.ajax({
+                url: '@Url.Action("ExportData", "Settings")',
+                type: 'POST',
+                data: { __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val() },
+                success: function(response) {
+                    toastr.success('Verileriniz dışa aktarılıyor. E-posta adresinize gönderilecektir.');
+                },
+                error: function() {
+                    toastr.error('Veri dışa aktarılırken bir hata oluştu.');
+                }
+            });
+        }
+
+        function deleteAccount() {
+            $('#deleteAccountModal').modal('show');
+        }
+    </script>
+}

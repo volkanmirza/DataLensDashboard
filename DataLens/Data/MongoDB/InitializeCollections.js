@@ -9,21 +9,29 @@ db.createCollection('Users', {
   validator: {
     $jsonSchema: {
       bsonType: 'object',
-      required: ['Username', 'Email', 'PasswordHash', 'Role', 'IsActive', 'CreatedAt'],
+      required: ['UserName', 'NormalizedUserName', 'Email', 'NormalizedEmail', 'PasswordHash', 'Role', 'IsActive', 'CreatedDate'],
       properties: {
         _id: {
           bsonType: 'objectId'
         },
-        Username: {
+        UserName: {
           bsonType: 'string',
           minLength: 3,
           maxLength: 50,
-          description: 'Username must be a string between 3-50 characters'
+          description: 'UserName must be a string between 3-50 characters'
+        },
+        NormalizedUserName: {
+          bsonType: 'string',
+          description: 'Normalized username for case-insensitive searches'
         },
         Email: {
           bsonType: 'string',
           pattern: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
           description: 'Email must be a valid email address'
+        },
+        NormalizedEmail: {
+          bsonType: 'string',
+          description: 'Normalized email for case-insensitive searches'
         },
         PasswordHash: {
           bsonType: 'string',
@@ -46,14 +54,14 @@ db.createCollection('Users', {
           bsonType: 'bool',
           description: 'IsActive must be a boolean'
         },
-        CreatedAt: {
+        CreatedDate: {
           bsonType: 'date',
-          description: 'CreatedAt must be a date'
+          description: 'CreatedDate must be a date'
         },
-        UpdatedAt: {
+        UpdatedDate: {
           bsonType: ['date', 'null']
         },
-        LastLoginAt: {
+        LastLoginDate: {
           bsonType: ['date', 'null']
         }
       }
@@ -62,18 +70,20 @@ db.createCollection('Users', {
 });
 
 // Create indexes for Users collection
-db.Users.createIndex({ 'Username': 1 }, { unique: true });
+db.Users.createIndex({ 'UserName': 1 }, { unique: true });
+db.Users.createIndex({ 'NormalizedUserName': 1 }, { unique: true });
 db.Users.createIndex({ 'Email': 1 }, { unique: true });
+db.Users.createIndex({ 'NormalizedEmail': 1 }, { unique: true });
 db.Users.createIndex({ 'Role': 1 });
 db.Users.createIndex({ 'IsActive': 1 });
-db.Users.createIndex({ 'CreatedAt': 1 });
+db.Users.createIndex({ 'CreatedDate': 1 });
 
 // Create UserGroups collection with validation schema
 db.createCollection('UserGroups', {
   validator: {
     $jsonSchema: {
       bsonType: 'object',
-      required: ['GroupName', 'IsActive', 'CreatedAt'],
+      required: ['GroupName', 'IsActive', 'CreatedDate'],
       properties: {
         _id: {
           bsonType: 'objectId'
@@ -92,11 +102,11 @@ db.createCollection('UserGroups', {
           bsonType: 'bool',
           description: 'IsActive must be a boolean'
         },
-        CreatedAt: {
+        CreatedDate: {
           bsonType: 'date',
-          description: 'CreatedAt must be a date'
+          description: 'CreatedDate must be a date'
         },
-        UpdatedAt: {
+        UpdatedDate: {
           bsonType: ['date', 'null']
         }
       }
@@ -107,14 +117,14 @@ db.createCollection('UserGroups', {
 // Create indexes for UserGroups collection
 db.UserGroups.createIndex({ 'GroupName': 1 }, { unique: true });
 db.UserGroups.createIndex({ 'IsActive': 1 });
-db.UserGroups.createIndex({ 'CreatedAt': 1 });
+db.UserGroups.createIndex({ 'CreatedDate': 1 });
 
 // Create UserGroupMembers collection with validation schema
 db.createCollection('UserGroupMembers', {
   validator: {
     $jsonSchema: {
       bsonType: 'object',
-      required: ['UserId', 'GroupId', 'IsActive', 'JoinedAt'],
+      required: ['UserId', 'GroupId', 'IsActive', 'JoinedDate'],
       properties: {
         _id: {
           bsonType: 'objectId'
@@ -131,11 +141,11 @@ db.createCollection('UserGroupMembers', {
           bsonType: 'bool',
           description: 'IsActive must be a boolean'
         },
-        JoinedAt: {
+        JoinedDate: {
           bsonType: 'date',
-          description: 'JoinedAt must be a date'
+          description: 'JoinedDate must be a date'
         },
-        LeftAt: {
+        LeftDate: {
           bsonType: ['date', 'null']
         }
       }
@@ -148,14 +158,14 @@ db.UserGroupMembers.createIndex({ 'UserId': 1, 'GroupId': 1 }, { unique: true })
 db.UserGroupMembers.createIndex({ 'UserId': 1 });
 db.UserGroupMembers.createIndex({ 'GroupId': 1 });
 db.UserGroupMembers.createIndex({ 'IsActive': 1 });
-db.UserGroupMembers.createIndex({ 'JoinedAt': 1 });
+db.UserGroupMembers.createIndex({ 'JoinedDate': 1 });
 
 // Create Dashboards collection with validation schema
 db.createCollection('Dashboards', {
   validator: {
     $jsonSchema: {
       bsonType: 'object',
-      required: ['Title', 'CreatedBy', 'IsActive', 'CreatedAt'],
+      required: ['Title', 'CreatedBy', 'IsActive', 'CreatedDate'],
       properties: {
         _id: {
           bsonType: 'objectId'
@@ -191,14 +201,14 @@ db.createCollection('Dashboards', {
           bsonType: 'bool',
           description: 'IsActive must be a boolean'
         },
-        CreatedAt: {
+        CreatedDate: {
           bsonType: 'date',
-          description: 'CreatedAt must be a date'
+          description: 'CreatedDate must be a date'
         },
-        UpdatedAt: {
+        UpdatedDate: {
           bsonType: ['date', 'null']
         },
-        LastModifiedAt: {
+        LastModifiedDate: {
           bsonType: ['date', 'null']
         },
         DashboardData: {
@@ -217,15 +227,15 @@ db.Dashboards.createIndex({ 'Category': 1 });
 db.Dashboards.createIndex({ 'Tags': 1 });
 db.Dashboards.createIndex({ 'IsPublic': 1 });
 db.Dashboards.createIndex({ 'IsActive': 1 });
-db.Dashboards.createIndex({ 'CreatedAt': 1 });
-db.Dashboards.createIndex({ 'LastModifiedAt': 1 });
+db.Dashboards.createIndex({ 'CreatedDate': 1 });
+db.Dashboards.createIndex({ 'LastModifiedDate': 1 });
 
 // Create DashboardPermissions collection with validation schema
 db.createCollection('DashboardPermissions', {
   validator: {
     $jsonSchema: {
       bsonType: 'object',
-      required: ['DashboardId', 'PermissionType', 'IsActive', 'GrantedAt'],
+      required: ['DashboardId', 'PermissionType', 'IsActive', 'GrantedDate'],
       properties: {
         _id: {
           bsonType: 'objectId'
@@ -251,11 +261,11 @@ db.createCollection('DashboardPermissions', {
           bsonType: 'bool',
           description: 'IsActive must be a boolean'
         },
-        GrantedAt: {
+        GrantedDate: {
           bsonType: 'date',
-          description: 'GrantedAt must be a date'
+          description: 'GrantedDate must be a date'
         },
-        RevokedAt: {
+        RevokedDate: {
           bsonType: ['date', 'null']
         },
         GrantedBy: {
@@ -274,7 +284,7 @@ db.DashboardPermissions.createIndex({ 'GroupId': 1 });
 db.DashboardPermissions.createIndex({ 'DashboardId': 1, 'UserId': 1, 'PermissionType': 1 });
 db.DashboardPermissions.createIndex({ 'DashboardId': 1, 'GroupId': 1, 'PermissionType': 1 });
 db.DashboardPermissions.createIndex({ 'IsActive': 1 });
-db.DashboardPermissions.createIndex({ 'GrantedAt': 1 });
+db.DashboardPermissions.createIndex({ 'GrantedDate': 1 });
 
 print('MongoDB collections and indexes created successfully!');
 print('Collections created: Users, UserGroups, UserGroupMembers, Dashboards, DashboardPermissions');

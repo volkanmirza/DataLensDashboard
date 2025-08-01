@@ -11,7 +11,6 @@ namespace DataLens.Services.Interfaces
         Task<IEnumerable<User>> GetAllUsersAsync();
         Task<string> CreateUserAsync(User user, string password);
         Task<bool> UpdateUserAsync(User user);
-        Task<bool> UpdateAsync(User user);
         Task<bool> DeleteUserAsync(string id);
         Task<bool> ChangePasswordAsync(string userId, string currentPassword, string newPassword);
         Task<User?> ValidateUserAsync(string username, string password);

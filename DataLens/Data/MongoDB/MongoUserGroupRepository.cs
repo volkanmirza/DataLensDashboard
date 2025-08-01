@@ -92,7 +92,7 @@ namespace DataLens.Data.MongoDB
 
             return await _userCollection
                 .Find(x => memberUserIds.Contains(x.Id))
-                .SortBy(x => x.Username)
+                .SortBy(x => x.UserName)
                 .ToListAsync();
         }
 

@@ -17,24 +17,12 @@ body {
   font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
   font-weight: 400;
   line-height: 1.6;
-  color: #212529;
-  background-color: #f4f6f9;
+  /* Use AdminLTE default colors */
 }
 
-/* Focus Styles */
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #007bff;
-}
+/* Use AdminLTE default focus styles */
 
-/* Form Styles */
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
-}
-
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
-}
+/* Use AdminLTE default form styles */
 
 /* AdminLTE Custom Overrides */
 .main-header {
@@ -45,32 +33,9 @@ body {
   box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
 }
 
-.content-wrapper {
-  background-color: #f4f6f9;
-}
+/* Use AdminLTE default content-wrapper styles */
 
-/* Card Enhancements */
-.card {
-  box-shadow: 0 0 1px rgba(0,0,0,.125), 0 1px 3px rgba(0,0,0,.2);
-  margin-bottom: 1rem;
-  border: 0;
-}
-
-.card-header {
-  background-color: transparent;
-  border-bottom: 1px solid rgba(0,0,0,.125);
-  padding: .75rem 1.25rem;
-  position: relative;
-  border-top-left-radius: .25rem;
-  border-top-right-radius: .25rem;
-}
-
-.card-title {
-  float: left;
-  font-size: 1.1rem;
-  font-weight: 400;
-  margin: 0;
-}
+/* Use AdminLTE default card styles */
 
 /* Small Box Enhancements */
 .small-box {
@@ -156,19 +121,7 @@ body {
   background-color: rgba(255,255,255,.1);
 }
 
-/* Button Enhancements */
-.btn {
-  border-radius: .25rem;
-  font-weight: 400;
-  text-align: center;
-  vertical-align: middle;
-  cursor: pointer;
-  border: 1px solid transparent;
-  padding: .375rem .75rem;
-  font-size: .875rem;
-  line-height: 1.5;
-  transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
-}
+/* Use AdminLTE default button styles */
 
 /* Table Enhancements */
 .table {
@@ -180,42 +133,7 @@ body {
   font-weight: 600;
 }
 
-/* Login Page Styles */
-.login-page {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  min-height: 100vh;
-}
-
-.login-box {
-  width: 360px;
-  margin: 7% auto;
-}
-
-.login-logo {
-  font-size: 2.1rem;
-  font-weight: 300;
-  margin-bottom: 0.9rem;
-  text-align: center;
-}
-
-.login-logo a {
-  color: #495057;
-  text-decoration: none;
-}
-
-.login-card-body {
-  background-color: #fff;
-  border-radius: .25rem;
-  box-shadow: 0 0 1px rgba(0,0,0,.125), 0 1px 3px rgba(0,0,0,.2);
-  color: #666;
-  padding: 20px;
-}
-
-.login-box-msg {
-  margin: 0;
-  text-align: center;
-  padding: 0 20px 20px 20px;
-}
+/* Use AdminLTE default login page styles */
 
 /* Dashboard Specific Styles */
 .dashboard-stats {
@@ -265,17 +183,7 @@ body {
   }
 }
 
-/* Dark Mode Support */
-@media (prefers-color-scheme: dark) {
-  .card {
-    background-color: #343a40;
-    color: #fff;
-  }
-  
-  .card-header {
-    border-bottom-color: #495057;
-  }
-}
+/* Use AdminLTE default light theme colors */
 
 /* Animation Classes */
 .fade-in {
@@ -319,4 +227,63 @@ body {
 
 .shadow-lg {
   box-shadow: 0 1rem 3rem rgba(0,0,0,.175);
+}
+
+/* AdminLTE Light Theme - Use default AdminLTE classes */
+
+/* Logo Styles */
+.brand-link .brand-image {
+  height: 33px;
+  width: auto;
+  max-width: 33px;
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+}
+
+.brand-link:hover .brand-image {
+  opacity: 1;
+}
+
+.login-logo img {
+  max-width: 200px;
+  height: auto;
+  display: block;
+  margin: 0 auto 15px;
+}
+
+.preloader img {
+  max-height: 80px;
+  width: auto;
+  opacity: 0.9;
+}
+
+/* Responsive logo adjustments */
+@media (max-width: 768px) {
+  .brand-link .brand-image {
+    height: 28px;
+    max-width: 28px;
+  }
+  
+  .login-logo img {
+    max-width: 150px;
+  }
+  
+  .preloader img {
+    max-height: 60px;
+  }
+}
+
+@media (max-width: 576px) {
+  .brand-link .brand-image {
+    height: 25px;
+    max-width: 25px;
+  }
+  
+  .login-logo img {
+    max-width: 120px;
+  }
+  
+  .preloader img {
+    max-height: 50px;
+  }
 }

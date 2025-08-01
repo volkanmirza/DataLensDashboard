@@ -1,0 +1,251 @@
+@{
+    ViewData["Title"] = "Dashboard Yönetimi";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">Dashboard Yönetimi</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="#">Ana Sayfa</a></li>
+                        <li class="breadcrumb-item active">Dashboard</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
+            <!-- Info boxes -->
+            <div class="row">
+                <div class="col-12 col-sm-6 col-md-3">
+                    <div class="info-box">
+                        <span class="info-box-icon bg-info elevation-1"><i class="fas fa-users"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Toplam Kullanıcı</span>
+                            <span class="info-box-number" id="totalUsers">0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-3">
+                    <div class="info-box mb-3">
+                        <span class="info-box-icon bg-danger elevation-1"><i class="fas fa-chart-bar"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Toplam Dashboard</span>
+                            <span class="info-box-number" id="totalDashboards">0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-3">
+                    <div class="info-box mb-3">
+                        <span class="info-box-icon bg-success elevation-1"><i class="fas fa-user-friends"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Kullanıcı Grupları</span>
+                            <span class="info-box-number" id="totalUserGroups">0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-3">
+                    <div class="info-box mb-3">
+                        <span class="info-box-icon bg-warning elevation-1"><i class="fas fa-database"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Veri Kaynakları</span>
+                            <span class="info-box-number" id="totalDataSources">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts row -->
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-header border-0">
+                            <div class="d-flex justify-content-between">
+                                <h3 class="card-title">Kullanıcı Aktivitesi</h3>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex">
+                                <p class="d-flex flex-column">
+                                    <span class="text-bold text-lg" id="activeUsersToday">0</span>
+                                    <span>Bugün Aktif Kullanıcı</span>
+                                </p>
+                                <p class="ml-auto d-flex flex-column text-right">
+                                    <span class="text-success" id="userGrowth">
+                                        <i class="fas fa-arrow-up"></i> 0%
+                                    </span>
+                                    <span class="text-muted">Geçen haftaya göre</span>
+                                </p>
+                            </div>
+                            <div class="position-relative mb-4">
+                                <canvas id="userActivityChart" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-header border-0">
+                            <h3 class="card-title">Dashboard Kullanımı</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex">
+                                <p class="d-flex flex-column">
+                                    <span class="text-bold text-lg" id="dashboardViews">0</span>
+                                    <span>Toplam Görüntülenme</span>
+                                </p>
+                                <p class="ml-auto d-flex flex-column text-right">
+                                    <span class="text-success" id="dashboardGrowth">
+                                        <i class="fas fa-arrow-up"></i> 0%
+                                    </span>
+                                    <span class="text-muted">Geçen aya göre</span>
+                                </p>
+                            </div>
+                            <div class="position-relative mb-4">
+                                <canvas id="dashboardUsageChart" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Son Aktiviteler</h3>
+                        </div>
+                        <div class="card-body table-responsive p-0">
+                            <table class="table table-hover text-nowrap">
+                                <thead>
+                                    <tr>
+                                        <th>Kullanıcı</th>
+                                        <th>Aktivite</th>
+                                        <th>Tarih</th>
+                                        <th>Durum</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recentActivities">
+                                    <!-- Activities will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+@section Scripts {
+    <!-- Chart.js -->
+    <script src="~/lib/admin-lte/plugins/chart.js/Chart.min.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            // Load dashboard statistics
+            loadDashboardStats();
+            
+            // Initialize charts
+            initializeCharts();
+            
+            // Load recent activities
+            loadRecentActivities();
+        });
+
+        function loadDashboardStats() {
+            // Mock data - replace with actual API calls
+            $('#totalUsers').text('150');
+            $('#totalDashboards').text('25');
+            $('#totalUserGroups').text('8');
+            $('#totalDataSources').text('12');
+            $('#activeUsersToday').text('45');
+            $('#dashboardViews').text('1,250');
+        }
+
+        function initializeCharts() {
+            // User Activity Chart
+            var userActivityCtx = document.getElementById('userActivityChart').getContext('2d');
+            var userActivityChart = new Chart(userActivityCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'],
+                    datasets: [{
+                        label: 'Aktif Kullanıcılar',
+                        data: [12, 19, 15, 25, 22, 18, 20],
+                        borderColor: 'rgb(75, 192, 192)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Dashboard Usage Chart
+            var dashboardUsageCtx = document.getElementById('dashboardUsageChart').getContext('2d');
+            var dashboardUsageChart = new Chart(dashboardUsageCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran'],
+                    datasets: [{
+                        label: 'Dashboard Görüntülenme',
+                        data: [65, 59, 80, 81, 56, 95],
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function loadRecentActivities() {
+            // Mock data - replace with actual API calls
+            var activities = [
+                { user: 'Admin User', activity: 'Yeni dashboard oluşturdu', date: '2 dakika önce', status: 'success' },
+                { user: 'John Doe', activity: 'Kullanıcı profili güncellendi', date: '5 dakika önce', status: 'info' },
+                { user: 'Jane Smith', activity: 'Dashboard görüntülendi', date: '10 dakika önce', status: 'primary' },
+                { user: 'Mike Johnson', activity: 'Veri kaynağı eklendi', date: '15 dakika önce', status: 'warning' }
+            ];
+
+            var html = '';
+            activities.forEach(function(activity) {
+                html += '<tr>';
+                html += '<td>' + activity.user + '</td>';
+                html += '<td>' + activity.activity + '</td>';
+                html += '<td>' + activity.date + '</td>';
+                html += '<td><span class="badge badge-' + activity.status + '">Tamamlandı</span></td>';
+                html += '</tr>';
+            });
+
+            $('#recentActivities').html(html);
+        }
+    </script>
+}

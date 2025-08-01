@@ -69,7 +69,7 @@ namespace DataLens.Data.MongoDB
         public async Task<bool> UpdateLastModifiedAsync(string dashboardId, string modifiedBy)
         {
             var update = Builders<Dashboard>.Update
-                .Set(d => d.LastModifiedAt, DateTime.UtcNow)
+                .Set(d => d.LastModifiedDate, DateTime.UtcNow)
                 .Set(d => d.CreatedBy, modifiedBy); // Using CreatedBy as ModifiedBy for now
             
             var result = await _collection.UpdateOneAsync(d => d.Id == dashboardId, update);
@@ -150,7 +150,7 @@ namespace DataLens.Data.MongoDB
 
         public async Task<bool> UpdateAsync(Dashboard dashboard)
         {
-            dashboard.LastModifiedAt = DateTime.UtcNow;
+            dashboard.LastModifiedDate = DateTime.UtcNow;
             var result = await _collection.ReplaceOneAsync(d => d.Id == dashboard.Id, dashboard);
             return result.ModifiedCount > 0;
         }

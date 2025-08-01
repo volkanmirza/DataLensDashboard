@@ -224,5 +224,6 @@ namespace DataLens.Data.SqlServer
                 _disposed = true;
             }
         }
+        public string DatabaseType => "SqlServer";
     }
 }

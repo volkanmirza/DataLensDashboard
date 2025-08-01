@@ -1,23 +1,26 @@
-using DataLens.Data.Interfaces;
 using DataLens.Models;
-using DataLens.Services;
-using DataLens.Services.Interfaces;
+using DataLens.Identity;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Cryptography;
-using System.Text;
+using System.Security.Claims;
 
 namespace DataLens.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly IUserService _userService;
-        private readonly IJwtService _jwtService;
+        private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
+        private readonly RoleManager<MongoRole> _roleManager;
 
-        public AccountController(IUserService userService, IJwtService jwtService)
+        public AccountController(
+            UserManager<User> userManager,
+            SignInManager<User> signInManager,
+            RoleManager<MongoRole> roleManager)
         {
-            _userService = userService;
-            _jwtService = jwtService;
+            _userManager = userManager;
+            _signInManager = signInManager;
+            _roleManager = roleManager;
         }
 
         [HttpGet]
@@ -27,7 +30,8 @@ namespace DataLens.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(string username, string password)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(string username, string password, bool rememberMe = false)
         {
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             {
@@ -35,32 +39,52 @@ namespace DataLens.Controllers
                 return View();
             }
 
-            var user = await _userService.ValidateUserAsync(username, password);
-            if (user == null)
+            // Find user by username or email
+            var user = await _userManager.FindByNameAsync(username) ?? await _userManager.FindByEmailAsync(username);
+            
+            if (user == null || !user.IsActive)
             {
                 ViewBag.Error = "Geçersiz kullanıcı adı veya şifre.";
                 return View();
             }
 
-            // Generate JWT token
-            var token = _jwtService.GenerateToken(user);
-
-            // Store token in cookie for web app usage
-            Response.Cookies.Append("jwt_token", token, new CookieOptions
+            var result = await _signInManager.PasswordSignInAsync(user, password, rememberMe, lockoutOnFailure: true);
+            
+            if (result.Succeeded)
             {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTime.UtcNow.AddMinutes(60)
-            });
+                // Update last login date
+                user.LastLoginDate = DateTime.UtcNow;
+                await _userManager.UpdateAsync(user);
 
-            // For API usage, return token in response
-            if (Request.Headers.Accept.ToString().Contains("application/json"))
+                // For API usage, return JSON response
+                if (Request.Headers.Accept.ToString().Contains("application/json"))
+                {
+                    return Json(new { 
+                        success = true, 
+                        user = new { 
+                            user.Id, 
+                            user.UserName, 
+                            user.Email, 
+                            user.Role,
+                            user.FirstName,
+                            user.LastName
+                        } 
+                    });
+                }
+
+                return RedirectToAction("Index", "Home");
+            }
+            
+            if (result.IsLockedOut)
             {
-                return Json(new { success = true, token = token, user = new { user.Id, user.Username, user.Email, user.Role } });
+                ViewBag.Error = "Hesabınız geçici olarak kilitlenmiştir. Lütfen daha sonra tekrar deneyin.";
+            }
+            else
+            {
+                ViewBag.Error = "Geçersiz kullanıcı adı veya şifre.";
             }
 
-            return RedirectToAction("Index", "Home");
+            return View();
         }
 
         [HttpPost]
@@ -72,48 +96,57 @@ namespace DataLens.Controllers
                 return BadRequest(new { error = "Kullanıcı adı ve şifre gereklidir." });
             }
 
-            var user = await _userService.ValidateUserAsync(request.Username, request.Password);
-            if (user == null)
+            var user = await _userManager.FindByNameAsync(request.Username) ?? await _userManager.FindByEmailAsync(request.Username);
+            
+            if (user == null || !user.IsActive)
             {
                 return Unauthorized(new { error = "Geçersiz kullanıcı adı veya şifre." });
             }
 
-            if (!user.IsActive)
+            var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, lockoutOnFailure: true);
+            
+            if (!result.Succeeded)
             {
-                return Unauthorized(new { error = "Hesabınız aktif değil." });
+                if (result.IsLockedOut)
+                {
+                    return Unauthorized(new { error = "Hesabınız geçici olarak kilitlenmiştir." });
+                }
+                return Unauthorized(new { error = "Geçersiz kullanıcı adı veya şifre." });
             }
 
-            var token = _jwtService.GenerateToken(user);
+            // Update last login date
+            user.LastLoginDate = DateTime.UtcNow;
+            await _userManager.UpdateAsync(user);
 
             return Ok(new
             {
-                token = token,
+                success = true,
                 user = new
                 {
                     user.Id,
-                    user.Username,
+                    user.UserName,
                     user.Email,
                     user.Role,
                     user.FirstName,
                     user.LastName
-                },
-                expiresAt = DateTime.UtcNow.AddMinutes(60)
+                }
             });
         }
 
         [HttpPost]
-        public IActionResult Logout()
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Logout()
         {
-            Response.Cookies.Delete("jwt_token");
+            await _signInManager.SignOutAsync();
             return RedirectToAction("Login");
         }
 
         [HttpPost]
         [Route("api/auth/logout")]
         [Authorize]
-        public IActionResult ApiLogout()
+        public async Task<IActionResult> ApiLogout()
         {
-            // For JWT, logout is handled client-side by removing the token
+            await _signInManager.SignOutAsync();
             return Ok(new { message = "Başarıyla çıkış yapıldı." });
         }
 
@@ -125,131 +158,69 @@ namespace DataLens.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(User user, string password, string confirmPassword)
+        public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            if (string.IsNullOrEmpty(password) || password != confirmPassword)
-            {
-                ModelState.AddModelError("", "Şifre ve şifre onayı eşleşmiyor.");
-                return View(user);
-            }
-
-            if (password.Length < 6)
-            {
-                ModelState.AddModelError("", "Şifre en az 6 karakter olmalıdır.");
-                return View(user);
-            }
-
-            // Set default role for registration
-            user.Role = "Viewer";
-
             if (ModelState.IsValid)
             {
-                try
+                var user = new User
                 {
-                    var userId = await _userService.CreateUserAsync(user, password);
+                    UserName = model.UserName,
+                    Email = model.Email,
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    Role = "Viewer",
+                    CreatedDate = DateTime.UtcNow,
+                    IsActive = true
+                };
+
+                var result = await _userManager.CreateAsync(user, model.Password);
+                
+                if (result.Succeeded)
+                {
+                    // Ensure Viewer role exists
+                    if (!await _roleManager.RoleExistsAsync("Viewer"))
+                    {
+                        await _roleManager.CreateAsync(new MongoRole("Viewer"));
+                    }
+                    
+                    // Add user to Viewer role
+                    await _userManager.AddToRoleAsync(user, "Viewer");
+                    
                     TempData["Success"] = "Hesabınız başarıyla oluşturuldu. Giriş yapabilirsiniz.";
                     return RedirectToAction(nameof(Login));
                 }
-                catch (InvalidOperationException ex)
+                
+                foreach (var error in result.Errors)
                 {
-                    ModelState.AddModelError("", ex.Message);
-                }
-                catch (Exception ex)
-                {
-                    ModelState.AddModelError("", "Hesap oluşturulurken bir hata oluştu.");
+                    ModelState.AddModelError("", error.Description);
                 }
             }
 
-            return View(user);
+            return View(model);
         }
 
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> Profile()
+        public IActionResult Profile()
         {
-            try
-            {
-                var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                if (string.IsNullOrEmpty(userId))
-                {
-                    return RedirectToAction(nameof(Login));
-                }
-
-                var user = await _userService.GetUserByIdAsync(userId);
-                if (user == null)
-                {
-                    return RedirectToAction(nameof(Login));
-                }
-
-                return View(user);
-            }
-            catch (Exception ex)
-            {
-                TempData["Error"] = "Profil bilgileri yüklenirken bir hata oluştu.";
-                return RedirectToAction("Index", "Home");
-            }
+            // Redirect to Profile area Dashboard
+            return RedirectToAction("Dashboard", "Profile", new { area = "Profile" });
         }
 
         [HttpPost]
         [Authorize]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Profile(User user)
+        public IActionResult Profile(User model)
         {
-            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId) || userId != user.Id)
-            {
-                return RedirectToAction(nameof(Login));
-            }
-
-            // Preserve certain fields that shouldn't be changed via profile
-            var existingUser = await _userService.GetUserByIdAsync(userId);
-            if (existingUser != null)
-            {
-                user.Role = existingUser.Role;
-                user.CreatedDate = existingUser.CreatedDate;
-                user.PasswordHash = existingUser.PasswordHash;
-                user.IsActive = existingUser.IsActive;
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    var result = await _userService.UpdateUserAsync(user);
-                    if (result)
-                    {
-                        TempData["Success"] = "Profil bilgileriniz başarıyla güncellendi.";
-                        return RedirectToAction(nameof(Profile));
-                    }
-                    else
-                    {
-                        ModelState.AddModelError("", "Profil güncellenemedi.");
-                    }
-                }
-                catch (InvalidOperationException ex)
-                {
-                    ModelState.AddModelError("", ex.Message);
-                }
-                catch (Exception ex)
-                {
-                    ModelState.AddModelError("", "Profil güncellenirken bir hata oluştu.");
-                }
-            }
-
-            return View(user);
+            // Redirect to Profile area Dashboard
+            return RedirectToAction("Dashboard", "Profile", new { area = "Profile" });
         }
 
         [HttpGet]
         [Authorize]
         public async Task<IActionResult> ChangePassword()
         {
-            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
-            {
-                return RedirectToAction(nameof(Login));
-            }
-
-            var user = await _userService.GetUserByIdAsync(userId);
+            var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
                 return RedirectToAction(nameof(Login));
@@ -264,8 +235,8 @@ namespace DataLens.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ChangePassword(string currentPassword, string newPassword, string confirmPassword)
         {
-            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
             {
                 return RedirectToAction(nameof(Login));
             }
@@ -275,29 +246,26 @@ namespace DataLens.Controllers
                 ModelState.AddModelError("", "Yeni şifre ve şifre onayı eşleşmiyor.");
             }
 
-            if (newPassword?.Length < 6)
-            {
-                ModelState.AddModelError("", "Şifre en az 6 karakter olmalıdır.");
-            }
-
             if (ModelState.IsValid)
             {
                 try
                 {
-                    var result = await _userService.ChangePasswordAsync(userId!, currentPassword, newPassword);
-                    if (result)
+                    var result = await _userManager.ChangePasswordAsync(user, currentPassword, newPassword);
+                    if (result.Succeeded)
                     {
+                        // Sign in the user again to refresh the security stamp
+                        await _signInManager.RefreshSignInAsync(user);
+                        
                         TempData["Success"] = "Şifreniz başarıyla değiştirildi.";
                         return RedirectToAction(nameof(Profile));
                     }
                     else
                     {
-                        ModelState.AddModelError("", "Şifre değiştirilemedi.");
+                        foreach (var error in result.Errors)
+                        {
+                            ModelState.AddModelError("", error.Description);
+                        }
                     }
-                }
-                catch (InvalidOperationException ex)
-                {
-                    ModelState.AddModelError("", ex.Message);
                 }
                 catch (Exception)
                 {
@@ -305,7 +273,6 @@ namespace DataLens.Controllers
                 }
             }
 
-            var user = await _userService.GetUserByIdAsync(userId);
             ViewBag.User = user;
             return View();
         }
@@ -319,32 +286,27 @@ namespace DataLens.Controllers
         [HttpGet]
         [Route("api/auth/validate")]
         [Authorize]
-        public IActionResult ValidateToken()
+        public async Task<IActionResult> ValidateToken()
         {
-            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            var username = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value;
-            var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return Unauthorized();
+            }
 
             return Ok(new
             {
                 valid = true,
                 user = new
                 {
-                    id = userId,
-                    username = username,
-                    role = role
+                    id = user.Id,
+                    username = user.UserName,
+                    email = user.Email,
+                    role = user.Role,
+                    firstName = user.FirstName,
+                    lastName = user.LastName
                 }
             });
-        }
-
-        private bool VerifyPassword(string password, string hash)
-        {
-            using (var sha256 = SHA256.Create())
-            {
-                var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-                var hashedPassword = Convert.ToBase64String(hashedBytes);
-                return hashedPassword == hash;
-            }
         }
     }
 

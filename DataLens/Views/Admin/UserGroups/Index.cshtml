@@ -1,0 +1,262 @@
+@{
+    ViewData["Title"] = "Kullanıcı Grupları";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">Kullanıcı Grupları</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="#">Ana Sayfa</a></li>
+                        <li class="breadcrumb-item active">Kullanıcı Grupları</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Kullanıcı Grupları Listesi</h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addGroupModal">
+                                    <i class="fas fa-plus"></i> Yeni Grup
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <table id="userGroupsTable" class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Grup Adı</th>
+                                        <th>Açıklama</th>
+                                        <th>Kullanıcı Sayısı</th>
+                                        <th>Yetkiler</th>
+                                        <th>Durum</th>
+                                        <th>Oluşturulma Tarihi</th>
+                                        <th>İşlemler</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- DataTables will populate this -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- Add Group Modal -->
+<div class="modal fade" id="addGroupModal" tabindex="-1" role="dialog" aria-labelledby="addGroupModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addGroupModalLabel">Yeni Kullanıcı Grubu</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addGroupForm">
+                    <div class="form-group">
+                        <label for="groupName">Grup Adı</label>
+                        <input type="text" class="form-control" id="groupName" name="groupName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="groupDescription">Açıklama</label>
+                        <textarea class="form-control" id="groupDescription" name="groupDescription" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Yetkiler</label>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="permissionRead" name="permissions" value="read">
+                                    <label class="form-check-label" for="permissionRead">
+                                        Okuma Yetkisi
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="permissionWrite" name="permissions" value="write">
+                                    <label class="form-check-label" for="permissionWrite">
+                                        Yazma Yetkisi
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="permissionDelete" name="permissions" value="delete">
+                                    <label class="form-check-label" for="permissionDelete">
+                                        Silme Yetkisi
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="permissionAdmin" name="permissions" value="admin">
+                                    <label class="form-check-label" for="permissionAdmin">
+                                        Yönetici Yetkisi
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="permissionDashboard" name="permissions" value="dashboard">
+                                    <label class="form-check-label" for="permissionDashboard">
+                                        Dashboard Yönetimi
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="permissionUser" name="permissions" value="user">
+                                    <label class="form-check-label" for="permissionUser">
+                                        Kullanıcı Yönetimi
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="isActive" name="isActive" checked>
+                            <label class="form-check-label" for="isActive">
+                                Aktif
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="saveGroupBtn">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- DataTables -->
+    <link rel="stylesheet" href="~/lib/admin-lte/plugins/datatables/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="~/lib/admin-lte/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="~/lib/admin-lte/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+    <link rel="stylesheet" href="~/lib/admin-lte/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
+
+    <script src="~/lib/admin-lte/plugins/datatables/js/jquery.dataTables.min.js"></script>
+    <script src="~/lib/admin-lte/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="~/lib/admin-lte/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/lib/admin-lte/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+    <script src="~/lib/admin-lte/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="~/lib/admin-lte/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Initialize DataTable
+            $('#userGroupsTable').DataTable({
+                "processing": true,
+                "serverSide": true,
+                "ajax": {
+                    "url": "@Url.Action("GetUserGroups", "UserGroups")",
+                    "type": "POST"
+                },
+                "columns": [
+                    { "data": "id" },
+                    { "data": "groupName" },
+                    { "data": "description" },
+                    { "data": "userCount" },
+                    { 
+                        "data": "permissions",
+                        "render": function(data, type, row) {
+                            if (data && data.length > 0) {
+                                return data.map(function(permission) {
+                                    return '<span class="badge badge-info mr-1">' + permission + '</span>';
+                                }).join('');
+                            }
+                            return '<span class="text-muted">Yetki yok</span>';
+                        }
+                    },
+                    { 
+                        "data": "isActive",
+                        "render": function(data, type, row) {
+                            return data ? '<span class="badge badge-success">Aktif</span>' : '<span class="badge badge-danger">Pasif</span>';
+                        }
+                    },
+                    { 
+                        "data": "createdDate",
+                        "render": function(data, type, row) {
+                            return new Date(data).toLocaleDateString('tr-TR');
+                        }
+                    },
+                    {
+                        "data": null,
+                        "orderable": false,
+                        "render": function(data, type, row) {
+                            return '<button class="btn btn-sm btn-info edit-group" data-id="' + row.id + '"><i class="fas fa-edit"></i></button> ' +
+                                   '<button class="btn btn-sm btn-warning manage-users" data-id="' + row.id + '"><i class="fas fa-users"></i></button> ' +
+                                   '<button class="btn btn-sm btn-danger delete-group" data-id="' + row.id + '"><i class="fas fa-trash"></i></button>';
+                        }
+                    }
+                ],
+                "responsive": true,
+                "lengthChange": false,
+                "autoWidth": false,
+                "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"],
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Turkish.json"
+                }
+            }).buttons().container().appendTo('#userGroupsTable_wrapper .col-md-6:eq(0)');
+
+            // Save group button click
+            $('#saveGroupBtn').click(function() {
+                var formData = {
+                    groupName: $('#groupName').val(),
+                    description: $('#groupDescription').val(),
+                    permissions: $('input[name="permissions"]:checked').map(function() {
+                        return this.value;
+                    }).get(),
+                    isActive: $('#isActive').is(':checked')
+                };
+
+                // Here you would make an AJAX call to save the group
+                console.log('Saving group:', formData);
+                
+                // Close modal and refresh table
+                $('#addGroupModal').modal('hide');
+                $('#userGroupsTable').DataTable().ajax.reload();
+            });
+
+            // Edit group button click
+            $(document).on('click', '.edit-group', function() {
+                var groupId = $(this).data('id');
+                // Load group data and show edit modal
+                console.log('Edit group:', groupId);
+            });
+
+            // Manage users button click
+            $(document).on('click', '.manage-users', function() {
+                var groupId = $(this).data('id');
+                // Show user management modal for this group
+                console.log('Manage users for group:', groupId);
+            });
+
+            // Delete group button click
+            $(document).on('click', '.delete-group', function() {
+                var groupId = $(this).data('id');
+                if (confirm('Bu grubu silmek istediğinizden emin misiniz?')) {
+                    // Make AJAX call to delete group
+                    console.log('Delete group:', groupId);
+                    $('#userGroupsTable').DataTable().ajax.reload();
+                }
+            });
+        });
+    </script>
+}

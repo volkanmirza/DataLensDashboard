@@ -131,52 +131,20 @@ namespace DataLens.Data.MongoDB
 
         public async Task BeginTransactionAsync()
         {
-            if (_session != null)
-                throw new InvalidOperationException("Transaction already started");
-
-            var client = _database.Client;
-            _session = await client.StartSessionAsync();
-            _session.StartTransaction();
-            _transactionStarted = true;
+            // MongoDB için transaction yok, no-op
+            await Task.CompletedTask;
         }
 
         public async Task CommitAsync()
         {
-            if (_session == null || !_transactionStarted)
-                throw new InvalidOperationException("No transaction to commit");
-
-            try
-            {
-                await _session.CommitTransactionAsync();
-            }
-            catch
-            {
-                await RollbackAsync();
-                throw;
-            }
-            finally
-            {
-                _session.Dispose();
-                _session = null;
-                _transactionStarted = false;
-            }
+            // MongoDB için transaction yok, no-op
+            await Task.CompletedTask;
         }
 
         public async Task RollbackAsync()
         {
-            if (_session == null || !_transactionStarted)
-                return;
-
-            try
-            {
-                await _session.AbortTransactionAsync();
-            }
-            finally
-            {
-                _session.Dispose();
-                _session = null;
-                _transactionStarted = false;
-            }
+            // MongoDB için transaction yok, no-op
+            await Task.CompletedTask;
         }
 
         public async Task<int> SaveChangesAsync()
@@ -237,5 +205,6 @@ namespace DataLens.Data.MongoDB
                 _disposed = true;
             }
         }
+        public string DatabaseType => "MongoDB";
     }
 }

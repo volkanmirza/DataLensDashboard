@@ -38,17 +38,19 @@ public bool IsActive { get; set; } = true;
 - FullName (computed property)
 - CreatedDate, UpdatedAt, IsActive
 
-#### Dashboard Model
+#### Dashboard Model ✅
 - Name (required, max 200 char)
 - Title (required, max 200 char)
 - Description (optional, max 1000 char)
 - DashboardData (required, JSON string)
 - CreatedBy (required, User ID reference)
+- UpdatedBy (optional, User ID reference) ✅
+- Content (optional, string) ✅
 - Category (default: "General", max 50 char)
 - Tags (List<string>)
 - IsPublic (default: false)
 - ViewCount (default: 0)
-- CreatedDate, LastModifiedDate, IsActive
+- CreatedDate, LastModifiedDate, UpdatedDate ✅, IsActive
 
 #### UserGroup Model
 - GroupName (unique, required, max 100 char)
@@ -90,37 +92,82 @@ public bool IsActive { get; set; } = true;
 - PushNotifications (default: true)
 - UpdatedAt
 
-### 5. Naming Conventions
+### 5. ViewModel Sınıfları ✅
+
+#### NotificationViewModel ✅
+- Id (string)
+- Title (required, max 200 char)
+- Message (required, max 1000 char)
+- Type (Info/Warning/Error/Success)
+- IsRead (default: false)
+- CreatedDate
+- ReadAt (nullable)
+
+#### UserSettingsViewModel ✅
+- Language (default: "tr-TR")
+- Theme (default: "light")
+- TimeZone (default: "Europe/Istanbul")
+- EmailNotifications (default: true)
+- PushNotifications (default: true)
+- SmsNotifications (default: false)
+- TwoFactorEnabled (default: false)
+
+#### ChangePasswordViewModel ✅
+- CurrentPassword (required, DataType.Password)
+- NewPassword (required, DataType.Password, StringLength(100, MinimumLength = 6))
+- ConfirmNewPassword (required, DataType.Password, Compare("NewPassword"))
+
+#### DashboardPermissionViewModel ✅
+- DashboardId (string)
+- DashboardTitle (string)
+- UserPermissions (List<UserItem>)
+- GroupPermissions (List<GroupItem>)
+
+##### UserItem (Helper Class) ✅
+- UserId (string)
+- Username (string)
+- FirstName (string)
+- LastName (string)
+- Email (string)
+- PermissionType (string)
+
+##### GroupItem (Helper Class) ✅
+- GroupId (string)
+- GroupName (string)
+- Description (string)
+- PermissionType (string)
+
+### 6. Naming Conventions
 - PascalCase for class names
 - PascalCase for property names
 - Descriptive and meaningful names
 - Avoid abbreviations
 - Use singular nouns for class names
 
-### 6. Property Guidelines
+### 7. Property Guidelines
 - Use nullable types for optional fields
 - Provide default values where appropriate
 - Use computed properties for derived data
 - Keep models focused and cohesive
 
-### 7. Relationships
+### 8. Relationships
 - Use string IDs for references (MongoDB ObjectId)
 - Avoid circular references
 - Use navigation properties sparingly
 - Implement foreign key constraints in repositories
 
-### 8. Data Annotations
+### 9. Data Annotations
 - Use System.ComponentModel.DataAnnotations
 - Combine with MongoDB.Bson.Serialization.Attributes
 - Ensure compatibility with both SQL and NoSQL
 
-### 9. Model Validation
+### 10. Model Validation
 - Client-side validation with data annotations
 - Server-side validation in controllers
 - Business rule validation in services
 - Database constraint validation in repositories
 
-### 10. Serialization
+### 11. Serialization
 - JSON serialization for API responses
 - BSON serialization for MongoDB
 - Handle DateTime serialization properly

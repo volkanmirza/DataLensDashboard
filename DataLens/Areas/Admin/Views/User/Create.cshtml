@@ -1,0 +1,343 @@
+@model DataLens.Models.User
+
+@{
+    ViewData["Title"] = "Yeni Kullanıcı Oluştur";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@section Styles {
+    <!-- Select2 -->
+    <link rel="stylesheet" href="~/lib/admin-lte/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="~/lib/admin-lte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+    <!-- iCheck for checkboxes and radio inputs -->
+    <link rel="stylesheet" href="~/lib/admin-lte/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+}
+
+@section Breadcrumb {
+    <li class="breadcrumb-item"><a href="@Url.Action("Index", "User", new { area = "Admin" })">Kullanıcılar</a></li>
+    <li class="breadcrumb-item active">Yeni Kullanıcı</li>
+}
+
+<div class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-8">
+                <!-- User Information Card -->
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">Kullanıcı Bilgileri</h3>
+                    </div>
+                    <form asp-action="Create" method="post" id="createUserForm">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="Username" class="form-label">Kullanıcı Adı <span class="text-danger">*</span></label>
+                                        <input asp-for="Username" class="form-control" placeholder="Kullanıcı adını giriniz" />
+                                        <span asp-validation-for="Username" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="Email" class="form-label">E-posta <span class="text-danger">*</span></label>
+                                        <input asp-for="Email" type="email" class="form-control" placeholder="E-posta adresini giriniz" />
+                                        <span asp-validation-for="Email" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="Password" class="form-label">Şifre <span class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <input type="password" id="Password" name="Password" class="form-control" placeholder="Şifreyi giriniz" />
+                                            <div class="input-group-append">
+                                                <button type="button" class="btn btn-outline-secondary" id="togglePassword">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <span class="text-danger" id="passwordError"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="ConfirmPassword" class="form-label">Şifre Tekrar <span class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <input type="password" id="ConfirmPassword" name="ConfirmPassword" class="form-control" placeholder="Şifreyi tekrar giriniz" />
+                                            <div class="input-group-append">
+                                                <button type="button" class="btn btn-outline-secondary" id="toggleConfirmPassword">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <span class="text-danger" id="confirmPasswordError"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="Role" class="form-label">Rol <span class="text-danger">*</span></label>
+                                        <select asp-for="Role" class="form-control select2" style="width: 100%;">
+                                            <option value="">Rol seçiniz</option>
+                                            <option value="Viewer">Viewer - Sadece Görüntüleme</option>
+                                            <option value="Designer">Designer - Dashboard Tasarımı</option>
+                                            <option value="Admin">Admin - Tam Yetki</option>
+                                        </select>
+                                        <span asp-validation-for="Role" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Durum</label>
+                                        <div class="icheck-primary">
+                                            <input type="checkbox" asp-for="IsActive" id="IsActive" checked />
+                                            <label for="IsActive">Aktif Kullanıcı</label>
+                                        </div>
+                                        <small class="form-text text-muted">Kullanıcının sisteme giriş yapabilmesi için aktif olması gerekir.</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="FirstName" class="form-label">Ad</label>
+                                <input type="text" id="FirstName" name="FirstName" class="form-control" placeholder="Adını giriniz" />
+                            </div>
+
+                            <div class="form-group">
+                                <label for="LastName" class="form-label">Soyad</label>
+                                <input type="text" id="LastName" name="LastName" class="form-control" placeholder="Soyadını giriniz" />
+                            </div>
+
+                            <div class="form-group">
+                                <label for="Phone" class="form-label">Telefon</label>
+                                <input type="tel" id="Phone" name="Phone" class="form-control" placeholder="Telefon numarasını giriniz" />
+                            </div>
+
+                            <div class="form-group">
+                                <label for="Department" class="form-label">Departman</label>
+                                <input type="text" id="Department" name="Department" class="form-control" placeholder="Departmanını giriniz" />
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Kullanıcı Oluştur
+                            </button>
+                            <a href="@Url.Action("Index", "Users", new { area = "Admin" })" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> İptal
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <!-- Help Card -->
+                <div class="card card-info">
+                    <div class="card-header">
+                        <h3 class="card-title">Yardım</h3>
+                    </div>
+                    <div class="card-body">
+                        <h6><i class="fas fa-info-circle"></i> Kullanıcı Rolleri</h6>
+                        <ul class="list-unstyled">
+                            <li><strong>Viewer:</strong> Sadece atanmış dashboardları görüntüleyebilir</li>
+                            <li><strong>Designer:</strong> Dashboard oluşturabilir ve düzenleyebilir</li>
+                            <li><strong>Admin:</strong> Tüm sistem yönetimi yetkilerine sahiptir</li>
+                        </ul>
+
+                        <h6><i class="fas fa-lock"></i> Şifre Gereksinimleri</h6>
+                        <ul class="list-unstyled">
+                            <li>• En az 8 karakter</li>
+                            <li>• En az 1 büyük harf</li>
+                            <li>• En az 1 küçük harf</li>
+                            <li>• En az 1 rakam</li>
+                            <li>• En az 1 özel karakter</li>
+                        </ul>
+
+                        <h6><i class="fas fa-exclamation-triangle"></i> Önemli Notlar</h6>
+                        <ul class="list-unstyled">
+                            <li>• Kullanıcı adı benzersiz olmalıdır</li>
+                            <li>• E-posta adresi geçerli olmalıdır</li>
+                            <li>• Pasif kullanıcılar sisteme giriş yapamaz</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Password Strength Card -->
+                <div class="card card-warning">
+                    <div class="card-header">
+                        <h3 class="card-title">Şifre Güvenliği</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="progress mb-2">
+                            <div class="progress-bar" id="passwordStrength" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <small id="passwordStrengthText" class="text-muted">Şifre gücü: Zayıf</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- Select2 -->
+    <script src="~/lib/admin-lte/plugins/select2/js/select2.full.min.js"></script>
+    <!-- jquery-validation -->
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+    <script>
+        $(function () {
+            // Initialize Select2
+            $('.select2').select2({
+                theme: 'bootstrap4'
+            });
+
+            // Password visibility toggle
+            $('#togglePassword').click(function () {
+                var passwordField = $('#Password');
+                var icon = $(this).find('i');
+                if (passwordField.attr('type') === 'password') {
+                    passwordField.attr('type', 'text');
+                    icon.removeClass('fa-eye').addClass('fa-eye-slash');
+                } else {
+                    passwordField.attr('type', 'password');
+                    icon.removeClass('fa-eye-slash').addClass('fa-eye');
+                }
+            });
+
+            $('#toggleConfirmPassword').click(function () {
+                var passwordField = $('#ConfirmPassword');
+                var icon = $(this).find('i');
+                if (passwordField.attr('type') === 'password') {
+                    passwordField.attr('type', 'text');
+                    icon.removeClass('fa-eye').addClass('fa-eye-slash');
+                } else {
+                    passwordField.attr('type', 'password');
+                    icon.removeClass('fa-eye-slash').addClass('fa-eye');
+                }
+            });
+
+            // Password strength checker
+            $('#Password').on('input', function () {
+                var password = $(this).val();
+                var strength = checkPasswordStrength(password);
+                updatePasswordStrengthUI(strength);
+            });
+
+            // Form validation
+            $('#createUserForm').validate({
+                rules: {
+                    Username: {
+                        required: true,
+                        minlength: 3,
+                        maxlength: 50
+                    },
+                    Email: {
+                        required: true,
+                        email: true
+                    },
+                    Password: {
+                        required: true,
+                        minlength: 8
+                    },
+                    ConfirmPassword: {
+                        required: true,
+                        equalTo: "#Password"
+                    },
+                    Role: {
+                        required: true
+                    }
+                },
+                messages: {
+                    Username: {
+                        required: "Kullanıcı adı gereklidir",
+                        minlength: "Kullanıcı adı en az 3 karakter olmalıdır",
+                        maxlength: "Kullanıcı adı en fazla 50 karakter olabilir"
+                    },
+                    Email: {
+                        required: "E-posta adresi gereklidir",
+                        email: "Geçerli bir e-posta adresi giriniz"
+                    },
+                    Password: {
+                        required: "Şifre gereklidir",
+                        minlength: "Şifre en az 8 karakter olmalıdır"
+                    },
+                    ConfirmPassword: {
+                        required: "Şifre tekrarı gereklidir",
+                        equalTo: "Şifreler eşleşmiyor"
+                    },
+                    Role: {
+                        required: "Rol seçimi gereklidir"
+                    }
+                },
+                errorElement: 'span',
+                errorPlacement: function (error, element) {
+                    error.addClass('text-danger');
+                    if (element.attr('name') === 'Password') {
+                        error.insertAfter('#passwordError');
+                    } else if (element.attr('name') === 'ConfirmPassword') {
+                        error.insertAfter('#confirmPasswordError');
+                    } else {
+                        error.insertAfter(element);
+                    }
+                },
+                highlight: function (element, errorClass, validClass) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function (element, errorClass, validClass) {
+                    $(element).removeClass('is-invalid');
+                }
+            });
+        });
+
+        function checkPasswordStrength(password) {
+            var strength = 0;
+            var checks = {
+                length: password.length >= 8,
+                lowercase: /[a-z]/.test(password),
+                uppercase: /[A-Z]/.test(password),
+                number: /[0-9]/.test(password),
+                special: /[^A-Za-z0-9]/.test(password)
+            };
+
+            for (var check in checks) {
+                if (checks[check]) strength += 20;
+            }
+
+            return {
+                score: strength,
+                checks: checks
+            };
+        }
+
+        function updatePasswordStrengthUI(strength) {
+            var progressBar = $('#passwordStrength');
+            var strengthText = $('#passwordStrengthText');
+            var score = strength.score;
+
+            progressBar.css('width', score + '%').attr('aria-valuenow', score);
+
+            if (score < 40) {
+                progressBar.removeClass().addClass('progress-bar bg-danger');
+                strengthText.text('Şifre gücü: Çok Zayıf');
+            } else if (score < 60) {
+                progressBar.removeClass().addClass('progress-bar bg-warning');
+                strengthText.text('Şifre gücü: Zayıf');
+            } else if (score < 80) {
+                progressBar.removeClass().addClass('progress-bar bg-info');
+                strengthText.text('Şifre gücü: Orta');
+            } else if (score < 100) {
+                progressBar.removeClass().addClass('progress-bar bg-primary');
+                strengthText.text('Şifre gücü: Güçlü');
+            } else {
+                progressBar.removeClass().addClass('progress-bar bg-success');
+                strengthText.text('Şifre gücü: Çok Güçlü');
+            }
+        }
+    </script>
+}

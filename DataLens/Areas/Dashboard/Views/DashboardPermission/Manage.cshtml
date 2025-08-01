@@ -1,0 +1,205 @@
+@model DataLens.Models.DashboardPermissionViewModel
+@{
+    ViewData["Title"] = "Dashboard İzin Yönetimi";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="content-wrapper">
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">Dashboard İzin Yönetimi</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home", new { area = "" })">Ana Sayfa</a></li>
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Dashboard")">Dashboardlar</a></li>
+                        <li class="breadcrumb-item active">İzin Yönetimi</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="content">
+        <div class="container-fluid">
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                    @TempData["Success"]
+                </div>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                    @TempData["Error"]
+                </div>
+            }
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">@Model.DashboardName - İzin Yönetimi</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="card card-primary">
+                                        <div class="card-header">
+                                            <h3 class="card-title">Kullanıcı İzinleri</h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <form asp-action="GrantUserPermission" method="post" class="mb-3">
+                                                <input type="hidden" name="dashboardId" value="@Model.DashboardId" />
+                                                <div class="form-group">
+                                                    <label>Kullanıcı Seç</label>
+                                                    <select name="userId" class="form-control" required>
+                                                        <option value="">Kullanıcı seçin...</option>
+                                                        @foreach (var user in Model.AvailableUsers)
+                                                        {
+                                                            <option value="@user.Id">@user.FirstName @user.LastName (@user.UserName)</option>
+                                                        }
+                                                    </select>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>İzin Türü</label>
+                                                    <select name="permissionType" class="form-control" required>
+                                                        <option value="View">Görüntüleme</option>
+                                                        <option value="Edit">Düzenleme</option>
+                                                        <option value="FullAccess">Tam Erişim</option>
+                                                    </select>
+                                                </div>
+                                                <button type="submit" class="btn btn-primary">İzin Ver</button>
+                                            </form>
+
+                                            <div class="table-responsive">
+                                                <table class="table table-sm">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Kullanıcı</th>
+                                                            <th>İzin</th>
+                                                            <th>İşlemler</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach (var permission in Model.UserPermissions)
+                                                        {
+                                                            <tr>
+                                                                <td>@permission.UserName</td>
+                                                                <td>
+                                                                    @if (permission.PermissionType == "View")
+                                                                    {
+                                                                        <span class="badge badge-info">Görüntüleme</span>
+                                                                    }
+                                                                    else if (permission.PermissionType == "Edit")
+                                                                    {
+                                                                        <span class="badge badge-warning">Düzenleme</span>
+                                                                    }
+                                                                    else if (permission.PermissionType == "FullAccess")
+                                                                    {
+                                                                        <span class="badge badge-success">Tam Erişim</span>
+                                                                    }
+                                                                </td>
+                                                                <td>
+                                                                    <a href="@Url.Action("RevokeUserPermission", new { dashboardId = Model.DashboardId, userId = permission.UserId })" 
+                                                                       class="btn btn-danger btn-sm" 
+                                                                       onclick="return confirm('Bu kullanıcının iznini iptal etmek istediğinizden emin misiniz?')">
+                                                                        <i class="fas fa-times"></i>
+                                                                    </a>
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="card card-success">
+                                        <div class="card-header">
+                                            <h3 class="card-title">Grup İzinleri</h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <form asp-action="GrantGroupPermission" method="post" class="mb-3">
+                                                <input type="hidden" name="dashboardId" value="@Model.DashboardId" />
+                                                <div class="form-group">
+                                                    <label>Grup Seç</label>
+                                                    <select name="groupId" class="form-control" required>
+                                                        <option value="">Grup seçin...</option>
+                                                        @foreach (var group in Model.AvailableGroups)
+                                                        {
+                                                            <option value="@group.Id">@group.GroupName</option>
+                                                        }
+                                                    </select>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>İzin Türü</label>
+                                                    <select name="permissionType" class="form-control" required>
+                                                        <option value="View">Görüntüleme</option>
+                                                        <option value="Edit">Düzenleme</option>
+                                                        <option value="FullAccess">Tam Erişim</option>
+                                                    </select>
+                                                </div>
+                                                <button type="submit" class="btn btn-success">İzin Ver</button>
+                                            </form>
+
+                                            <div class="table-responsive">
+                                                <table class="table table-sm">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Grup</th>
+                                                            <th>İzin</th>
+                                                            <th>İşlemler</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach (var permission in Model.GroupPermissions)
+                                                        {
+                                                            <tr>
+                                                                <td>@permission.GroupName</td>
+                                                                <td>
+                                                                    @if (permission.PermissionType == "View")
+                                                                    {
+                                                                        <span class="badge badge-info">Görüntüleme</span>
+                                                                    }
+                                                                    else if (permission.PermissionType == "Edit")
+                                                                    {
+                                                                        <span class="badge badge-warning">Düzenleme</span>
+                                                                    }
+                                                                    else if (permission.PermissionType == "FullAccess")
+                                                                    {
+                                                                        <span class="badge badge-success">Tam Erişim</span>
+                                                                    }
+                                                                </td>
+                                                                <td>
+                                                                    <a href="@Url.Action("RevokeGroupPermission", new { dashboardId = Model.DashboardId, groupId = permission.GroupId })" 
+                                                                       class="btn btn-danger btn-sm" 
+                                                                       onclick="return confirm('Bu grubun iznini iptal etmek istediğinizden emin misiniz?')">
+                                                                        <i class="fas fa-times"></i>
+                                                                    </a>
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <a href="@Url.Action("Index", "Dashboard")" class="btn btn-secondary">Geri Dön</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

@@ -27,13 +27,19 @@ namespace DataLens.Models
         [Required]
         public string CreatedBy { get; set; } = string.Empty;
 
+        [BsonElement("CreatedDate")]
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
         public DateTime? LastModifiedDate { get; set; }
 
-        public DateTime? LastModifiedAt { get; set; }
-
         public string? LastModifiedBy { get; set; }
+        
+        public string? UpdatedBy { get; set; }
+        
+        public DateTime? UpdatedDate { get; set; }
+        
+        [StringLength(5000)]
+        public string? Content { get; set; }
 
         public bool IsActive { get; set; } = true;
 

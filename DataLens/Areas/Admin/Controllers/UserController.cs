@@ -35,6 +35,49 @@ namespace DataLens.Areas.Admin.Controllers
             }
         }
 
+        // POST: Admin/User/GetUsers - DataTables Ajax endpoint
+        [HttpPost]
+        public async Task<IActionResult> GetUsers()
+        {
+            try
+            {
+                var users = await _userService.GetAllUsersAsync();
+                
+                var data = users.Select(u => new
+                {
+                    id = u.Id,
+                    username = u.UserName,
+                    email = u.Email,
+                    role = u.Role,
+                    firstName = u.FirstName ?? "",
+                    lastName = u.LastName ?? "",
+                    isActive = u.IsActive,
+                    createdDate = u.CreatedDate.ToString("dd.MM.yyyy"),
+                    lastLoginDate = u.LastLoginDate?.ToString("dd.MM.yyyy HH:mm") ?? "Hiç giriş yapmamış"
+                }).ToList();
+
+                return Json(new
+                {
+                    draw = Request.Form["draw"].FirstOrDefault(),
+                    recordsTotal = data.Count,
+                    recordsFiltered = data.Count,
+                    data = data
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving users for DataTables");
+                return Json(new
+                {
+                    draw = Request.Form["draw"].FirstOrDefault(),
+                    recordsTotal = 0,
+                    recordsFiltered = 0,
+                    data = new List<object>(),
+                    error = "Kullanıcılar yüklenirken bir hata oluştu."
+                });
+            }
+        }
+
         // GET: Admin/User/Details/5
         public async Task<IActionResult> Details(string id)
         {
@@ -269,7 +312,7 @@ namespace DataLens.Areas.Admin.Controllers
             {
                 try
                 {
-                    var result = await _userService.ChangePasswordAsync(id, currentPassword, newPassword);
+                    var result = await _userService.ChangePasswordAsync(id, currentPassword, newPassword!);
                     if (result)
                     {
                         TempData["Success"] = "Şifre başarıyla değiştirildi.";

@@ -1,0 +1,149 @@
+@model IEnumerable<DataLens.Models.Dashboard>
+@{
+    ViewData["Title"] = "Dashboardlar";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section class="content">
+    <div class="container-fluid">
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                    @TempData["Success"]
+                </div>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                    @TempData["Error"]
+                </div>
+            }
+
+            <!-- Search and Filter Section -->
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <form method="get" class="form-inline">
+                                <div class="form-group mr-3">
+                                    <label for="search" class="sr-only">Arama</label>
+                                    <input type="text" class="form-control" id="search" name="search" placeholder="Dashboard ara..." value="@ViewBag.SearchTerm" />
+                                </div>
+                                <div class="form-group mr-3">
+                                    <select name="category" class="form-control">
+                                        <option value="">Tüm Kategoriler</option>
+                                        @foreach (var category in ViewBag.Categories as List<string> ?? new List<string>())
+                                        {
+                                            <option value="@category" @(ViewBag.CurrentCategory == category ? "selected" : "")>@category</option>
+                                        }
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary mr-2">Filtrele</button>
+                                <a href="@Url.Action("Index")" class="btn btn-secondary">Temizle</a>
+                                @if (ViewBag.UserRole == "Designer" || ViewBag.UserRole == "Admin")
+                                {
+                                    <a href="@Url.Action("Create")" class="btn btn-success ml-auto">
+                                        <i class="fas fa-plus"></i> Yeni Dashboard
+                                    </a>
+                                }
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Grid -->
+            <div class="row">
+                @if (Model.Any())
+                {
+                    @foreach (var dashboard in Model)
+                    {
+                        <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">@dashboard.Name</h3>
+                                    <div class="card-tools">
+                                        @if (dashboard.IsPublic)
+                                        {
+                                            <span class="badge badge-success">Genel</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-warning">Özel</span>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <p class="card-text">@(dashboard.Description ?? "Açıklama bulunmuyor.")</p>
+                                    <p class="text-muted">
+                                        <small>
+                                            <i class="fas fa-tag"></i> @dashboard.Category<br>
+                                            <i class="fas fa-user"></i> @dashboard.CreatedBy<br>
+                                            <i class="fas fa-calendar"></i> @dashboard.CreatedDate.ToString("dd.MM.yyyy")
+                                        </small>
+                                    </p>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="btn-group" role="group">
+                                        <a href="@Url.Action("Viewer", new { id = dashboard.Id })" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-eye"></i> Görüntüle
+                                        </a>
+                                        <a href="@Url.Action("Details", new { id = dashboard.Id })" class="btn btn-info btn-sm">
+                                            <i class="fas fa-info-circle"></i> Detay
+                                        </a>
+                                        @if (ViewBag.UserRole == "Designer" || ViewBag.UserRole == "Admin" || dashboard.CreatedBy == User.Identity.Name)
+                                        {
+                                            <a href="@Url.Action("Designer", new { id = dashboard.Id })" class="btn btn-warning btn-sm">
+                                                <i class="fas fa-edit"></i> Düzenle
+                                            </a>
+                                        }
+                                        @if (ViewBag.UserRole == "Admin" || dashboard.CreatedBy == User.Identity.Name)
+                                        {
+                                            <div class="btn-group" role="group">
+                                                <button type="button" class="btn btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown">
+                                                    <i class="fas fa-cog"></i>
+                                                </button>
+                                                <div class="dropdown-menu">
+                                                    <a class="dropdown-item" href="@Url.Action("Manage", "DashboardPermission", new { id = dashboard.Id })">
+                                                        <i class="fas fa-users"></i> İzinler
+                                                    </a>
+                                                    <a class="dropdown-item" href="@Url.Action("Clone", new { id = dashboard.Id })">
+                                                        <i class="fas fa-copy"></i> Kopyala
+                                                    </a>
+                                                    <div class="dropdown-divider"></div>
+                                                    <a class="dropdown-item text-danger" href="@Url.Action("Delete", new { id = dashboard.Id })" onclick="return confirm('Bu dashboard\'ı silmek istediğinizden emin misiniz?')">
+                                                        <i class="fas fa-trash"></i> Sil
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <i class="fas fa-chart-bar fa-3x text-muted mb-3"></i>
+                                <h4 class="text-muted">Henüz dashboard bulunmuyor</h4>
+                                <p class="text-muted">İlk dashboard'ınızı oluşturmak için aşağıdaki butona tıklayın.</p>
+                                @if (ViewBag.UserRole == "Designer" || ViewBag.UserRole == "Admin")
+                                {
+                                    <a href="@Url.Action("Create")" class="btn btn-primary">
+                                        <i class="fas fa-plus"></i> İlk Dashboard'ımı Oluştur
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+</div>

@@ -12,7 +12,7 @@ namespace DataLens.Data.MongoDB
         public MongoUserRepository(IDbConnectionFactory connectionFactory)
         {
             var database = connectionFactory.CreateMongoDatabase();
-            _users = database.GetCollection<User>("users");
+            _users = database.GetCollection<User>("Users");
         }
 
         public async Task<User?> GetByIdAsync(string id)
@@ -72,7 +72,7 @@ namespace DataLens.Data.MongoDB
 
         public async Task<User?> GetByUsernameAsync(string username)
         {
-            var filter = Builders<User>.Filter.Eq(u => u.Username, username);
+            var filter = Builders<User>.Filter.Eq(u => u.UserName, username);
             return await _users.Find(filter).FirstOrDefaultAsync();
         }
 
@@ -86,7 +86,7 @@ namespace DataLens.Data.MongoDB
         {
             var filter = Builders<User>.Filter.Eq(u => u.Role, role);
             return await _users.Find(filter)
-                .SortBy(u => u.Username)
+                .SortBy(u => u.UserName)
                 .ToListAsync();
         }
 
@@ -94,13 +94,13 @@ namespace DataLens.Data.MongoDB
         {
             var filter = Builders<User>.Filter.Eq(u => u.IsActive, true);
             return await _users.Find(filter)
-                .SortBy(u => u.Username)
+                .SortBy(u => u.UserName)
                 .ToListAsync();
         }
 
         public async Task<bool> IsUsernameExistsAsync(string username)
         {
-            var filter = Builders<User>.Filter.Eq(u => u.Username, username);
+            var filter = Builders<User>.Filter.Eq(u => u.UserName, username);
             var count = await _users.CountDocumentsAsync(filter);
             return count > 0;
         }

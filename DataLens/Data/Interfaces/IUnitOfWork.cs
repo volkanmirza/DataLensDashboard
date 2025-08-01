@@ -25,6 +25,9 @@ namespace DataLens.Data.Interfaces
         // Connection management
         IDbConnection? Connection { get; }
         IDbTransaction? Transaction { get; }
+
+        // Database type
+        string DatabaseType { get; }
         
         // MongoDB specific (for MongoDB implementations)
         Task<bool> SaveChangesMongoAsync();

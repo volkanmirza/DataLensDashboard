@@ -82,7 +82,7 @@ namespace DataLens.Data.SqlServer
             var command = new SqlCommand(@"
                 UPDATE Dashboards SET 
                     Name = @Name, Title = @Title, Description = @Description, DashboardData = @DashboardData,
-                    LastModifiedDate = @LastModifiedDate, LastModifiedBy = @LastModifiedBy, LastModifiedAt = @LastModifiedAt,
+                    LastModifiedDate = @LastModifiedDate, LastModifiedBy = @LastModifiedBy,
                     IsActive = @IsActive, IsPublic = @IsPublic, Category = @Category, ViewCount = @ViewCount
                 WHERE Id = @Id", connection);
             
@@ -93,7 +93,7 @@ namespace DataLens.Data.SqlServer
             command.Parameters.AddWithValue("@DashboardData", dashboard.DashboardData);
             command.Parameters.AddWithValue("@LastModifiedDate", dashboard.LastModifiedDate ?? (object)DBNull.Value);
             command.Parameters.AddWithValue("@LastModifiedBy", dashboard.LastModifiedBy ?? (object)DBNull.Value);
-            command.Parameters.AddWithValue("@LastModifiedAt", dashboard.LastModifiedAt ?? (object)DBNull.Value);
+            
             command.Parameters.AddWithValue("@IsActive", dashboard.IsActive);
             command.Parameters.AddWithValue("@IsPublic", dashboard.IsPublic);
             command.Parameters.AddWithValue("@Category", dashboard.Category);
@@ -385,13 +385,13 @@ namespace DataLens.Data.SqlServer
                 UPDATE Dashboards 
                 SET LastModifiedDate = @LastModifiedDate, 
                     LastModifiedBy = @ModifiedBy,
-                    LastModifiedAt = @LastModifiedAt
+                    LastModifiedDate = @LastModifiedDate
                 WHERE Id = @Id", connection);
             
             command.Parameters.AddWithValue("@Id", dashboardId);
             command.Parameters.AddWithValue("@ModifiedBy", modifiedBy);
             command.Parameters.AddWithValue("@LastModifiedDate", DateTime.UtcNow);
-            command.Parameters.AddWithValue("@LastModifiedAt", DateTime.UtcNow);
+            command.Parameters.AddWithValue("@LastModifiedDate", DateTime.UtcNow);
             
             var rowsAffected = await command.ExecuteNonQueryAsync();
             return rowsAffected > 0;
@@ -483,7 +483,6 @@ namespace DataLens.Data.SqlServer
                 CreatedDate = reader.GetDateTime("CreatedDate"),
                 LastModifiedDate = reader.IsDBNull("LastModifiedDate") ? null : reader.GetDateTime("LastModifiedDate"),
                 LastModifiedBy = reader.IsDBNull("LastModifiedBy") ? null : reader.GetString("LastModifiedBy"),
-                LastModifiedAt = reader.IsDBNull("LastModifiedAt") ? null : reader.GetDateTime("LastModifiedAt"),
                 IsActive = reader.GetBoolean("IsActive"),
                 IsPublic = reader.GetBoolean("IsPublic"),
                 Category = reader.GetString("Category"),

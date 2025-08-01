@@ -1,0 +1,182 @@
+@model DataLens.Models.Dashboard
+@{
+    ViewData["Title"] = "Yeni Dashboard Oluştur";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section class="content">
+    <div class="container-fluid">
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                    @TempData["Error"]
+                </div>
+            }
+
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Dashboard Bilgileri</h3>
+                        </div>
+                        <form asp-action="Create" method="post">
+                            <div class="card-body">
+                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                
+                                <div class="form-group">
+                                    <label asp-for="Name" class="control-label">Dashboard Adı *</label>
+                                    <input asp-for="Name" class="form-control" placeholder="Dashboard adını girin" />
+                                    <span asp-validation-for="Name" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group">
+                                    <label asp-for="Description" class="control-label">Açıklama</label>
+                                    <textarea asp-for="Description" class="form-control" rows="3" placeholder="Dashboard açıklamasını girin (isteğe bağlı)"></textarea>
+                                    <span asp-validation-for="Description" class="text-danger"></span>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label asp-for="Category" class="control-label">Kategori *</label>
+                                            <select asp-for="Category" class="form-control">
+                                                <option value="">Kategori seçin</option>
+                                                @foreach (var category in ViewBag.Categories as List<string> ?? new List<string>())
+                                                {
+                                                    <option value="@category">@category</option>
+                                                }
+                                                <option value="other">Diğer (Yeni kategori)</option>
+                                            </select>
+                                            <span asp-validation-for="Category" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group" id="newCategoryGroup" style="display: none;">
+                                            <label for="newCategory" class="control-label">Yeni Kategori Adı</label>
+                                            <input type="text" id="newCategory" name="newCategory" class="form-control" placeholder="Yeni kategori adını girin" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="custom-control custom-switch">
+                                        <input type="checkbox" class="custom-control-input" asp-for="IsPublic" id="isPublicSwitch">
+                                        <label class="custom-control-label" for="isPublicSwitch">
+                                            Genel Dashboard (Tüm kullanıcılar görüntüleyebilir)
+                                        </label>
+                                    </div>
+                                    <small class="form-text text-muted">
+                                        Genel dashboard'lar tüm kullanıcılar tarafından görüntülenebilir. Özel dashboard'lar sadece siz ve yetki verdiğiniz kullanıcılar tarafından görüntülenebilir.
+                                    </small>
+                                </div>
+                            </div>
+                            
+                            <div class="card-footer">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Oluştur ve Tasarımcıya Git
+                                </button>
+                                <a href="@Url.Action("Index")" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i> İptal
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Yardım</h3>
+                        </div>
+                        <div class="card-body">
+                            <h5><i class="fas fa-info-circle text-info"></i> Dashboard Oluşturma</h5>
+                            <p class="text-muted">
+                                Dashboard oluşturduktan sonra otomatik olarak tasarımcı sayfasına yönlendirileceksiniz. 
+                                Burada grafikler, tablolar ve diğer bileşenleri ekleyebilirsiniz.
+                            </p>
+                            
+                            <h5><i class="fas fa-users text-primary"></i> Erişim İzinleri</h5>
+                            <p class="text-muted">
+                                Dashboard oluşturduktan sonra "İzinleri Yönet" bölümünden belirli kullanıcı ve gruplara 
+                                görüntüleme, düzenleme veya tam erişim izni verebilirsiniz.
+                            </p>
+                            
+                            <h5><i class="fas fa-tags text-success"></i> Kategoriler</h5>
+                            <p class="text-muted">
+                                Dashboard'larınızı kategorilere ayırarak daha kolay organize edebilirsiniz. 
+                                Mevcut kategorilerden birini seçebilir veya yeni bir kategori oluşturabilirsiniz.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h3 class="card-title">Öneriler</h3>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success"></i> Açıklayıcı bir isim seçin</li>
+                                <li><i class="fas fa-check text-success"></i> Detaylı açıklama yazın</li>
+                                <li><i class="fas fa-check text-success"></i> Uygun kategori seçin</li>
+                                <li><i class="fas fa-check text-success"></i> Erişim seviyesini belirleyin</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Category selection change handler
+            $('#Category').change(function() {
+                if ($(this).val() === 'other') {
+                    $('#newCategoryGroup').show();
+                    $('#newCategory').prop('required', true);
+                } else {
+                    $('#newCategoryGroup').hide();
+                    $('#newCategory').prop('required', false);
+                }
+            });
+
+            // Form validation
+            $('form').submit(function(e) {
+                var isValid = true;
+                var name = $('#Name').val().trim();
+                var category = $('#Category').val();
+                var newCategory = $('#newCategory').val().trim();
+
+                // Name validation
+                if (name === '') {
+                    isValid = false;
+                    $('#Name').addClass('is-invalid');
+                } else {
+                    $('#Name').removeClass('is-invalid');
+                }
+
+                // Category validation
+                if (category === '') {
+                    isValid = false;
+                    $('#Category').addClass('is-invalid');
+                } else if (category === 'other' && newCategory === '') {
+                    isValid = false;
+                    $('#newCategory').addClass('is-invalid');
+                } else {
+                    $('#Category').removeClass('is-invalid');
+                    $('#newCategory').removeClass('is-invalid');
+                }
+
+                if (!isValid) {
+                    e.preventDefault();
+                    $('html, body').animate({
+                        scrollTop: $('.is-invalid').first().offset().top - 100
+                    }, 500);
+                }
+            });
+        });
+    </script>
+}

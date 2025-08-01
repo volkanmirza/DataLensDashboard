@@ -32,42 +32,48 @@ if (existingUsers > 0) {
   const users = [
     {
       _id: adminUserId,
-      Username: 'admin',
+      UserName: 'admin',
+      NormalizedUserName: 'ADMIN',
       Email: 'admin@datalens.com',
+      NormalizedEmail: 'ADMIN@DATALENS.COM',
       PasswordHash: 'jGl25bVBBBW96Qi9Te4V37Fnqchz/Eu4qB9vKrRIqRg=', // SHA256 hash of 'admin123'
       FirstName: 'System',
       LastName: 'Administrator',
       Role: 'Admin',
       IsActive: true,
-      CreatedAt: new Date(),
-      UpdatedAt: null,
-      LastLoginAt: null
+      CreatedDate: new Date(),
+      UpdatedDate: null,
+      LastLoginDate: null
     },
     {
       _id: designerUserId,
-      Username: 'designer',
+      UserName: 'designer',
+      NormalizedUserName: 'DESIGNER',
       Email: 'designer@datalens.com',
+      NormalizedEmail: 'DESIGNER@DATALENS.COM',
       PasswordHash: 'XohImNooBHFR0OVvjcYpJ3NgPQ1qq73WKhHvch0VQtg=', // SHA256 hash of 'designer123'
       FirstName: 'Dashboard',
       LastName: 'Designer',
       Role: 'Designer',
       IsActive: true,
-      CreatedAt: new Date(),
-      UpdatedAt: null,
-      LastLoginAt: null
+      CreatedDate: new Date(),
+      UpdatedDate: null,
+      LastLoginDate: null
     },
     {
       _id: viewerUserId,
-      Username: 'viewer',
+      UserName: 'viewer',
+      NormalizedUserName: 'VIEWER',
       Email: 'viewer@datalens.com',
+      NormalizedEmail: 'VIEWER@DATALENS.COM',
       PasswordHash: 'fEqNCco3Yq9h5ZUglD3CZJT4lBs+zPpaWkDWXamML9o=', // SHA256 hash of 'viewer123'
       FirstName: 'Report',
       LastName: 'Viewer',
       Role: 'Viewer',
       IsActive: true,
-      CreatedAt: new Date(),
-      UpdatedAt: null,
-      LastLoginAt: null
+      CreatedDate: new Date(),
+      UpdatedDate: null,
+      LastLoginDate: null
     }
   ];
 
@@ -86,24 +92,24 @@ if (existingUsers > 0) {
       GroupName: 'Administrators',
       Description: 'System administrators with full access',
       IsActive: true,
-      CreatedAt: new Date(),
-      UpdatedAt: null
+      CreatedDate: new Date(),
+      UpdatedDate: null
     },
     {
       _id: designerGroupId,
       GroupName: 'Dashboard Designers',
       Description: 'Users who can create and edit dashboards',
       IsActive: true,
-      CreatedAt: new Date(),
-      UpdatedAt: null
+      CreatedDate: new Date(),
+      UpdatedDate: null
     },
     {
       _id: viewerGroupId,
       GroupName: 'Report Viewers',
       Description: 'Users who can only view dashboards and reports',
       IsActive: true,
-      CreatedAt: new Date(),
-      UpdatedAt: null
+      CreatedDate: new Date(),
+      UpdatedDate: null
     }
   ];
 
@@ -118,24 +124,24 @@ if (existingUsers > 0) {
       UserId: adminUserId,
       GroupId: adminGroupId,
       IsActive: true,
-      JoinedAt: new Date(),
-      LeftAt: null
+      JoinedDate: new Date(),
+      LeftDate: null
     },
     {
       _id: generateObjectId(),
       UserId: designerUserId,
       GroupId: designerGroupId,
       IsActive: true,
-      JoinedAt: new Date(),
-      LeftAt: null
+      JoinedDate: new Date(),
+      LeftDate: null
     },
     {
       _id: generateObjectId(),
       UserId: viewerUserId,
       GroupId: viewerGroupId,
       IsActive: true,
-      JoinedAt: new Date(),
-      LeftAt: null
+      JoinedDate: new Date(),
+      LeftDate: null
     }
   ];
 
@@ -154,9 +160,9 @@ if (existingUsers > 0) {
     CreatedBy: designerUserId,
     IsPublic: true,
     IsActive: true,
-    CreatedAt: new Date(),
-    UpdatedAt: null,
-    LastModifiedAt: new Date(),
+    CreatedDate: new Date(),
+      UpdatedDate: null,
+      LastModifiedDate: new Date(),
     DashboardData: {
       layout: {
         rows: [
@@ -210,8 +216,8 @@ if (existingUsers > 0) {
       GroupId: null,
       PermissionType: 'Delete',
       IsActive: true,
-      GrantedAt: new Date(),
-      RevokedAt: null,
+      GrantedDate: new Date(),
+      RevokedDate: null,
       GrantedBy: adminUserId
     },
     {
@@ -221,8 +227,8 @@ if (existingUsers > 0) {
       GroupId: designerGroupId,
       PermissionType: 'Edit',
       IsActive: true,
-      GrantedAt: new Date(),
-      RevokedAt: null,
+      GrantedDate: new Date(),
+      RevokedDate: null,
       GrantedBy: adminUserId
     },
     {
@@ -232,8 +238,8 @@ if (existingUsers > 0) {
       GroupId: viewerGroupId,
       PermissionType: 'View',
       IsActive: true,
-      GrantedAt: new Date(),
-      RevokedAt: null,
+      GrantedDate: new Date(),
+      RevokedDate: null,
       GrantedBy: adminUserId
     }
   ];

@@ -1,34 +1,24 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Identity;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace DataLens.Models
 {
-    public class User
+    public class User : IdentityUser
     {
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; } = ObjectId.GenerateNewId().ToString();
-
-        [Required]
-        [StringLength(50)]
-        public string Username { get; set; } = string.Empty;
-
-        [Required]
-        [EmailAddress]
-        [StringLength(100)]
-        public string Email { get; set; } = string.Empty;
-
-        [Required]
-        public string PasswordHash { get; set; } = string.Empty;
-
+        public override string Id { get; set; }
         [Required]
         [StringLength(20)]
         public string Role { get; set; } = "Viewer"; // Viewer, Designer, Admin
 
+        [BsonElement("CreatedDate")]
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
-        public DateTime? UpdatedAt { get; set; }
+        public DateTime? UpdatedDate { get; set; }
+
+        [BsonElement("LastLoginDate")]
+        public DateTime? LastLoginDate { get; set; }
 
         public bool IsActive { get; set; } = true;
 

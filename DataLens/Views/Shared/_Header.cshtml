@@ -95,13 +95,13 @@
         <li class="nav-item dropdown">
             <a class="nav-link" data-toggle="dropdown" href="#">
                 <img src="~/lib/admin-lte/img/user2-160x160.jpg" alt="User Avatar" class="img-size-32 img-circle mr-2">
-                <span class="d-none d-md-inline">Kullanıcı Adı</span>
+                                    <span class="d-none d-md-inline">@User.Identity.Name</span>
             </a>
             <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
                 <div class="dropdown-header">
                     <img src="~/lib/admin-lte/img/user2-160x160.jpg" alt="User Avatar" class="img-size-50 img-circle mr-3">
                     <div class="d-inline-block">
-                        Kullanıcı Adı<br>
+                                                @User.Identity.Name<br>
                         <small class="text-muted">user@example.com</small>
                     </div>
                 </div>

@@ -127,26 +127,26 @@ if (databaseType == "MongoDB")
 - FirstName, LastName
 - Role (Admin, Designer, Viewer)
 - IsActive
-- CreatedAt, UpdatedAt, LastLoginAt
+- CreatedDate, UpdatedDate, LastLoginDate
 
 ### UserGroups
 - GroupName (unique)
 - Description
 - IsActive
-- CreatedAt, UpdatedAt
+- CreatedDate, UpdatedDate
 
 ### UserGroupMembers
 - UserId (ObjectId reference)
 - GroupId (ObjectId reference)
 - IsActive
-- JoinedAt, LeftAt
+- JoinedDate, LeftDate
 
 ### Dashboards
 - Title
 - Description, Category, Tags
 - CreatedBy (ObjectId reference)
 - IsPublic, IsActive
-- CreatedAt, UpdatedAt, LastModifiedAt
+- CreatedDate, UpdatedDate, LastModifiedDate
 - DashboardData (JSON object)
 
 ### DashboardPermissions
@@ -154,7 +154,7 @@ if (databaseType == "MongoDB")
 - UserId/GroupId (ObjectId reference)
 - PermissionType (View, Edit, Delete, Share)
 - IsActive
-- GrantedAt, RevokedAt
+- GrantedDate, RevokedDate
 - GrantedBy (ObjectId reference)
 
 ## Troubleshooting

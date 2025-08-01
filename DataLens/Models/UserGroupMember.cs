@@ -16,6 +16,7 @@ namespace DataLens.Models
         [Required]
         public string GroupId { get; set; } = string.Empty;
 
+        [BsonElement("JoinedDate")]
         public DateTime JoinedDate { get; set; } = DateTime.UtcNow;
 
         public string AddedBy { get; set; } = string.Empty;

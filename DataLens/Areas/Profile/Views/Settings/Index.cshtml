@@ -1,0 +1,167 @@
+@model DataLens.Models.UserSettingsViewModel
+@{
+    ViewData["Title"] = "Ayarlar";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="content-wrapper">
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">Kullanıcı Ayarları</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home", new { area = "" })">Ana Sayfa</a></li>
+                        <li class="breadcrumb-item"><a href="@Url.Action("Index", "Profile")">Profil</a></li>
+                        <li class="breadcrumb-item active">Ayarlar</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="content">
+        <div class="container-fluid">
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                    @TempData["Success"]
+                </div>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                    @TempData["Error"]
+                </div>
+            }
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card card-primary card-tabs">
+                        <div class="card-header p-0 pt-1">
+                            <ul class="nav nav-tabs" id="custom-tabs-one-tab" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link active" id="general-tab" data-toggle="pill" href="#general" role="tab" aria-controls="general" aria-selected="true">Genel</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="notifications-tab" data-toggle="pill" href="#notifications" role="tab" aria-controls="notifications" aria-selected="false">Bildirimler</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="privacy-tab" data-toggle="pill" href="#privacy" role="tab" aria-controls="privacy" aria-selected="false">Gizlilik</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="card-body">
+                            <div class="tab-content" id="custom-tabs-one-tabContent">
+                                <div class="tab-pane fade show active" id="general" role="tabpanel" aria-labelledby="general-tab">
+                                    <form asp-action="Index" method="post">
+                                        <div class="form-group">
+                                            <label asp-for="Language" class="control-label">Dil</label>
+                                            <select asp-for="Language" class="form-control">
+                                                <option value="tr">Türkçe</option>
+                                                <option value="en">English</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label asp-for="Theme" class="control-label">Tema</label>
+                                            <select asp-for="Theme" class="form-control">
+                                                <option value="light">Açık Tema</option>
+                                                <option value="dark">Koyu Tema</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label asp-for="TimeZone" class="control-label">Saat Dilimi</label>
+                                            <select asp-for="TimeZone" class="form-control">
+                                                <option value="Europe/Istanbul">İstanbul (UTC+3)</option>
+                                                <option value="UTC">UTC (UTC+0)</option>
+                                                <option value="Europe/London">Londra (UTC+0)</option>
+                                                <option value="America/New_York">New York (UTC-5)</option>
+                                            </select>
+                                        </div>
+
+                                        <button type="submit" class="btn btn-primary">Kaydet</button>
+                                    </form>
+                                </div>
+
+                                <div class="tab-pane fade" id="notifications" role="tabpanel" aria-labelledby="notifications-tab">
+                                    <form asp-action="Index" method="post">
+                                        <div class="form-group">
+                                            <div class="custom-control custom-switch">
+                                                <input asp-for="EmailNotifications" type="checkbox" class="custom-control-input" id="emailNotifications">
+                                                <label class="custom-control-label" for="emailNotifications">E-posta Bildirimleri</label>
+                                            </div>
+                                            <small class="form-text text-muted">Önemli güncellemeler ve bildirimler e-posta ile gönderilsin.</small>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <div class="custom-control custom-switch">
+                                                <input asp-for="DashboardNotifications" type="checkbox" class="custom-control-input" id="dashboardNotifications">
+                                                <label class="custom-control-label" for="dashboardNotifications">Dashboard Bildirimleri</label>
+                                            </div>
+                                            <small class="form-text text-muted">Dashboard ile ilgili bildirimler gösterilsin.</small>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <div class="custom-control custom-switch">
+                                                <input asp-for="SystemNotifications" type="checkbox" class="custom-control-input" id="systemNotifications">
+                                                <label class="custom-control-label" for="systemNotifications">Sistem Bildirimleri</label>
+                                            </div>
+                                            <small class="form-text text-muted">Sistem güncellemeleri ve bakım bildirimleri gösterilsin.</small>
+                                        </div>
+
+                                        <button type="submit" class="btn btn-primary">Kaydet</button>
+                                    </form>
+                                </div>
+
+                                <div class="tab-pane fade" id="privacy" role="tabpanel" aria-labelledby="privacy-tab">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <h5>Veri Yönetimi</h5>
+                                            <p class="text-muted">Kişisel verilerinizi yönetmek için aşağıdaki seçenekleri kullanabilirsiniz.</p>
+                                            
+                                            <div class="mb-3">
+                                                <a href="@Url.Action("ExportData", "Settings")" class="btn btn-info">
+                                                    <i class="fas fa-download"></i> Verilerimi İndir
+                                                </a>
+                                                <small class="form-text text-muted">Tüm kişisel verilerinizi JSON formatında indirin.</small>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <a href="@Url.Action("Privacy", "Settings")" class="btn btn-secondary">
+                                                    <i class="fas fa-shield-alt"></i> Gizlilik Ayarları
+                                                </a>
+                                                <small class="form-text text-muted">Detaylı gizlilik ayarlarını yönetin.</small>
+                                            </div>
+
+                                            <hr>
+
+                                            <h5 class="text-danger">Tehlikeli Bölge</h5>
+                                            <p class="text-muted">Bu işlemler geri alınamaz. Lütfen dikkatli olun.</p>
+                                            
+                                            <div class="mb-3">
+                                                <a href="@Url.Action("DeleteAccount", "Settings")" class="btn btn-danger" onclick="return confirm('Hesabınızı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz!')">
+                                                    <i class="fas fa-trash"></i> Hesabımı Sil
+                                                </a>
+                                                <small class="form-text text-muted">Hesabınızı ve tüm verilerinizi kalıcı olarak silin.</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

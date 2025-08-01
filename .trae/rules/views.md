@@ -279,7 +279,7 @@
 
 #### Dashboard Area Views
 
-##### Dashboards/Index.cshtml
+##### Dashboards/Index.cshtml ✅
 ```html
 @model IEnumerable<DataLens.Models.Dashboard>
 @{
@@ -306,6 +306,390 @@
         </div>
     }
 </div>
+
+##### Dashboards/Create.cshtml ✅
+```html
+@model DataLens.Models.Dashboard
+@{
+    ViewData["Title"] = "Yeni Dashboard";
+    Layout = "~/Areas/Dashboard/Views/Shared/_DashboardLayout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card card-primary">
+            <div class="card-header">
+                <h3 class="card-title">Dashboard Bilgileri</h3>
+            </div>
+            <form asp-action="Create" method="post">
+                <div class="card-body">
+                    <div class="form-group">
+                        <label asp-for="Name" class="control-label"></label>
+                        <input asp-for="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label asp-for="Title" class="control-label"></label>
+                        <input asp-for="Title" class="form-control" />
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label asp-for="Description" class="control-label"></label>
+                        <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label asp-for="Category" class="control-label"></label>
+                        <input asp-for="Category" class="form-control" />
+                        <span asp-validation-for="Category" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-check">
+                            <input asp-for="IsPublic" class="form-check-input" type="checkbox" />
+                            <label asp-for="IsPublic" class="form-check-label"></label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                    <a href="@Url.Action("Index")" class="btn btn-secondary">İptal</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+```
+
+##### Dashboards/Edit.cshtml ✅
+```html
+@model DataLens.Models.Dashboard
+@{
+    ViewData["Title"] = "Dashboard Düzenle";
+    Layout = "~/Areas/Dashboard/Views/Shared/_DashboardLayout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card card-warning">
+            <div class="card-header">
+                <h3 class="card-title">Dashboard Düzenle</h3>
+            </div>
+            <form asp-action="Edit" method="post">
+                <input asp-for="Id" type="hidden" />
+                <div class="card-body">
+                    <div class="form-group">
+                        <label asp-for="Name" class="control-label"></label>
+                        <input asp-for="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label asp-for="Title" class="control-label"></label>
+                        <input asp-for="Title" class="form-control" />
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label asp-for="Description" class="control-label"></label>
+                        <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label asp-for="Category" class="control-label"></label>
+                        <input asp-for="Category" class="form-control" />
+                        <span asp-validation-for="Category" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-check">
+                            <input asp-for="IsPublic" class="form-check-input" type="checkbox" />
+                            <label asp-for="IsPublic" class="form-check-label"></label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-warning">Güncelle</button>
+                    <a href="@Url.Action("Index")" class="btn btn-secondary">İptal</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+```
+
+##### Dashboards/Details.cshtml ✅
+```html
+@model DataLens.Models.Dashboard
+@{
+    ViewData["Title"] = "Dashboard Detayları";
+    Layout = "~/Areas/Dashboard/Views/Shared/_DashboardLayout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card card-info">
+            <div class="card-header">
+                <h3 class="card-title">@Model.Title</h3>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-3">Ad:</dt>
+                    <dd class="col-sm-9">@Model.Name</dd>
+                    
+                    <dt class="col-sm-3">Başlık:</dt>
+                    <dd class="col-sm-9">@Model.Title</dd>
+                    
+                    <dt class="col-sm-3">Açıklama:</dt>
+                    <dd class="col-sm-9">@Model.Description</dd>
+                    
+                    <dt class="col-sm-3">Kategori:</dt>
+                    <dd class="col-sm-9">@Model.Category</dd>
+                    
+                    <dt class="col-sm-3">Durum:</dt>
+                    <dd class="col-sm-9">
+                        <span class="badge badge-@(Model.IsPublic ? "success" : "warning")">
+                            @(Model.IsPublic ? "Genel" : "Özel")
+                        </span>
+                    </dd>
+                    
+                    <dt class="col-sm-3">Görüntülenme:</dt>
+                    <dd class="col-sm-9">@Model.ViewCount</dd>
+                    
+                    <dt class="col-sm-3">Oluşturan:</dt>
+                    <dd class="col-sm-9">@Model.CreatedBy</dd>
+                    
+                    <dt class="col-sm-3">Oluşturma Tarihi:</dt>
+                    <dd class="col-sm-9">@Model.CreatedDate.ToString("dd.MM.yyyy HH:mm")</dd>
+                    
+                    <dt class="col-sm-3">Son Güncelleme:</dt>
+                    <dd class="col-sm-9">@Model.LastModifiedDate?.ToString("dd.MM.yyyy HH:mm")</dd>
+                </dl>
+            </div>
+            <div class="card-footer">
+                <a href="@Url.Action("Edit", new { id = Model.Id })" class="btn btn-warning">Düzenle</a>
+                <a href="@Url.Action("Index")" class="btn btn-secondary">Geri</a>
+            </div>
+        </div>
+    </div>
+</div>
+```
+
+##### Dashboards/Manage.cshtml ✅
+```html
+@model DataLens.Models.DashboardPermissionViewModel
+@{
+    ViewData["Title"] = "Dashboard İzin Yönetimi";
+    Layout = "~/Areas/Dashboard/Views/Shared/_DashboardLayout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">@Model.DashboardTitle - İzin Yönetimi</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Kullanıcı İzinleri</h5>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Kullanıcı</th>
+                                    <th>İzin Türü</th>
+                                    <th>İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var user in Model.UserPermissions)
+                                {
+                                    <tr>
+                                        <td>@user.FirstName @user.LastName</td>
+                                        <td>@user.PermissionType</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-danger">Kaldır</button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h5>Grup İzinleri</h5>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Grup</th>
+                                    <th>İzin Türü</th>
+                                    <th>İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var group in Model.GroupPermissions)
+                                {
+                                    <tr>
+                                        <td>@group.GroupName</td>
+                                        <td>@group.PermissionType</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-danger">Kaldır</button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+```
+
+#### Profile Area Views
+
+##### Profile/Index.cshtml ✅
+```html
+@model DataLens.Models.User
+@{
+    ViewData["Title"] = "Profil";
+    Layout = "~/Areas/Profile/Views/Shared/_ProfileLayout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card card-primary">
+            <div class="card-header">
+                <h3 class="card-title">Profil Bilgileri</h3>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-3">Kullanıcı Adı:</dt>
+                    <dd class="col-sm-9">@Model.Username</dd>
+                    
+                    <dt class="col-sm-3">E-posta:</dt>
+                    <dd class="col-sm-9">@Model.Email</dd>
+                    
+                    <dt class="col-sm-3">Ad:</dt>
+                    <dd class="col-sm-9">@Model.FirstName</dd>
+                    
+                    <dt class="col-sm-3">Soyad:</dt>
+                    <dd class="col-sm-9">@Model.LastName</dd>
+                    
+                    <dt class="col-sm-3">Rol:</dt>
+                    <dd class="col-sm-9">
+                        <span class="badge badge-primary">@Model.Role</span>
+                    </dd>
+                    
+                    <dt class="col-sm-3">Kayıt Tarihi:</dt>
+                    <dd class="col-sm-9">@Model.CreatedDate.ToString("dd.MM.yyyy")</dd>
+                </dl>
+            </div>
+            <div class="card-footer">
+                <a href="@Url.Action("Edit")" class="btn btn-primary">Düzenle</a>
+                <a href="@Url.Action("ChangePassword")" class="btn btn-warning">Şifre Değiştir</a>
+            </div>
+        </div>
+    </div>
+</div>
+```
+
+##### Profile/Edit.cshtml ✅
+```html
+@model DataLens.Models.User
+@{
+    ViewData["Title"] = "Profil Düzenle";
+    Layout = "~/Areas/Profile/Views/Shared/_ProfileLayout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card card-warning">
+            <div class="card-header">
+                <h3 class="card-title">Profil Düzenle</h3>
+            </div>
+            <form asp-action="Edit" method="post">
+                <div class="card-body">
+                    <div class="form-group">
+                        <label asp-for="FirstName" class="control-label"></label>
+                        <input asp-for="FirstName" class="form-control" />
+                        <span asp-validation-for="FirstName" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label asp-for="LastName" class="control-label"></label>
+                        <input asp-for="LastName" class="form-control" />
+                        <span asp-validation-for="LastName" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label asp-for="Email" class="control-label"></label>
+                        <input asp-for="Email" class="form-control" type="email" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                </div>
+                
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-warning">Güncelle</button>
+                    <a href="@Url.Action("Index")" class="btn btn-secondary">İptal</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+```
+
+##### Profile/ChangePassword.cshtml ✅
+```html
+@model DataLens.Models.ChangePasswordViewModel
+@{
+    ViewData["Title"] = "Şifre Değiştir";
+    Layout = "~/Areas/Profile/Views/Shared/_ProfileLayout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card card-danger">
+            <div class="card-header">
+                <h3 class="card-title">Şifre Değiştir</h3>
+            </div>
+            <form asp-action="ChangePassword" method="post">
+                <div class="card-body">
+                    <div class="form-group">
+                        <label asp-for="CurrentPassword" class="control-label"></label>
+                        <input asp-for="CurrentPassword" class="form-control" type="password" />
+                        <span asp-validation-for="CurrentPassword" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label asp-for="NewPassword" class="control-label"></label>
+                        <input asp-for="NewPassword" class="form-control" type="password" />
+                        <span asp-validation-for="NewPassword" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label asp-for="ConfirmNewPassword" class="control-label"></label>
+                        <input asp-for="ConfirmNewPassword" class="form-control" type="password" />
+                        <span asp-validation-for="ConfirmNewPassword" class="text-danger"></span>
+                    </div>
+                </div>
+                
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-danger">Şifre Değiştir</button>
+                    <a href="@Url.Action("Index")" class="btn btn-secondary">İptal</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+```
 
 <div class="row">
     <div class="col-12">

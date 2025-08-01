@@ -68,13 +68,19 @@ Orta ölçekli şirketler için kullanıcı yetkilendirmeli dashboard yönetim s
 - [x] Dependency Injection konfigürasyonu (appsettings.json'dan db seçimi)
 - [ ] SQL query optimization ve stored procedures
 
-#### 2.2 Kimlik Doğrulama ve Yetkilendirme
-- [x] JWT Authentication implementasyonu (ASP.NET Core Identity yerine)
-- [x] JWT Service (token generation, validation)
-- [x] JWT Cookie Middleware (web app için cookie-based token storage)
+#### 2.2 Kimlik Doğrulama ve Yetkilendirme ✅
+- [x] ASP.NET Core Identity implementasyonu (JWT'den geçiş)
+- [x] MongoDB için özel Identity Store implementasyonu:
+  - MongoUserStore: Kullanıcı yönetimi için özel store
+  - MongoRoleStore: Rol yönetimi için özel store
+- [x] Cookie-based authentication (JWT middleware kaldırıldı)
 - [x] Role-based authorization attributes
 - [x] Custom authorization policies
 - [x] Password hashing ve güvenlik
+- [x] MongoDB varsayılan veritabanı konfigürasyonu
+- [x] Çoklu veritabanı desteği (SQL Server, PostgreSQL, MongoDB)
+- [x] Identity servislerinin SQL veritabanları için koşullu konfigürasyonu
+- [x] MongoDB için tam ASP.NET Core Identity desteği
 
 #### 2.3 Kullanıcı Yönetimi Controllers ✅
 - [x] UserController (Admin Area)
@@ -209,24 +215,24 @@ Orta ölçekli şirketler için kullanıcı yetkilendirmeli dashboard yönetim s
 - [x] Üye yönetimi entegrasyonu (Edit ve Details sayfalarında)
 
 #### 4.4 Dashboard Yönetimi Views (AdminLTE)
-- [ ] Dashboards/Index.cshtml (AdminLTE card/box grid layout - dashboard listesi)
-- [ ] Dashboards/Create.cshtml (AdminLTE form components - dashboard oluşturma)
-- [ ] Dashboards/Edit.cshtml (AdminLTE form components - dashboard düzenleme)
-- [ ] Dashboards/View.cshtml (AdminLTE box components - dashboard görüntüleme)
-- [ ] Dashboards/ManagePermissions.cshtml (AdminLTE permission widgets - izin yönetimi)
-- [ ] AdminLTE info-box ve small-box components ile dashboard kartları
-- [ ] AdminLTE timeline components ile dashboard aktivite geçmişi
+- [x] Dashboards/Index.cshtml (AdminLTE card/box grid layout - dashboard listesi)
+- [x] Dashboards/Create.cshtml (AdminLTE form components - dashboard oluşturma)
+- [x] Dashboards/Edit.cshtml (AdminLTE form components - dashboard düzenleme)
+- [x] Dashboards/Details.cshtml (AdminLTE box components - dashboard detayları)
+- [x] Dashboards/Manage.cshtml (AdminLTE permission widgets - izin yönetimi)
+- [x] AdminLTE info-box ve small-box components ile dashboard kartları
+- [x] AdminLTE timeline components ile dashboard aktivite geçmişi
 
 #### 4.5 Kullanıcı Profil Yönetimi Views (AdminLTE)
-- [ ] Profile/Index.cshtml (AdminLTE user profile template - profil görüntüleme)
-- [ ] Profile/Edit.cshtml (AdminLTE form components - profil düzenleme)
-- [ ] Profile/ChangePassword.cshtml (AdminLTE form components - şifre değiştirme)
-- [ ] Settings/Index.cshtml (AdminLTE form components - genel ayarlar)
-- [ ] Settings/Privacy.cshtml (AdminLTE form components - gizlilik ayarları)
-- [ ] Notification/Index.cshtml (AdminLTE timeline/list - bildirim listesi)
-- [ ] Notification/Preferences.cshtml (AdminLTE form components - bildirim tercihleri)
-- [ ] AdminLTE user widgets ve profil kartları
-- [ ] AdminLTE notification badges ve alert components
+- [x] Profile/Index.cshtml (AdminLTE user profile template - profil görüntüleme)
+- [x] Profile/Edit.cshtml (AdminLTE form components - profil düzenleme)
+- [x] Profile/ChangePassword.cshtml (AdminLTE form components - şifre değiştirme)
+- [x] Settings/Index.cshtml (AdminLTE form components - genel ayarlar)
+- [x] Settings/Privacy.cshtml (AdminLTE form components - gizlilik ayarları)
+- [x] Notification/Index.cshtml (AdminLTE timeline/list - bildirim listesi)
+- [x] Notification/Preferences.cshtml (AdminLTE form components - bildirim tercihleri)
+- [x] AdminLTE user widgets ve profil kartları
+- [x] AdminLTE notification badges ve alert components
 
 #### 4.6 DevExpress Dashboard Views Entegrasyonu (AdminLTE) DevExpress 25.1 uyumlu
 - [ ] DashboardDesigner.cshtml (AdminLTE box container + DevExpress Designer)
