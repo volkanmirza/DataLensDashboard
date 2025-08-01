@@ -1,8 +1,6 @@
 using DataLens.Data.Interfaces;
 using DataLens.Models;
 using DataLens.Services.Interfaces;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace DataLens.Services
 {
@@ -188,15 +186,19 @@ namespace DataLens.Services
 
         private string HashPassword(string password)
         {
-            using var sha256 = SHA256.Create();
-            var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-            return Convert.ToBase64String(hashedBytes);
+            return BCrypt.Net.BCrypt.HashPassword(password, BCrypt.Net.BCrypt.GenerateSalt());
         }
 
         private bool VerifyPassword(string password, string hash)
         {
-            var passwordHash = HashPassword(password);
-            return passwordHash == hash;
+            try
+            {
+                return BCrypt.Net.BCrypt.Verify(password, hash);
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

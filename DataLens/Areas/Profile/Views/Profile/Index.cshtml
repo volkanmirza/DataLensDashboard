@@ -106,102 +106,122 @@
                         <div class="tab-content" id="custom-tabs-two-tabContent">
                             <!-- Genel Ayarlar Tab -->
                             <div class="tab-pane fade show active" id="custom-tabs-two-home" role="tabpanel" aria-labelledby="custom-tabs-two-home-tab">
-                                <form asp-action="UpdateSettings" asp-controller="Settings" method="post">
+                                @using (Html.BeginForm("UpdateSettings", "Profile", null, FormMethod.Post, false, new { @class = "form-horizontal" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    @Html.HiddenFor(model => model.Id)
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label for="language">Dil</label>
-                                                <select class="form-control" id="language" name="language">
-                                                    <option value="tr">Türkçe</option>
-                                                    <option value="en">English</option>
-                                                </select>
+                                                @Html.LabelFor(model => model.Language, "Dil", htmlAttributes: new { @class = "control-label" })
+                                                @Html.DropDownListFor(model => model.Language, new SelectList(new[] {
+                                                    new { Value = "tr", Text = "Türkçe" },
+                                                    new { Value = "en", Text = "English" }
+                                                }, "Value", "Text", Model.Language), new { @class = "form-control" })
+                                                @Html.ValidationMessageFor(model => model.Language, "", new { @class = "text-danger" })
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label for="theme">Tema</label>
-                                                <select class="form-control" id="theme" name="theme">
-                                                    <option value="light">Açık Tema</option>
-                                                    <option value="dark">Koyu Tema</option>
-                                                </select>
+                                                @Html.LabelFor(model => model.Theme, "Tema", htmlAttributes: new { @class = "control-label" })
+                                                @Html.DropDownListFor(model => model.Theme, new SelectList(new[] {
+                                                    new { Value = "light", Text = "Açık Tema" },
+                                                    new { Value = "dark", Text = "Koyu Tema" }
+                                                }, "Value", "Text", Model.Theme), new { @class = "form-control" })
+                                                @Html.ValidationMessageFor(model => model.Theme, "", new { @class = "text-danger" })
                                             </div>
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label for="timezone">Saat Dilimi</label>
-                                        <select class="form-control" id="timezone" name="timeZone">
-                                            <option value="Europe/Istanbul">İstanbul (UTC+3)</option>
-                                            <option value="UTC">UTC (UTC+0)</option>
-                                            <option value="Europe/London">Londra (UTC+0)</option>
-                                            <option value="America/New_York">New York (UTC-5)</option>
-                                        </select>
+                                        @Html.LabelFor(model => model.TimeZone, "Saat Dilimi", htmlAttributes: new { @class = "control-label" })
+                                        @Html.DropDownListFor(model => model.TimeZone, new SelectList(new[] {
+                                            new { Value = "Europe/Istanbul", Text = "İstanbul (UTC+3)" },
+                                            new { Value = "UTC", Text = "UTC (UTC+0)" },
+                                            new { Value = "Europe/London", Text = "Londra (UTC+0)" },
+                                            new { Value = "America/New_York", Text = "New York (UTC-5)" }
+                                        }, "Value", "Text", Model.TimeZone), new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.TimeZone, "", new { @class = "text-danger" })
                                     </div>
                                     <button type="submit" class="btn btn-primary">Kaydet</button>
-                                </form>
+                                }
                             </div>
 
                             <!-- Bildirimler Tab -->
                             <div class="tab-pane fade" id="custom-tabs-two-profile" role="tabpanel" aria-labelledby="custom-tabs-two-profile-tab">
-                                <form asp-action="UpdateNotificationPreferences" asp-controller="Notification" method="post">
+                                @using (Html.BeginForm("UpdateNotificationPreferences", "Profile", null, FormMethod.Post, false, new { @class = "form-horizontal" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    @Html.HiddenFor(model => model.Id)
                                     <div class="form-group">
                                         <div class="custom-control custom-switch">
-                                            <input type="checkbox" class="custom-control-input" id="emailNotifications" name="emailNotifications">
-                                            <label class="custom-control-label" for="emailNotifications">E-posta Bildirimleri</label>
+                                            @Html.CheckBoxFor(model => model.EmailNotifications, new { @class = "custom-control-input", @id = "emailNotifications" })
+                                            @Html.LabelFor(model => model.EmailNotifications, "E-posta Bildirimleri", htmlAttributes: new { @class = "custom-control-label", @for = "emailNotifications" })
+                                            @Html.ValidationMessageFor(model => model.EmailNotifications, "", new { @class = "text-danger" })
                                         </div>
                                         <small class="form-text text-muted">Önemli güncellemeler ve bildirimler e-posta ile gönderilsin.</small>
                                     </div>
                                     <div class="form-group">
                                         <div class="custom-control custom-switch">
-                                            <input type="checkbox" class="custom-control-input" id="browserNotifications" name="browserNotifications">
-                                            <label class="custom-control-label" for="browserNotifications">Tarayıcı Bildirimleri</label>
+                                            @Html.CheckBoxFor(model => model.BrowserNotifications, new { @class = "custom-control-input", @id = "browserNotifications" })
+                                            @Html.LabelFor(model => model.BrowserNotifications, "Tarayıcı Bildirimleri", htmlAttributes: new { @class = "custom-control-label", @for = "browserNotifications" })
+                                            @Html.ValidationMessageFor(model => model.BrowserNotifications, "", new { @class = "text-danger" })
                                         </div>
                                         <small class="form-text text-muted">Tarayıcı üzerinden anlık bildirimler alın.</small>
                                     </div>
                                     <div class="form-group">
                                         <div class="custom-control custom-switch">
-                                            <input type="checkbox" class="custom-control-input" id="dashboardSharing" name="dashboardSharingNotifications">
-                                            <label class="custom-control-label" for="dashboardSharing">Dashboard Paylaşım Bildirimleri</label>
+                                            @Html.CheckBoxFor(model => model.DashboardShared, new { @class = "custom-control-input", @id = "dashboardSharing" })
+                                            @Html.LabelFor(model => model.DashboardShared, "Dashboard Paylaşım Bildirimleri", htmlAttributes: new { @class = "custom-control-label", @for = "dashboardSharing" })
+                                            @Html.ValidationMessageFor(model => model.DashboardShared, "", new { @class = "text-danger" })
                                         </div>
                                         <small class="form-text text-muted">Dashboard paylaşıldığında bildirim alın.</small>
                                     </div>
                                     <div class="form-group">
                                         <div class="custom-control custom-switch">
-                                            <input type="checkbox" class="custom-control-input" id="securityAlerts" name="securityAlerts">
-                                            <label class="custom-control-label" for="securityAlerts">Güvenlik Uyarıları</label>
+                                            @Html.CheckBoxFor(model => model.SecurityAlerts, new { @class = "custom-control-input", @id = "securityAlerts" })
+                                            @Html.LabelFor(model => model.SecurityAlerts, "Güvenlik Uyarıları", htmlAttributes: new { @class = "custom-control-label", @for = "securityAlerts" })
+                                            @Html.ValidationMessageFor(model => model.SecurityAlerts, "", new { @class = "text-danger" })
                                         </div>
                                         <small class="form-text text-muted">Güvenlik ile ilgili önemli uyarıları alın.</small>
                                     </div>
                                     <button type="submit" class="btn btn-primary">Kaydet</button>
-                                </form>
+                                }
                             </div>
 
                             <!-- Gizlilik Tab -->
                             <div class="tab-pane fade" id="custom-tabs-two-messages" role="tabpanel" aria-labelledby="custom-tabs-two-messages-tab">
-                                <form asp-action="UpdatePrivacySettings" asp-controller="Settings" method="post">
+                                @using (Html.BeginForm("UpdatePrivacySettings", "Profile", null, FormMethod.Post, false, new { @class = "form-horizontal" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    @Html.HiddenFor(model => model.Id)
                                     <div class="form-group">
-                                        <label for="profileVisibility">Profil Görünürlüğü</label>
-                                        <select class="form-control" id="profileVisibility" name="profileVisibility">
-                                            <option value="Public">Herkese Açık</option>
-                                            <option value="Private">Özel</option>
-                                            <option value="Organization">Sadece Organizasyon</option>
-                                        </select>
+                                        @Html.LabelFor(model => model.ProfileVisibility, "Profil Görünürlüğü", htmlAttributes: new { @class = "control-label" })
+                                        @Html.DropDownListFor(model => model.ProfileVisibility, new SelectList(new[] {
+                                            new { Value = "public", Text = "Herkese Açık" },
+                                            new { Value = "private", Text = "Özel" },
+                                            new { Value = "organization", Text = "Sadece Organizasyon" }
+                                        }, "Value", "Text", Model.ProfileVisibility), new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.ProfileVisibility, "", new { @class = "text-danger" })
                                     </div>
                                     <div class="form-group">
                                         <div class="custom-control custom-switch">
-                                            <input type="checkbox" class="custom-control-input" id="allowDashboardSharing" name="allowDashboardSharing">
-                                            <label class="custom-control-label" for="allowDashboardSharing">Dashboard Paylaşımına İzin Ver</label>
+                                            @Html.CheckBoxFor(model => model.AllowDashboardSharing, new { @class = "custom-control-input", @id = "allowDashboardSharing" })
+                                            @Html.LabelFor(model => model.AllowDashboardSharing, "Dashboard Paylaşımına İzin Ver", htmlAttributes: new { @class = "custom-control-label", @for = "allowDashboardSharing" })
+                                            @Html.ValidationMessageFor(model => model.AllowDashboardSharing, "", new { @class = "text-danger" })
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <div class="custom-control custom-switch">
-                                            <input type="checkbox" class="custom-control-input" id="trackActivity" name="trackActivity">
-                                            <label class="custom-control-label" for="trackActivity">Aktivite Takibine İzin Ver</label>
+                                            @Html.CheckBoxFor(model => model.TrackActivity, new { @class = "custom-control-input", @id = "trackActivity" })
+                                            @Html.LabelFor(model => model.TrackActivity, "Aktivite Takibine İzin Ver", htmlAttributes: new { @class = "custom-control-label", @for = "trackActivity" })
+                                            @Html.ValidationMessageFor(model => model.TrackActivity, "", new { @class = "text-danger" })
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <div class="custom-control custom-switch">
-                                            <input type="checkbox" class="custom-control-input" id="twoFactorAuth" name="twoFactorAuth">
-                                            <label class="custom-control-label" for="twoFactorAuth">İki Faktörlü Kimlik Doğrulama</label>
+                                            @Html.CheckBoxFor(model => model.TwoFactorEnabled, new { @class = "custom-control-input", @id = "twoFactorAuth" })
+                                            @Html.LabelFor(model => model.TwoFactorEnabled, "İki Faktörlü Kimlik Doğrulama", htmlAttributes: new { @class = "custom-control-label", @for = "twoFactorAuth" })
+                                            @Html.ValidationMessageFor(model => model.TwoFactorEnabled, "", new { @class = "text-danger" })
                                         </div>
                                     </div>
                                     <hr>
@@ -215,27 +235,33 @@
                                         </div>
                                     </div>
                                     <button type="submit" class="btn btn-primary mt-3">Kaydet</button>
-                                </form>
+                                }
                             </div>
 
                             <!-- Şifre Değiştir Tab -->
                             <div class="tab-pane fade" id="custom-tabs-two-settings" role="tabpanel" aria-labelledby="custom-tabs-two-settings-tab">
-                                <form asp-action="ChangePassword" asp-controller="Settings" method="post">
+                                @using (Html.BeginForm("ChangePassword", "Profile", null, FormMethod.Post, false, new { @class = "form-horizontal" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    @Html.HiddenFor(model => model.Id)
                                     <div class="form-group">
-                                        <label for="currentPassword">Mevcut Şifre</label>
-                                        <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
+                                        @Html.LabelFor(model => model.CurrentPassword, "Mevcut Şifre", htmlAttributes: new { @class = "control-label" })
+                                        @Html.PasswordFor(model => model.CurrentPassword, new { @class = "form-control", @id = "currentPassword" })
+                                        @Html.ValidationMessageFor(model => model.CurrentPassword, "", new { @class = "text-danger" })
                                     </div>
                                     <div class="form-group">
-                                        <label for="newPassword">Yeni Şifre</label>
-                                        <input type="password" class="form-control" id="newPassword" name="newPassword" required>
+                                        @Html.LabelFor(model => model.NewPassword, "Yeni Şifre", htmlAttributes: new { @class = "control-label" })
+                                        @Html.PasswordFor(model => model.NewPassword, new { @class = "form-control", @id = "newPassword" })
+                                        @Html.ValidationMessageFor(model => model.NewPassword, "", new { @class = "text-danger" })
                                         <small class="form-text text-muted">Şifreniz en az 8 karakter olmalı ve büyük harf, küçük harf, rakam içermelidir.</small>
                                     </div>
                                     <div class="form-group">
-                                        <label for="confirmPassword">Yeni Şifre Tekrar</label>
-                                        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                                        @Html.LabelFor(model => model.ConfirmPassword, "Yeni Şifre Tekrar", htmlAttributes: new { @class = "control-label" })
+                                        @Html.PasswordFor(model => model.ConfirmPassword, new { @class = "form-control", @id = "confirmPassword" })
+                                        @Html.ValidationMessageFor(model => model.ConfirmPassword, "", new { @class = "text-danger" })
                                     </div>
                                     <button type="submit" class="btn btn-primary">Şifreyi Değiştir</button>
-                                </form>
+                                }
                             </div>
                         </div>
                     </div>
@@ -261,7 +287,8 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
-                <form asp-action="DeleteAccount" asp-controller="Settings" method="post" style="display: inline;">
+                <form asp-action="DeleteAccount" asp-controller="Profile" method="post" style="display: inline;">
+                    @Html.AntiForgeryToken()
                     <button type="submit" class="btn btn-danger">Hesabımı Sil</button>
                 </form>
             </div>
@@ -292,7 +319,7 @@
 
         function exportData() {
             $.ajax({
-                url: '@Url.Action("ExportData", "Settings")',
+                url: '@Url.Action("ExportData", "Profile")',
                 type: 'POST',
                 data: { __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val() },
                 success: function(response) {

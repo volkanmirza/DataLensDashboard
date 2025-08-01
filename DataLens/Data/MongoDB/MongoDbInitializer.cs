@@ -268,7 +268,22 @@ namespace DataLens.Data.MongoDB
                     LastName = "Administrator",
                     Role = "Admin",
                     IsActive = true,
-                    CreatedDate = DateTime.UtcNow
+                    CreatedDate = DateTime.UtcNow,
+                    Department = "IT",
+                    Position = "System Administrator",
+                    PhoneNumber = "+90 555 123 4567",
+                    Biography = "DataLens sistem yöneticisi. Tüm sistem operasyonlarından sorumludur.",
+                    Language = "tr",
+                    Theme = "light",
+                    TimeZone = "Turkey Standard Time",
+                    EmailNotifications = true,
+                    BrowserNotifications = true,
+                    DashboardShared = true,
+                    SecurityAlerts = true,
+                    ProfileVisibility = "Public",
+                    AllowDashboardSharing = true,
+                    TrackActivity = true,
+                    TwoFactorEnabled = false
                 },
                 new User
                 {
@@ -282,7 +297,22 @@ namespace DataLens.Data.MongoDB
                     LastName = "Designer",
                     Role = "Designer",
                     IsActive = true,
-                    CreatedDate = DateTime.UtcNow
+                    CreatedDate = DateTime.UtcNow,
+                    Department = "Analytics",
+                    Position = "Senior Dashboard Designer",
+                    PhoneNumber = "+90 555 234 5678",
+                    Biography = "Deneyimli dashboard tasarımcısı. Veri görselleştirme ve analitik dashboard geliştirme konularında uzman.",
+                    Language = "tr",
+                    Theme = "dark",
+                    TimeZone = "Turkey Standard Time",
+                    EmailNotifications = true,
+                    BrowserNotifications = false,
+                    DashboardShared = true,
+                    SecurityAlerts = true,
+                    ProfileVisibility = "Private",
+                    AllowDashboardSharing = true,
+                    TrackActivity = true,
+                    TwoFactorEnabled = true
                 },
                 new User
                 {
@@ -296,7 +326,22 @@ namespace DataLens.Data.MongoDB
                     LastName = "Viewer",
                     Role = "Viewer",
                     IsActive = true,
-                    CreatedDate = DateTime.UtcNow
+                    CreatedDate = DateTime.UtcNow,
+                    Department = "Sales",
+                    Position = "Sales Analyst",
+                    PhoneNumber = "+90 555 345 6789",
+                    Biography = "Satış departmanında çalışan analitik uzmanı. Raporları inceleyerek satış performansını takip eder.",
+                    Language = "en",
+                    Theme = "light",
+                    TimeZone = "Turkey Standard Time",
+                    EmailNotifications = false,
+                    BrowserNotifications = true,
+                    DashboardShared = false,
+                    SecurityAlerts = false,
+                    ProfileVisibility = "Friends",
+                    AllowDashboardSharing = false,
+                    TrackActivity = false,
+                    TwoFactorEnabled = false
                 }
             };
 

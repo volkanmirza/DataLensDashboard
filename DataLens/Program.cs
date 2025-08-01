@@ -108,6 +108,9 @@ else if (databaseType == "MongoDB")
     .AddUserStore<DataLens.Identity.MongoUserStore>()
     .AddRoleStore<DataLens.Identity.MongoRoleStore>()
     .AddDefaultTokenProviders();
+    
+    // Register custom BCrypt password hasher
+    builder.Services.AddScoped<IPasswordHasher<User>, DataLens.Identity.BCryptPasswordHasher>();
 }
 
 builder.Services.ConfigureApplicationCookie(options =>

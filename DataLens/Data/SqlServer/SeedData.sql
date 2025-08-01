@@ -5,7 +5,10 @@ GO
 -- Insert Admin User (Password: Admin123!)
 IF NOT EXISTS (SELECT 1 FROM Users WHERE Username = 'admin')
 BEGIN
-    INSERT INTO Users (Id, Username, Email, PasswordHash, Role, CreatedDate, IsActive, FirstName, LastName)
+    INSERT INTO Users (Id, Username, Email, PasswordHash, Role, CreatedDate, IsActive, FirstName, LastName, 
+                      Department, Position, PhoneNumber, Biography, Language, Theme, TimeZone,
+                      EmailNotifications, BrowserNotifications, DashboardShared, SecurityAlerts,
+                      ProfileVisibility, AllowDashboardSharing, TrackActivity, TwoFactorEnabled)
     VALUES (
         NEWID(),
         'admin',
@@ -15,7 +18,22 @@ BEGIN
         GETUTCDATE(),
         1,
         'System',
-        'Administrator'
+        'Administrator',
+        'IT',
+        'System Administrator',
+        '+90 555 123 4567',
+        'DataLens sistem yöneticisi. Tüm sistem operasyonlarından sorumludur.',
+        'tr',
+        'light',
+        'Turkey Standard Time',
+        1,
+        1,
+        1,
+        1,
+        'Public',
+        1,
+        1,
+        0
     );
 END
 GO
@@ -23,7 +41,10 @@ GO
 -- Insert Designer User (Password: Designer123!)
 IF NOT EXISTS (SELECT 1 FROM Users WHERE Username = 'designer')
 BEGIN
-    INSERT INTO Users (Id, Username, Email, PasswordHash, Role, CreatedDate, IsActive, FirstName, LastName)
+    INSERT INTO Users (Id, Username, Email, PasswordHash, Role, CreatedDate, IsActive, FirstName, LastName,
+                      Department, Position, PhoneNumber, Biography, Language, Theme, TimeZone,
+                      EmailNotifications, BrowserNotifications, DashboardShared, SecurityAlerts,
+                      ProfileVisibility, AllowDashboardSharing, TrackActivity, TwoFactorEnabled)
     VALUES (
         NEWID(),
         'designer',
@@ -33,7 +54,22 @@ BEGIN
         GETUTCDATE(),
         1,
         'John',
-        'Designer'
+        'Designer',
+        'Analytics',
+        'Senior Dashboard Designer',
+        '+90 555 234 5678',
+        'Deneyimli dashboard tasarımcısı. Veri görselleştirme ve analitik dashboard geliştirme konularında uzman.',
+        'tr',
+        'dark',
+        'Turkey Standard Time',
+        1,
+        0,
+        1,
+        1,
+        'Private',
+        1,
+        1,
+        1
     );
 END
 GO
@@ -41,7 +77,10 @@ GO
 -- Insert Viewer User (Password: Viewer123!)
 IF NOT EXISTS (SELECT 1 FROM Users WHERE Username = 'viewer')
 BEGIN
-    INSERT INTO Users (Id, Username, Email, PasswordHash, Role, CreatedDate, IsActive, FirstName, LastName)
+    INSERT INTO Users (Id, Username, Email, PasswordHash, Role, CreatedDate, IsActive, FirstName, LastName,
+                      Department, Position, PhoneNumber, Biography, Language, Theme, TimeZone,
+                      EmailNotifications, BrowserNotifications, DashboardShared, SecurityAlerts,
+                      ProfileVisibility, AllowDashboardSharing, TrackActivity, TwoFactorEnabled)
     VALUES (
         NEWID(),
         'viewer',
@@ -51,7 +90,22 @@ BEGIN
         GETUTCDATE(),
         1,
         'Jane',
-        'Viewer'
+        'Viewer',
+        'Sales',
+        'Sales Analyst',
+        '+90 555 345 6789',
+        'Satış departmanında çalışan analitik uzmanı. Raporları inceleyerek satış performansını takip eder.',
+        'en',
+        'light',
+        'Turkey Standard Time',
+        0,
+        1,
+        0,
+        0,
+        'Friends',
+        0,
+        0,
+        0
     );
 END
 GO
